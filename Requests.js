@@ -246,7 +246,6 @@ LokiJS.prototype.findTransactionById = function(transactionId){
 module.exports = LokiJS;
 
 
-
 //////////////////////////////////////////////
 
 // LokiJS.prototype.createAssets = async function(issuer, recipient, amount, assetCode, fee, data){
