@@ -10,7 +10,7 @@ const LokiJS = function() {
   this.url = 'http://localhost:9085/';
 }
 
-//Allows setting a different url than the default to create and accept RPC connections
+//Allows setting a different url than the default from which to create and accept RPC connections
 LokiJS.prototype.setUrl = function(url) {
   this.url = url;
 }
@@ -32,7 +32,6 @@ LokiJS.prototype.getBalances = function(){
     "method": "balances",
     "params": [{}]
   };
-
   const payload =
   {
     url: this.url + route,
@@ -40,7 +39,6 @@ LokiJS.prototype.getBalances = function(){
     header: header,
     body: JSON.stringify(body)
   };
-
   return fetch(this.url + route, payload)
   .then(function(response){
     return response.json();
@@ -64,7 +62,6 @@ LokiJS.prototype.getBalancesByKey = function(publicKey){
       "publicKey": publicKey
     }]
   };
-
   const payload =
   {
     url: this.url + route,
@@ -72,7 +69,6 @@ LokiJS.prototype.getBalancesByKey = function(publicKey){
     header: header,
     body: JSON.stringify(body)
   };
-
   return fetch(this.url + route, payload)
   .then(function(response){
     return response.json();
@@ -94,7 +90,6 @@ LokiJS.prototype.getOpenKeyfiles = function(){
     "method": "listOpenKeyfiles",
     "params": [{}]
   };
-
   const payload =
   {
     url: this.url + route,
@@ -102,7 +97,6 @@ LokiJS.prototype.getOpenKeyfiles = function(){
     header: header,
     body: JSON.stringify(body)
   };
-
   return fetch(this.url + route, payload)
   .then(function(response){
     return response.json();
@@ -126,7 +120,6 @@ LokiJS.prototype.generateKeyfile = function(password){
       "password": password
     }]
   };
-
   const payload =
   {
     url: this.url + route,
@@ -134,7 +127,6 @@ LokiJS.prototype.generateKeyfile = function(password){
     header: header,
     body: JSON.stringify(body)
   };
-
   return fetch(this.url + route, payload)
   .then(function(response){
     return response.json();
@@ -163,7 +155,6 @@ LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, f
       "data": data
     }]
   };
-
   const payload =
   {
     url: this.url + route,
@@ -171,7 +162,6 @@ LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, f
     header: header,
     body: JSON.stringify(body)
   };
-
   // var response;
   return fetch(this.url + route, payload)
   .then(function(response){
@@ -182,9 +172,7 @@ LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, f
   }).catch(function(err){
     return err;
   })
-
   // return response
-
 }
 
 
@@ -206,7 +194,6 @@ LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode,
       "data": data
     }]
   };
-
   const payload =
   {
     url: this.url + route,
@@ -214,10 +201,8 @@ LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode,
     header: header,
     body: JSON.stringify(body)
   };
-
   return fetch(this.url + route, payload)
   .then(function(response){
-    // console.log(response.json())
     return response.json();
   }).then(function(jsonData){
     return JSON.stringify(jsonData, null, 2);
@@ -225,7 +210,6 @@ LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode,
     return err;
   })
 }
-
 
 /////////////////findTransactionById////////////
 
@@ -240,7 +224,6 @@ LokiJS.prototype.findTransactionById = function(transactionId){
       "transactionId": transactionId
     }]
   };
-
   const payload =
   {
     url: this.url + route,
@@ -248,21 +231,17 @@ LokiJS.prototype.findTransactionById = function(transactionId){
     header: header,
     body: JSON.stringify(body)
   };
-
   return fetch(this.url + route, payload)
   .then(function(response){
-    // console.log(response.json())
     return response.json();
   }).then(function(jsonData){
-    // console.log(JSON.stringify(jsonData));
-    // response = JSON.stringify(jsonData);
     return JSON.stringify(jsonData, null, 2);
   }).catch(function(err){
     return err;
   })
 }
 
-
+///////////////////////////////////////////////////
 
 module.exports = LokiJS;
 
