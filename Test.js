@@ -18,11 +18,11 @@ LokiObj.getBalancesByKey('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb')
 .then(function(response) {
   //console.log(response);
 });
-LokiObj.getOpenKeyfiles()
-.then(function(response) {
-  console.log(response);
-});
-LokiObj.generateKeyfile("password")
-.then(function(response) {
-  console.log(response);
-});
+// LokiObj.getOpenKeyfiles()
+// .then(function(response) {
+//   console.log(response);
+// });
+// LokiObj.generateKeyfile("password")
+// .then(function(response) {
+//   console.log(response);
+// });

@@ -175,7 +175,6 @@ LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, f
   // return response
 }
 
-
 /////////////////transferAssets////////////
 
 LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode, fee, data){
@@ -220,6 +219,36 @@ LokiJS.prototype.findTransactionById = function(transactionId){
     "jsonrpc": "2.0",
     "id": "30",
     "method": "transactionById",
+    "params": [{
+      "transactionId": transactionId
+    }]
+  };
+  const payload =
+  {
+    url: this.url + route,
+    method: 'POST',
+    header: header,
+    body: JSON.stringify(body)
+  };
+  return fetch(this.url + route, payload)
+  .then(function(response){
+    return response.json();
+  }).then(function(jsonData){
+    return JSON.stringify(jsonData, null, 2);
+  }).catch(function(err){
+    return err;
+  })
+}
+
+/////////////////findTransactionFromMempool////////////
+
+LokiJS.prototype.findTransactionFromMempool = function(transactionId){
+  const route = 'nodeView/';
+  const body =
+  {
+    "jsonrpc": "2.0",
+    "id": "30",
+    "method": "transactionFromMempool",
     "params": [{
       "transactionId": transactionId
     }]
