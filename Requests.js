@@ -137,6 +137,68 @@ LokiJS.prototype.generateKeyfile = function(password){
   })
 }
 
+//////lockKeyfile////////////////
+
+LokiJS.prototype.lockKeyfile = function(publicKey, password){
+  const route = 'wallet/';
+  const body =
+  {
+    "jsonrpc": "2.0",
+    "id": "30",
+    "method": "lockKeyfile",
+    "params": [{
+      "publicKey": publicKey,
+      "password": password
+    }]
+  };
+  const payload =
+  {
+    url: this.url + route,
+    method: 'POST',
+    header: header,
+    body: JSON.stringify(body)
+  };
+  return fetch(this.url + route, payload)
+  .then(function(response){
+    return response.json();
+  }).then(function(jsonData){
+    return JSON.stringify(jsonData, null, 2);
+  }).catch(function(err){
+    return err;
+  })
+}
+
+//////unlockKeyfile////////////////
+
+LokiJS.prototype.unlockKeyfile = function(publicKey, password){
+  const route = 'wallet/';
+  const body =
+  {
+    "jsonrpc": "2.0",
+    "id": "30",
+    "method": "unlockKeyfile",
+    "params": [{
+      "publicKey": publicKey,
+      "password": password
+    }]
+  };
+  const payload =
+  {
+    url: this.url + route,
+    method: 'POST',
+    header: header,
+    body: JSON.stringify(body)
+  };
+  return fetch(this.url + route, payload)
+  .then(function(response){
+    return response.json();
+  }).then(function(jsonData){
+    return JSON.stringify(jsonData, null, 2);
+  }).catch(function(err){
+    return err;
+  })
+}
+
 /////////////////createAssets////////////
 
 LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, fee, data){
@@ -189,6 +251,78 @@ LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode,
       "recipient": recipient,
       "amount": amount,
       "assetCode": assetCode,
+      "fee": fee,
+      "data": data
+    }]
+  };
+  const payload =
+  {
+    url: this.url + route,
+    method: 'POST',
+    header: header,
+    body: JSON.stringify(body)
+  };
+  return fetch(this.url + route, payload)
+  .then(function(response){
+    return response.json();
+  }).then(function(jsonData){
+    return JSON.stringify(jsonData, null, 2);
+  }).catch(function(err){
+    return err;
+  })
+}
+
+/////////////////transferArbits////////////
+
+LokiJS.prototype.transferArbits = function(recipient, amount, fee, data){
+  const route = 'wallet/';
+  const body =
+  {
+    "jsonrpc": "2.0",
+    "id": "30",
+    "method": "transferArbits",
+    "params": [{
+      "recipient": recipient,
+      "amount": amount,
+      "fee": fee,
+      "data": data
+    }]
+  };
+  const payload =
+  {
+    url: this.url + route,
+    method: 'POST',
+    header: header,
+    body: JSON.stringify(body)
+  };
+  return fetch(this.url + route, payload)
+  .then(function(response){
+    return response.json();
+  }).then(function(jsonData){
+    return JSON.stringify(jsonData, null, 2);
+  }).catch(function(err){
+    return err;
+  })
+}
+
+/////////////////transferArbitsByPublicKey////////////
+/* Optional parameters publicKeysToSendFrom and publicKeyToSendChangeTo may be
+ * specified, publicKeysToSendFrom must be a list of Base 58 encoded string addresses
+ * and publicKeyToSendChangeTo must be a Base58 encoded string
+*/
+
+LokiJS.prototype.transferArbitsByPublicKey = function(recipient, amount, fee, data, publicKeysToSendFrom = [], publicKeyToSendChangeTo = ''){
+  const route = 'wallet/';
+  const body =
+  {
+    "jsonrpc": "2.0",
+    "id": "30",
+    "method": "transferArbits",
+    "params": [{
+      "recipient": recipient,
+      "publicKeysToSendFrom": publicKeysToSendFrom,
+      "publicKeyToSendChangeTo": publicKeyToSendChangeTo,
+      "amount": amount,
       "fee": fee,
       "data": data
     }]
