@@ -374,6 +374,7 @@ LokiJS.prototype.findTransactionById = function(transactionId){
   })
 }
 
+
 /////////////////findTransactionFromMempool////////////
 
 LokiJS.prototype.findTransactionFromMempool = function(transactionId){
@@ -403,6 +404,59 @@ LokiJS.prototype.findTransactionFromMempool = function(transactionId){
     return err;
   })
 }
+
+
+
+
+
+/////////////Promise request//////////////////////////
+
+//Trying to couple setInterval and setTimeout to wrap the findTransactionById fetch request
+LokiJS.prototype.onConfirm = function(transactionResult, timeout = 10000, interval = 1000) {
+  const transactionRes = JSON.parse(transactionResult);
+  var _this = this;
+  // try {
+    return new Promise((resolve, reject) => {
+      var intervalID = setInterval(function() {
+        _this.findTransactionById(transactionRes.result.txHash)
+        .then(function(response){
+          try{
+            const confirmationRes = JSON.parse(response);
+            //If result is non-null (transaction found)
+            //resolve the promise with json of result
+            //and stop interval and timeout threads
+            if(confirmationRes.result != undefined) {
+              clearInterval(intervalID);
+              clearTimeout(timeoutID);
+              resolve(response);
+            }
+            else {
+              console.log(response);
+            }
+          }
+          catch(error) {//Catch if response cannot be parsed correctly
+            reject("Unexepected API response from findTransactionById" + '\n' + error);
+          }
+        },function(error) {//Failure callback for .then() on findTransactionById
+          reject("Error: findTransactionById promise failed to resolve" + '\n' + error);
+        })
+        .catch(function(error) {//Catch for findTransactionById
+          reject(error);
+        });
+      }, interval);
+      //Setting timeout thread to clear interval thread after timeout duration
+      var timeoutID = setTimeout(function() {
+        clearInterval(intervalID);
+        reject("Error: Request timed out, transaction not found");
+      }, timeout);
+    });
+  // }
+  // catch(e) {
+  //   console.log(e);
+  // }
+}
+
+
 
 ///////////////////////////////////////////////////
 
