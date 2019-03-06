@@ -412,10 +412,12 @@ LokiJS.prototype.onConfirm = function(transactionResult, timeout = 60000, interv
   var _this = this;
   // try {
     return new Promise((resolve, reject) => {
+      var failureResponse;
       var intervalID = setInterval(function() {
         _this.findTransactionById(transactionRes.result.txHash)
         .then(function(response) {
           try{
+            failureResponse = response;
             const confirmationRes = JSON.parse(response);
             //If result is non-null (transaction found)
             //resolve the promise with json of result
@@ -425,9 +427,6 @@ LokiJS.prototype.onConfirm = function(transactionResult, timeout = 60000, interv
               clearTimeout(timeoutID);
               resolve(response);
             }
-            // else {
-            //   console.log(response);
-            // }
           }
           catch(error) {//Catch if response cannot be parsed correctly
             reject("Unexepected API response from findTransactionById" + '\n' + error);
@@ -442,7 +441,7 @@ LokiJS.prototype.onConfirm = function(transactionResult, timeout = 60000, interv
       //Setting timeout thread to clear interval thread after timeout duration
       var timeoutID = setTimeout(function() {
         clearInterval(intervalID);
-        reject("Error: Request timed out, transaction not found");
+        reject("Error: Request timed out, transaction not found" + '\n' + failureResponse);
       }, timeout);
     });
   // }

@@ -12,7 +12,8 @@ var LokiJS = function LokiJS() {
   this.url = 'http://localhost:9085/';
 };
 
-//Allows setting a different url than the default from which to create and accept RPC connections
+//Allows setting a different url than the default from which to
+//create and accept RPC connections
 LokiJS.prototype.setUrl = function (url) {
   this.url = url;
 };
@@ -380,9 +381,11 @@ LokiJS.prototype.onConfirm = function (transactionResult) {
   var _this = this;
   // try {
   return new Promise(function (resolve, reject) {
+    var failureResponse;
     var intervalID = setInterval(function () {
       _this.findTransactionById(transactionRes.result.txHash).then(function (response) {
         try {
+          failureResponse = response;
           var confirmationRes = JSON.parse(response);
           //If result is non-null (transaction found)
           //resolve the promise with json of result
@@ -392,9 +395,6 @@ LokiJS.prototype.onConfirm = function (transactionResult) {
             clearTimeout(timeoutID);
             resolve(response);
           }
-          // else {
-          //   console.log(response);
-          // }
         } catch (error) {
           //Catch if response cannot be parsed correctly
           reject("Unexepected API response from findTransactionById" + '\n' + error);
@@ -410,7 +410,7 @@ LokiJS.prototype.onConfirm = function (transactionResult) {
     //Setting timeout thread to clear interval thread after timeout duration
     var timeoutID = setTimeout(function () {
       clearInterval(intervalID);
-      reject("Error: Request timed out, transaction not found" + '\n' + response);
+      reject("Error: Request timed out, transaction not found" + '\n' + failureResponse);
     }, timeout);
   });
   // }
