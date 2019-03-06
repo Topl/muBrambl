@@ -2,7 +2,7 @@
 A Javascript API module allowing users to interact with Topl's blockchain
 
 # Installation
-To install run "npm install bifrost-lokijs" in your project directory<br/>
+To install run "npm install bifrost-lokijs" in your project directory<br/><br/>
 Create an instance of lokijs in your JS application by including:<br/>
 var LokiJS = require('bifrost-lokijs');
 
