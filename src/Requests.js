@@ -442,7 +442,7 @@ LokiJS.prototype.onConfirm = function(transactionResult, timeout = 60000, interv
       //Setting timeout thread to clear interval thread after timeout duration
       var timeoutID = setTimeout(function() {
         clearInterval(intervalID);
-        reject("Error: Request timed out, transaction not found" + '\n' + response);
+        reject("Error: Request timed out, transaction not found");
       }, timeout);
     });
   // }
