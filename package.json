@@ -1,9 +1,10 @@
 {
   "name": "lokijs",
-  "version": "1.0.0",
-  "main": "Requests.js",
+  "version": "0.0.1",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/Test.js ",
+    "build": "babel src -d build"
   },
   "author": "",
   "license": "ISC",
@@ -11,7 +12,10 @@
   "dependencies": {
     "base58": "^2.0.1",
     "es6-promise": "^4.2.6",
-    "fetch-everywhere": "^1.0.5",
-    "request": "^2.88.0"
+    "fetch-everywhere": "^1.0.5"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0"
   }
 }
