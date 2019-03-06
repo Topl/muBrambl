@@ -8,6 +8,7 @@ require('es6-promise').polyfill();
 //when a private chain is run locally
 const LokiJS = function() {
   this.url = 'http://localhost:9085/';
+  this.defaultAccount = '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ';
 }
 
 //Allows setting a different url than the default from which to
@@ -24,7 +25,7 @@ const header =
 
 //////getBalances////////////////
 
-LokiJS.prototype.getBalances = function(){
+LokiJS.prototype.getBalances = function() {
   const route = 'wallet/';
   const body =
   {
@@ -52,7 +53,7 @@ LokiJS.prototype.getBalances = function(){
 
 //////getBalancesByKey////////////////
 
-LokiJS.prototype.getBalancesByKey = function(publicKey){
+LokiJS.prototype.getBalancesByKey = function(publicKey) {
   const route = 'wallet/';
   const body =
   {
@@ -82,7 +83,7 @@ LokiJS.prototype.getBalancesByKey = function(publicKey){
 
 //////getOpenKeyfiles////////////////
 
-LokiJS.prototype.getOpenKeyfiles = function(){
+LokiJS.prototype.getOpenKeyfiles = function() {
   const route = 'wallet/';
   const body =
   {
@@ -110,7 +111,7 @@ LokiJS.prototype.getOpenKeyfiles = function(){
 
 //////generateKeyfile////////////////
 
-LokiJS.prototype.generateKeyfile = function(password){
+LokiJS.prototype.generateKeyfile = function(password) {
   const route = 'wallet/';
   const body =
   {
@@ -140,7 +141,7 @@ LokiJS.prototype.generateKeyfile = function(password){
 
 //////lockKeyfile////////////////
 
-LokiJS.prototype.lockKeyfile = function(publicKey, password){
+LokiJS.prototype.lockKeyfile = function(publicKey, password) {
   const route = 'wallet/';
   const body =
   {
@@ -171,7 +172,7 @@ LokiJS.prototype.lockKeyfile = function(publicKey, password){
 
 //////unlockKeyfile////////////////
 
-LokiJS.prototype.unlockKeyfile = function(publicKey, password){
+LokiJS.prototype.unlockKeyfile = function(publicKey, password) {
   const route = 'wallet/';
   const body =
   {
@@ -202,7 +203,7 @@ LokiJS.prototype.unlockKeyfile = function(publicKey, password){
 
 /////////////////createAssets////////////
 
-LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, fee, data){
+LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, fee, data) {
   const route = 'asset/';
   const body =
   {
@@ -237,7 +238,7 @@ LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, f
 
 /////////////////transferAssets////////////
 
-LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode, fee, data){
+LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode, fee, data) {
   const route = 'asset/';
   const body =
   {
@@ -270,9 +271,42 @@ LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode,
   })
 }
 
+/////////////////transferPolys////////////
+
+LokiJS.prototype.transferPolys = function(recipient, amount, fee, data) {
+  const route = 'wallet/';
+  const body =
+  {
+    "jsonrpc": "2.0",
+    "id": "30",
+    "method": "transferPolys",
+    "params": [{
+      "recipient": recipient,
+      "amount": amount,
+      "fee": fee,
+      "data": data
+    }]
+  };
+  const payload =
+  {
+    url: this.url + route,
+    method: 'POST',
+    header: header,
+    body: JSON.stringify(body)
+  };
+  return fetch(this.url + route, payload)
+  .then(function(response){
+    return response.json();
+  }).then(function(jsonData){
+    return JSON.stringify(jsonData, null, 2);
+  }).catch(function(err){
+    return err;
+  })
+}
+
 /////////////////transferArbits////////////
 
-LokiJS.prototype.transferArbits = function(recipient, amount, fee, data){
+LokiJS.prototype.transferArbits = function(recipient, amount, fee, data) {
   const route = 'wallet/';
   const body =
   {
@@ -309,7 +343,7 @@ LokiJS.prototype.transferArbits = function(recipient, amount, fee, data){
  * and publicKeyToSendChangeTo must be a Base58 encoded string
 */
 
-LokiJS.prototype.transferArbitsByPublicKey = function(recipient, amount, fee, data, publicKeysToSendFrom = [], publicKeyToSendChangeTo = ''){
+LokiJS.prototype.transferArbitsByPublicKey = function(recipient, amount, fee, data, publicKeysToSendFrom = [], publicKeyToSendChangeTo = '') {
   const route = 'wallet/';
   const body =
   {
@@ -342,9 +376,9 @@ LokiJS.prototype.transferArbitsByPublicKey = function(recipient, amount, fee, da
   })
 }
 
-/////////////////findTransactionById////////////
+/////////////////getTransactionById////////////
 
-LokiJS.prototype.findTransactionById = function(transactionId){
+LokiJS.prototype.getTransactionById = function(transactionId) {
   const route = 'nodeView/';
   const body =
   {
@@ -373,9 +407,9 @@ LokiJS.prototype.findTransactionById = function(transactionId){
 }
 
 
-/////////////////findTransactionFromMempool////////////
+/////////////////getTransactionFromMempool////////////
 
-LokiJS.prototype.findTransactionFromMempool = function(transactionId){
+LokiJS.prototype.getTransactionFromMempool = function(transactionId) {
   const route = 'nodeView/';
   const body =
   {
@@ -384,6 +418,64 @@ LokiJS.prototype.findTransactionFromMempool = function(transactionId){
     "method": "transactionFromMempool",
     "params": [{
       "transactionId": transactionId
+    }]
+  };
+  const payload =
+  {
+    url: this.url + route,
+    method: 'POST',
+    header: header,
+    body: JSON.stringify(body)
+  };
+  return fetch(this.url + route, payload)
+  .then(function(response){
+    return response.json();
+  }).then(function(jsonData){
+    return JSON.stringify(jsonData, null, 2);
+  }).catch(function(err){
+    return err;
+  })
+}
+
+/////////////////getMempool////////////
+
+LokiJS.prototype.getMempool = function() {
+  const route = 'nodeView/';
+  const body =
+  {
+    "jsonrpc": "2.0",
+    "id": "30",
+    "method": "mempool",
+    "params": [{}]
+  };
+  const payload =
+  {
+    url: this.url + route,
+    method: 'POST',
+    header: header,
+    body: JSON.stringify(body)
+  };
+  return fetch(this.url + route, payload)
+  .then(function(response){
+    return response.json();
+  }).then(function(jsonData){
+    return JSON.stringify(jsonData, null, 2);
+  }).catch(function(err){
+    return err;
+  })
+}
+
+/////////////////getBlockById////////////
+
+LokiJS.prototype.getBlockById = function(blockId) {
+  const route = 'nodeView/';
+  const body =
+  {
+    "jsonrpc": "2.0",
+    "id": "30",
+    "method": "blockById",
+    "params": [{
+      "blockId": blockId
     }]
   };
   const payload =
@@ -414,7 +506,7 @@ LokiJS.prototype.onConfirm = function(transactionResult, timeout = 60000, interv
     return new Promise((resolve, reject) => {
       var failureResponse;
       var intervalID = setInterval(function() {
-        _this.findTransactionById(transactionRes.result.txHash)
+        _this.getTransactionById(transactionRes.result.txHash)
         .then(function(response) {
           try{
             failureResponse = response;

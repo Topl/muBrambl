@@ -5,27 +5,13 @@ const LokiJS = require('./../src/Requests.js');
 
 var LokiObj = new LokiJS();
 
-//Finding transaction from mempool sample usage -- not necessary
-// LokiObj.createAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 1, 'testAssets', 0, '')
-// .then(function(response) {
-//   const res = JSON.parse(response);
-//   console.log("--------------------------------------------------------------");
-//   console.log("create assets result:");
-//   console.log(response);
-//   console.log(res.result.txHash);
-//   LokiObj.findTransactionFromMempool(res.result.txHash)
-//   .then(function(response) {
-//     console.log("findTransactionFromMempool result:");
-//     console.log(response);
-//   });
-// });
-
 
 //////////Better abstraction//////////
 
 console.log('\n' + "----------Promises Tests----------" + '\n'); LokiObj.createAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 1, 'testAssets', 0, '')
 .then(function(response) {
-  LokiObj.onConfirm(response, 1000, 3000)
+  console.log(JSON.parse(response).result.txHash);
+  LokiObj.onConfirm(response, 10000, 3000)
   .then(function(response) {
     console.log("Response" + '\n' + response);
   },function(error) {
@@ -33,7 +19,16 @@ console.log('\n' + "----------Promises Tests----------" + '\n'); LokiObj.createA
   });
 });
 
-
+// LokiObj.getTransactionById('9boUPrAxPZJNNMHMRxWCN9E6eMNr8t9KDewV5dEBAdYq')
+// .then(function(response) {
+//   console.log(response);
+// });
+//
+// LokiObj.getMempool()
+// .then(function(response) {
+//   console.log("mempool");
+//   console.log(response);
+// });
 
 
 
