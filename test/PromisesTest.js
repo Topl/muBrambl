@@ -19,11 +19,11 @@ console.log('\n' + "----------Promises Tests----------" + '\n'); LokiObj.createA
   });
 });
 
-// LokiObj.getTransactionById('9boUPrAxPZJNNMHMRxWCN9E6eMNr8t9KDewV5dEBAdYq')
+// LokiObj.getTransactionById('H35qvgeh7dV7VZWWcUHpMssfXQX2Ur9o35SDYuEkDEKn')
 // .then(function(response) {
 //   console.log(response);
 // });
-//
+
 // LokiObj.getMempool()
 // .then(function(response) {
 //   console.log("mempool");

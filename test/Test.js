@@ -8,11 +8,11 @@ var LokiObj = new LokiJS();
 console.log('\n' + "----------LokiJS prototype model tests------------" + '\n');
 //Using .then on promise to access json data
 // console.log('----------------------------------------------------------------');
-// console.log("getBalances result:");
-// LokiObj.getBalances()
-// .then(function(response) {
-//   console.log(response);
-// });
+console.log("getBalancesByKey result:");
+LokiObj.getBalancesByKey('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ')
+.then(function(response) {
+  console.log(response);
+});
 
 LokiObj.createAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 10, 'testAssets', 0, '')
 .then(function(response) {
@@ -28,21 +28,21 @@ LokiObj.transferAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'A9vRt6hw
   console.log(response);
 });
 
-LokiObj.transferArbits('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 10, 0, '')
+LokiObj.transferArbits('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 1, 0, '')
 .then(function(response) {
   console.log('----------------------------------------------------------------');
   console.log("transferArbits result:");
   console.log(response);
 });
 
-LokiObj.transferArbitsByPublicKey('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 10, 0, '', ['6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ'], '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ')
+LokiObj.transferArbitsByPublicKey('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 1, 0, '', ['6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ'], '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ')
 .then(function(response) {
   console.log('----------------------------------------------------------------');
   console.log("transferArbitsByPublicKey result:");
   console.log(response);
 });
 
-LokiObj.transferArbitsByPublicKey('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 10, 0, '')
+LokiObj.transferArbitsByPublicKey('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 1, 0, '')
 .then(function(response) {
   console.log('----------------------------------------------------------------');
   console.log("transferArbitsByPublicKey result with no params specified");
@@ -83,3 +83,44 @@ LokiObj.unlockKeyfile('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'genesis')
   console.log("unlockKeyfile result:");
   console.log(response);
 });
+
+LokiObj.chainInfo()
+.then(function(response) {
+  console.log('----------------------------------------------------------------');
+  console.log("chainInfo result:");
+  console.log(response);
+});
+
+LokiObj.printChain()
+.then(function(response) {
+  console.log('----------------------------------------------------------------');
+  console.log("printChain result:");
+  console.log(response);
+});
+
+LokiObj.myBlocks()
+.then(function(response) {
+  console.log('----------------------------------------------------------------');
+  console.log("myBlocks result:");
+  console.log(response);
+});
+
+LokiObj.blockGenerators()
+.then(function(response) {
+  console.log('----------------------------------------------------------------');
+  console.log("blockGenerators result:");
+  console.log(response);
+});
+
+LokiObj.calcDelay('6LPtWEm5CRzcjcqJKym9ByKPRYWvBYy7P3DHeE4K7F2r', 10)
+.then(function(response) {
+  console.log('----------------------------------------------------------------');
+  console.log("calcDelay result:");
+  console.log(response);
+});
+
+console.log(LokiObj.seed());
+
+console.log(LokiObj.seed(10));
+
+console.log(LokiObj.blakeHash('Hello World'));

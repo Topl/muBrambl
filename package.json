@@ -1,6 +1,6 @@
 {
   "name": "bifrost-lokijs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "index.js",
   "scripts": {
     "test": "node test/Test.js ",
@@ -10,9 +10,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "base58": "^2.0.1",
+    "base-58": "0.0.1",
+    "blake2": "^2.0.1",
     "es6-promise": "^4.2.6",
-    "fetch-everywhere": "^1.0.5"
+    "fetch-everywhere": "^1.0.5",
+    "secure-random": "^1.1.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
