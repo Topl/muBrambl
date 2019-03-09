@@ -8,10 +8,9 @@ var LokiObj = new LokiJS();
 
 //////////Better abstraction//////////
 
-console.log('\n' + "----------Promises Tests----------" + '\n'); LokiObj.createAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 1, 'testAssets', 0, '')
+console.log('\n' + "----------Promises Tests----------" + '\n'); LokiObj.createAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 100, 'testAssets', 0, '')
 .then(function(response) {
-  console.log(JSON.parse(response).result.txHash);
-  LokiObj.onConfirm(response, 10000, 3000)
+  LokiObj.onConfirm(response, 30000, 3000)
   .then(function(response) {
     console.log("Response" + '\n' + response);
   },function(error) {
@@ -27,6 +26,11 @@ console.log('\n' + "----------Promises Tests----------" + '\n'); LokiObj.createA
 // LokiObj.getMempool()
 // .then(function(response) {
 //   console.log("mempool");
+//   console.log(response);
+// });
+
+// LokiObj.getBalancesByKey('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ')
+// .then(function(response) {
 //   console.log(response);
 // });
 

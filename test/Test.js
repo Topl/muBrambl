@@ -2,17 +2,10 @@
 
 const LokiJS = require('./../src/Requests.js');
 
-// var LokiObj = new LokiJS('http://localhost:9085/');
 var LokiObj = new LokiJS();
 
 console.log('\n' + "----------LokiJS prototype model tests------------" + '\n');
 //Using .then on promise to access json data
-// console.log('----------------------------------------------------------------');
-console.log("getBalancesByKey result:");
-LokiObj.getBalancesByKey('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ')
-.then(function(response) {
-  console.log(response);
-});
 
 LokiObj.createAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 10, 'testAssets', 0, '')
 .then(function(response) {

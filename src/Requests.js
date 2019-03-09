@@ -674,7 +674,7 @@ LokiJS.prototype.printChain = function() {
 ///////Generates random seed of specified length - defaults to 32//////
 
 LokiJS.prototype.seed = function(seedLength = 32) {
-  var bytes = new secureRandom(seedLength);
+  const bytes = new secureRandom(seedLength);
   return Base58.encode(bytes);
 }
 
