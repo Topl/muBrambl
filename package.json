@@ -1,12 +1,12 @@
 {
   "name": "bifrost-lokijs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.js",
   "scripts": {
     "test": "node test/Test.js ",
     "build": "babel src -d build"
   },
-  "author": "",
+  "author": "yamirtainwala",
   "license": "ISC",
   "description": "",
   "dependencies": {

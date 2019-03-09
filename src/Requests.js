@@ -1,4 +1,9 @@
-//require('request');
+/* A Javascript API module for the Bifrost Protocol
+*
+* @author Yamir Tainwala <y.tainwala@topl.me>
+* @date 2019
+*/
+
 require('fetch-everywhere');
 require('es6-promise').polyfill();
 const secureRandom = require('secure-random');
