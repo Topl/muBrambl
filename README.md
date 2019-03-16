@@ -5,11 +5,11 @@ A Javascript API wrapper to communicate with the Topl blockchain via fetch reque
 To install run "npm install bifrost-lokijs" in your project directory<br/>
 
 # Usage
-Create an instance of lokijs in your JS application by including:<br/>
-var LokiJS = require('bifrost-lokijs');<br/><br/>
+Create an instance of LokiJS in your JS application by including:<br/>
+* var LokiJS = require('bifrost-lokijs');<br/><br/>
 Most of the functions return promises that need to be operated upon using .then functions. For example: <br/>
-var LokiObj = new LokiJS();<br/>
-LokiObj.getMempool().then(function(response){console.log(response);});<br/>
+* var LokiObj = new LokiJS();<br/>
+* LokiObj.getMempool().then(function(response){console.log(response);});<br/>
 
 # Api-Key protection
 To api-key protect your node and requests follow these steps:<br/>
