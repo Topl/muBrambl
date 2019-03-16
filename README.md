@@ -12,10 +12,10 @@ var LokiObj = new LokiJS();<br/>
 LokiObj.getMempool().then(function(response){console.log(response);});<br/>
 
 # Api-Key protection
-To Api-Key protect your node and requests follow these steps:<br/>
-1. Choose an Api-Key (some string)<br/>
+To api-key protect your node and requests follow these steps:<br/>
+1. Choose an api-key (some string)<br/>
 2. Find the Blake2b256 hash of this string (can be found using the blakeHash function in this module)<br/>
-3. Set the "apiKeyHash" field in the settings file of your node to be the blakeHash of your chosen api-key<br/>
+3. Set the "apiKeyHash" field in the settings file of your node to be the blakeHash of your chosen api-key as found in the previous step<br/>
 4. Use the setApiKey function in this module to set your chosen api-key for all requests made using a LokiJS instance in your application<br/>
 
 License
