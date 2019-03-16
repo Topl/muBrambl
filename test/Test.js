@@ -117,3 +117,5 @@ console.log(LokiObj.seed());
 console.log(LokiObj.seed(10));
 
 console.log(LokiObj.blakeHash('Hello World'));
+
+console.log(LokiObj.blakeHash('test_key'));

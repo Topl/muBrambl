@@ -1,6 +1,11 @@
 'use strict';
 
-//require('request');
+/* A Javascript API wrapper module for the Bifrost Protocol
+*
+* @author Yamir Tainwala <y.tainwala@topl.me>
+* @date 2019
+*/
+
 require('fetch-everywhere');
 require('es6-promise').polyfill();
 var secureRandom = require('secure-random');
@@ -9,11 +14,14 @@ var blake2 = require('blake2');
 
 'use strict';
 
-//Sets the url to localhost and port 9085 by default, which is the default setting
-//when a private chain is run locally
+//Sets the url to localhost and port 9085 by default, which is the default setting when a private chain is run locally
 var LokiJS = function LokiJS() {
   this.url = 'http://localhost:9085/';
   this.defaultAccount = '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ';
+  this.headers = {
+    'Content-Type': 'application/json-rpc'
+    // 'Accept': 'application/json-rpc',
+  };
 };
 
 //Allows setting a different url than the default from which to
@@ -26,9 +34,12 @@ LokiJS.prototype.setDefaultAccount = function (account) {
   this.defaultAccount = account;
 };
 
-var header = {
-  'Content-Type': 'application/json-rpc',
-  'Accept': 'application/json-rpc'
+LokiJS.prototype.setApiKey = function (apiKey) {
+  this.headers = {
+    'Content-Type': 'application/json-rpc',
+    // 'Accept': 'application/json-rpc',
+    'api_key': apiKey
+  };
 };
 
 /////////////////////////////////
@@ -48,7 +59,7 @@ LokiJS.prototype.getBalances = function () {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -75,7 +86,7 @@ LokiJS.prototype.getBalancesByKey = function (publicKey) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -100,7 +111,7 @@ LokiJS.prototype.getOpenKeyfiles = function () {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -127,7 +138,7 @@ LokiJS.prototype.generateKeyfile = function (password) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -155,7 +166,7 @@ LokiJS.prototype.lockKeyfile = function (publicKey, password) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -183,7 +194,7 @@ LokiJS.prototype.unlockKeyfile = function (publicKey, password) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -213,7 +224,7 @@ LokiJS.prototype.transferPolys = function (recipient, amount, fee, data) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -243,7 +254,7 @@ LokiJS.prototype.transferArbits = function (recipient, amount, fee, data) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -282,7 +293,7 @@ LokiJS.prototype.transferArbitsByPublicKey = function (recipient, amount, fee, d
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -318,7 +329,7 @@ LokiJS.prototype.createAssets = function (issuer, recipient, amount, assetCode, 
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -350,7 +361,7 @@ LokiJS.prototype.transferAssets = function (issuer, recipient, amount, assetCode
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -381,7 +392,7 @@ LokiJS.prototype.getTransactionById = function (transactionId) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -408,7 +419,7 @@ LokiJS.prototype.getTransactionFromMempool = function (transactionId) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -433,7 +444,7 @@ LokiJS.prototype.getMempool = function () {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -460,7 +471,7 @@ LokiJS.prototype.getBlockById = function (blockId) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -489,7 +500,7 @@ LokiJS.prototype.chainInfo = function () {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -517,7 +528,7 @@ LokiJS.prototype.calcDelay = function (blockId, numBlocks) {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -542,7 +553,7 @@ LokiJS.prototype.myBlocks = function () {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -567,7 +578,7 @@ LokiJS.prototype.blockGenerators = function () {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
@@ -592,7 +603,7 @@ LokiJS.prototype.printChain = function () {
   var payload = {
     url: this.url + route,
     method: 'POST',
-    header: header,
+    headers: this.headers,
     body: JSON.stringify(body)
   };
   return fetch(this.url + route, payload).then(function (response) {
