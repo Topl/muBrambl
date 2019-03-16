@@ -1,5 +1,5 @@
 # LokiJS
-A Javascript API module allowing users to interact with Topl's blockchain
+A Javascript API wrapper to communicate with the Topl blockchain via fetch requests.
 
 # Installation
 To install run "npm install bifrost-lokijs" in your project directory<br/>
