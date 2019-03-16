@@ -7,6 +7,7 @@ To install run "npm install bifrost-lokijs" in your project directory<br/>
 # Usage
 Create an instance of LokiJS in your JS application by including:<br/>
 * var LokiJS = require('bifrost-lokijs');<br/>
+<br/>
 Most of the functions return promises that need to be operated upon using .then functions. For example: <br/>
 * var LokiObj = new LokiJS();<br/>
 * LokiObj.getMempool().then(function(response){console.log(response);});<br/>
