@@ -27,7 +27,6 @@ To api-key protect your node and requests follow these steps:<br/>
 4. Use the setApiKey function in this module to set your chosen api-key for all requests made using a LokiJS instance in your application<br/>
 
 # License
--------
 LokiJS is licensed under the
 [Open Software License v. 3.0 (OSL-3.0)](https://opensource.org/licenses/OSL-3.0), also included
 in our repository in the `LICENSE` file.
