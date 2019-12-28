@@ -13,9 +13,11 @@ Most of the functions return promises that need to be operated upon using .then 
 OR<br/><br/>
 
 To install locally git clone this repo and<br/>
-* Run "npm build" within the cloned repo to build the project using babel<br/>
-* Run "npm pack" to create a tar.gz of the module<br/>
-* Navigate to your app's directory and run "npm install <path_to_newly_created_tar.gz>"<br/><br/>
+* Run ``npm run build`` within the cloned repo to build the project using babel<br/>
+* Run ``npm pack`` to create a tar.gz of the module<br/>
+* Navigate to your app's directory and run ``npm install <path_to_newly_created_tgz>``
+  * You may also include the the tarball in your ``packages.json`` by adding the line  ``"bifrost-lokijs": "file:<path_to_newly_created_tgz>"``
+<br/><br/>
 Create an instance of LokiJS in your JS application by including:<br/>
 * var LokiJS = require('LokiJS');<br/><br/>
 
