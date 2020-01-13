@@ -84,13 +84,6 @@ LokiObj.chainInfo()
   console.log(response);
 });
 
-LokiObj.printChain()
-.then(function(response) {
-  console.log('----------------------------------------------------------------');
-  console.log("printChain result:");
-  console.log(response);
-});
-
 LokiObj.myBlocks()
 .then(function(response) {
   console.log('----------------------------------------------------------------');
