@@ -14,13 +14,6 @@ LokiObj.getBalancesByKey('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb')
   console.log(response);
 });
 
-LokiObj.generateKeyfile("password")
-.then(function(response) {
-  console.log('----------------------------------------------------------------');
-  console.log("generateKeyfile result:");
-  console.log(response);
-});
-
 LokiObj.lockKeyfile('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'genesis')
 .then(function(response) {
   console.log('----------------------------------------------------------------');
