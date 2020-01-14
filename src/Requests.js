@@ -693,7 +693,7 @@ LokiJS.prototype.seed = function(seedLength = 32) {
 
 LokiJS.prototype.blakeHash = function(message) {
   var h = blake2.createHash('blake2b', {digestLength: 32});
-  h.update(new Buffer(message));
+  h.update(new Buffer.from(message));
   return Base58.encode(h.digest());
 }
 
