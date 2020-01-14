@@ -257,7 +257,7 @@ LokiJS.prototype.transferPolys = function(recipient, amount, fee, data) {
 
 /////////////////transferArbits////////////
 
-LokiJS.prototype.transferArbits = function(recipient, amount, fee, data) {
+LokiJS.prototype.transferArbits = function(recipient, sender, amount, fee, data) {
   const route = 'wallet/';
   const body =
   {
@@ -266,6 +266,7 @@ LokiJS.prototype.transferArbits = function(recipient, amount, fee, data) {
     "method": "transferArbits",
     "params": [{
       "recipient": recipient,
+      "sender": sender,
       "amount": amount,
       "fee": fee,
       "data": data
