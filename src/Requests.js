@@ -289,46 +289,6 @@ LokiJS.prototype.transferArbits = function(recipient, sender, amount, fee, data)
   })
 }
 
-/////////////////transferArbitsByPublicKey////////////
-/* Optional parameters publicKeysToSendFrom and publicKeyToSendChangeTo may be
- * specified, publicKeysToSendFrom must be a list of Base 58 encoded string addresses
- * and publicKeyToSendChangeTo must be a Base58 encoded string
-*/
-
-LokiJS.prototype.transferArbitsByPublicKey = function(recipient, amount, fee, data, publicKeysToSendFrom = [], publicKeyToSendChangeTo = '') {
-  const route = 'wallet/';
-  const body =
-  {
-    "jsonrpc": "2.0",
-    "id": "30",
-    "method": "transferArbits",
-    "params": [{
-      "recipient": recipient,
-      "publicKeysToSendFrom": publicKeysToSendFrom,
-      "publicKeyToSendChangeTo": publicKeyToSendChangeTo,
-      "amount": amount,
-      "fee": fee,
-      "data": data
-    }]
-  };
-  const payload =
-  {
-    url: this.url + route,
-    method: 'POST',
-    headers: this.headers,
-    body: JSON.stringify(body)
-  };
-  return fetch(this.url + route, payload)
-  .then(function(response){
-    return response.json();
-  }).then(function(jsonData){
-    return JSON.stringify(jsonData, null, 2);
-  }).catch(function(err){
-    return err;
-  })
-}
-
-
 /////////////////////////////////
 /////Asset Api Routes////////////
 /////////////////////////////////

@@ -7,20 +7,6 @@ var LokiObj = new LokiJS();
 console.log('\n' + "----------LokiJS prototype model tests------------" + '\n');
 //Using .then on promise to access json data
 
-LokiObj.transferArbitsByPublicKey('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 1, 0, '', ['6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ'], '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ')
-.then(function(response) {
-  console.log('----------------------------------------------------------------');
-  console.log("transferArbitsByPublicKey result:");
-  console.log(response);
-});
-
-LokiObj.transferArbitsByPublicKey('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 1, 0, '')
-.then(function(response) {
-  console.log('----------------------------------------------------------------');
-  console.log("transferArbitsByPublicKey result with no params specified");
-  console.log(response);
-});
-
 LokiObj.getBalancesByKey('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb')
 .then(function(response) {
   console.log('----------------------------------------------------------------');
