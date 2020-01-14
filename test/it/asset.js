@@ -1,5 +1,5 @@
 const assert =  require('assert')
-const LokiJS = require('../src/Requests')
+const LokiJS = require('./../../src/Requests')
 
 describe('Asset', () => {
 

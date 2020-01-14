@@ -4,7 +4,7 @@
   "version": "0.0.7",
   "main": "index.js",
   "scripts": {
-    "mochaTest": "mocha test/asset.js",
+    "mochaTest": "mocha test/it",
     "test": "node test/Test.js ",
     "build": "babel src -d build"
   },
