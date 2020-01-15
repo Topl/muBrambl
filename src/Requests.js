@@ -295,7 +295,7 @@ LokiJS.prototype.transferArbits = function(recipient, sender, amount, fee, data)
 
 /////////////////createAssets////////////
 
-LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, fee, data) {
+LokiJS.prototype.createAssets = async function(issuer, recipient, amount, assetCode, fee, data) {
   const route = 'asset/';
   const body =
   {
@@ -318,14 +318,14 @@ LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, f
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  return fetch(this.url + route, payload)
-  .then(function(response){
-    return response.json();
-  }).then(function(jsonData){
+  try {
+    const response = await fetch(this.url + route, payload);
+    const jsonData = await response.json();
     return JSON.stringify(jsonData, null, 2);
-  }).catch(function(err){
+  }
+  catch (err) {
     return err;
-  })
+  }
 }
 
 /////////////////transferAssets////////////
