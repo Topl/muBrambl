@@ -46,8 +46,7 @@ describe('Keyfile', () => {
     it('should return a successfully unlocked keyfile', (done) => {
         lokijs.unlockKeyfile('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'genesis')
             .then((response) => {
-                const res = JSON.parse(response)
-                assert.equal(typeof res.result, 'object')
+                assert.equal(typeof response.result, 'object')
                 done()
             })
             .catch((error) => {

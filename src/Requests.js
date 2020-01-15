@@ -261,7 +261,7 @@ LokiJS.prototype.transferArbits = async function(recipient, sender, amount, fee,
     body: JSON.stringify(body)
   };
   try {
-    return await fetch(this.url + route, payload);
+    return await (await fetch(this.url + route, payload)).json();
   }
   catch (err) {
     return err;
