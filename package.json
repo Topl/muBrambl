@@ -1,15 +1,15 @@
 {
   "name": "bifrost-lokijs",
   "repository": "https://github.com/Topl/LokiJS",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "main": "index.js",
   "scripts": {
     "mochaTest": "mocha test/it",
     "test": "node test/Test.js ",
     "build": "babel src -d build"
   },
-  "author": "yamirtainwala",
-  "license": "ISC",
+  "author": "topl",
+  "license": "MPL-2.0",
   "description": "",
   "dependencies": {
     "base-58": "0.0.1",

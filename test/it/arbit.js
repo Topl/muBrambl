@@ -12,8 +12,7 @@ describe('Arbit', () => {
         lokijs.transferArbits('A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', ['6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ'], 1, 0, '')
             .then((response) => {
                 console.log(response)
-                const res = JSON.parse(response)
-                assert.equal(typeof res.result, 'object')
+                assert.equal(typeof response.result, 'object')
                 done()
             })
             .catch((error) => {

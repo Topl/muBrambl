@@ -10,8 +10,8 @@ describe('Asset', () => {
     it('should create assets', (done) => {
         lokijs.createAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', '6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 10, 'testAssets', 0, '')
             .then((response) => {
-                const res = JSON.parse(response)
-                assert.equal(typeof res.result, 'object')
+                console.log(response)
+                assert.equal(typeof response.result, 'object')
                 done()
             })
             .catch((error) => {
@@ -23,8 +23,7 @@ describe('Asset', () => {
         lokijs.transferAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 1, 'testAssets', 0, '')
             .then((response) => {
                 console.log(response)
-                const res = JSON.parse(response)
-                assert.equal(typeof res.result, 'object')
+                assert.equal(typeof response.result, 'object')
                 done()
             })
             .catch((error) => {

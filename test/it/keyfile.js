@@ -11,8 +11,7 @@ describe('Keyfile', () => {
         lokijs.getOpenKeyfiles()
             .then((response) => {
                 console.log(response)
-                const res = JSON.parse(response)
-                assert.equal(typeof res.result, 'object')
+                assert.equal(typeof response.result, 'object')
                 done()
             })
             .catch((error) => {
@@ -24,8 +23,7 @@ describe('Keyfile', () => {
         lokijs.generateKeyfile("password")
             .then((response) => {
                 console.log(response)
-                const res = JSON.parse(response)
-                assert.equal(typeof res.result, 'object')
+                assert.equal(typeof response.result, 'object')
                 done()
             })
             .catch((error) => {
@@ -33,15 +31,15 @@ describe('Keyfile', () => {
             })
     })
 
-    it('should return a successfully locked keyfile', (done) => {
-        lokijs.lockKeyfile('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'genesis')
-            .then((response) => {
-                const res = JSON.parse(response)
-                assert.equal(typeof res.result, 'object')
-                done()
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    })
+    // it('should return a successfully locked keyfile', (done) => {
+    //     lokijs.lockKeyfile('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'genesis')
+    //         .then((response) => {
+    //             console.log(response)
+    //             assert.equal(typeof response.result, 'object')
+    //             done()
+    //         })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // })
 })
