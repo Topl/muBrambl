@@ -19,8 +19,8 @@ describe('Asset', () => {
             })
     })
 
-    /*it('should transfer assets', (done) => {
-        lokijs.transferAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', 1, 'testAssets', 0, '')
+    it('should transfer assets', (done) => {
+        lokijs.transferAssets('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb', [], 1, 'testAssets', 0, '')
             .then((response) => {
                 console.log(response)
                 const res = JSON.parse(response)
@@ -31,5 +31,4 @@ describe('Asset', () => {
                 console.log(error)
             })
     })
-    */
 })

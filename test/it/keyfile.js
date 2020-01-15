@@ -33,8 +33,20 @@ describe('Keyfile', () => {
             })
     })
 
-    it('should return a successfully locked keyfile', (done) => {
+    /*it('should return a successfully locked keyfile', (done) => {
         lokijs.lockKeyfile('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'genesis')
+            .then((response) => {
+                const res = JSON.parse(response)
+                assert.equal(typeof res.result, 'object')
+                done()
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    })*/
+
+    it('should return a successfully unlocked keyfile', (done) => {
+        lokijs.unlockKeyfile('6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 'genesis')
             .then((response) => {
                 const res = JSON.parse(response)
                 assert.equal(typeof res.result, 'object')

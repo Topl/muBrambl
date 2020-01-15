@@ -330,7 +330,7 @@ LokiJS.prototype.createAssets = function(issuer, recipient, amount, assetCode, f
 
 /////////////////transferAssets////////////
 
-LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode, fee, data) {
+LokiJS.prototype.transferAssets = function(issuer, recipient, sender, amount, assetCode, fee, data) {
   const route = 'asset/';
   const body =
   {
@@ -340,6 +340,7 @@ LokiJS.prototype.transferAssets = function(issuer, recipient, amount, assetCode,
     "params": [{
       "issuer": issuer,
       "recipient": recipient,
+      "sender": [],
       "amount": amount,
       "assetCode": assetCode,
       "fee": fee,
