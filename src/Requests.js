@@ -292,6 +292,7 @@ LokiJS.prototype.createAssets = async function(
 LokiJS.prototype.transferAssets = async function(
   issuer,
   recipient,
+  sender,
   amount,
   assetCode,
   fee,
@@ -304,12 +305,13 @@ LokiJS.prototype.transferAssets = async function(
     method: "transferAssets",
     params: [
       {
-        issuer: issuer,
-        recipient: recipient,
-        amount: amount,
-        assetCode: assetCode,
-        fee: fee,
-        data: data
+        issuer,
+        recipient,
+        sender,
+        amount,
+        assetCode,
+        fee,
+        data
       }
     ]
   };
