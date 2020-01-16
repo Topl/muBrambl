@@ -13,8 +13,8 @@ const blake2 = require("blake2");
 ("use strict");
 
 //Sets the url to localhost and port 9085 by default, which is the default setting when a private chain is run locally
-const LokiJS = function() {
-  this.url = "http://localhost:9085/";
+const LokiJS = function(url = "http://localhost:9085/") {
+  this.url = url;
   this.headers = {
     "Content-Type": "application/json-rpc"
     // 'Accept': 'application/json-rpc',
