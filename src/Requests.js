@@ -55,11 +55,9 @@ LokiJS.prototype.getBalances = async function() {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 //////getBalancesByKey////////////////
@@ -82,11 +80,9 @@ LokiJS.prototype.getBalancesByKey = async function(publicKey) {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 //////getOpenKeyfiles////////////////
@@ -105,11 +101,9 @@ LokiJS.prototype.getOpenKeyfiles = async function() {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 //////generateKeyfile////////////////
@@ -132,11 +126,9 @@ LokiJS.prototype.generateKeyfile = async function(password) {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 //////lockKeyfile////////////////
@@ -160,11 +152,9 @@ LokiJS.prototype.lockKeyfile = async function(publicKey, password) {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 //////unlockKeyfile////////////////
@@ -188,11 +178,9 @@ LokiJS.prototype.unlockKeyfile = async function(publicKey, password) {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////transferPolys////////////
@@ -218,11 +206,9 @@ LokiJS.prototype.transferPolys = async function(recipient, amount, fee, data) {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////transferArbits////////////
@@ -255,11 +241,9 @@ LokiJS.prototype.transferArbits = async function(
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////////////////////
@@ -298,11 +282,9 @@ LokiJS.prototype.createAssets = async function(
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////transferAssets////////////
@@ -337,11 +319,9 @@ LokiJS.prototype.transferAssets = async function(
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////////////////////
@@ -368,11 +348,9 @@ LokiJS.prototype.getTransactionById = async function(transactionId) {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////getTransactionFromMempool////////////
@@ -395,11 +373,9 @@ LokiJS.prototype.getTransactionFromMempool = async function(transactionId) {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////getMempool////////////
@@ -418,11 +394,9 @@ LokiJS.prototype.getMempool = async function() {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////getBlockById////////////
@@ -445,11 +419,9 @@ LokiJS.prototype.getBlockById = async function(blockId) {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////////////////////
@@ -472,11 +444,9 @@ LokiJS.prototype.chainInfo = async function() {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 ////////////Calculate block delay////////////
@@ -500,11 +470,9 @@ LokiJS.prototype.calcDelay = async function(blockId, numBlocks) {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 //////////Blocks generated by node's keys////////////
@@ -523,11 +491,9 @@ LokiJS.prototype.myBlocks = async function() {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////Map block geneators to blocks////////////
@@ -546,11 +512,9 @@ LokiJS.prototype.blockGenerators = async function() {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 ////////////Print full chain////////////
@@ -569,11 +533,9 @@ LokiJS.prototype.printChain = async function() {
     headers: this.headers,
     body: JSON.stringify(body)
   };
-  try {
-    return await (await fetch(this.url + route, payload)).json();
-  } catch (err) {
-    return err;
-  }
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
 };
 
 /////////////////////////////////
