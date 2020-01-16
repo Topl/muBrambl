@@ -326,6 +326,41 @@ LokiJS.prototype.transferAssets = async function(
   else { return response } 
 };
 
+/////////////////transferTargetAssets////////////
+
+LokiJS.prototype.transferTargetAssets = async function(
+  recipient,
+  assetId,
+  amount,
+  fee,
+  data
+) {
+  const route = "asset/";
+  const body = {
+    jsonrpc: "2.0",
+    id: "30",
+    method: "transferTargetAssets",
+    params: [
+      {
+        recipient,
+        assetId,
+        amount,
+        fee,
+        data
+      }
+    ]
+  };
+  const payload = {
+    url: this.url + route,
+    method: "POST",
+    headers: this.headers,
+    body: JSON.stringify(body)
+  };
+  const response = await (await fetch(this.url + route, payload)).json();
+  if (response.error) {throw response}
+  else { return response } 
+};
+
 /////////////////////////////////
 /////NodeView Api Routes/////////
 /////////////////////////////////
