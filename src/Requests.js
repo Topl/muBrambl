@@ -183,7 +183,7 @@ LokiJS.prototype.unlockKeyfile = async function(publicKey, password) {
   else { return response } 
 };
 
-LokiJS.prototype.signTx = async function(publicKey, tx) {
+LokiJS.prototype.signTx = async function(publicKeys, tx) {
   const route = "wallet/";
   const body = {
     jsonrpc: "2.0",
@@ -191,7 +191,7 @@ LokiJS.prototype.signTx = async function(publicKey, tx) {
     method: "signTx",
     params: [
       {
-        publicKey: publicKey,
+        publicKeys: publicKeys,
         tx: tx
       }
     ]
