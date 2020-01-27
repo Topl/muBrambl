@@ -2,7 +2,7 @@
  * Create, import, and export Topl Bifrost keys.
  * @author James Aman (j.aman@topl.me)
  * 
- * Based of the keythereum library from Jack Peterson
+ * Based on the keythereum library from Jack Peterson
  * https://github.com/Topljs/keythereum
  */
 

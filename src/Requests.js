@@ -209,7 +209,7 @@ LokiJS.prototype.signTx = async function(publicKeys, tx) {
 
 ///////////broadcastTx////////////////////
 
-LokisJS.prototype.broadcastTx = async function(tx) {
+LokiJS.prototype.broadcastTx = async function(tx) {
   const route = "wallet/";
   const body = {
     jsonrpc: "2.0",
