@@ -47,7 +47,7 @@ module.exports = {
         // Key derivation function parameters
         scrypt: {
             dklen: 32,
-            n: Math.pow(2,18), // cost (as given in bifrost)
+            n: Math.pow(2, 18), // cost (as given in bifrost)
             r: 8,        // blocksize
             p: 1         // parallelization
         }
@@ -184,13 +184,13 @@ module.exports = {
         // use scrypt as key derivation function
         // synchronous key generation if callback not provided
         if (!isFunction(cb)) {
-            return crypto.scryptSync(password, salt, this.constants.scrypt.dklen, {N, r, p, maxmem})
+            return crypto.scryptSync(password, salt, this.constants.scrypt.dklen, { N, r, p, maxmem })
         }
 
         // asynchronous key generation
         cb(function (err, deriveKey) {
             if (err) return cb(err);
-            crypto.scrypt(password, salt, this.constants.scrypt.dklen, {N, r, p, maxmem})
+            crypto.scrypt(password, salt, this.constants.scrypt.dklen, { N, r, p, maxmem })
         });
     },
 
@@ -229,6 +229,45 @@ module.exports = {
             if (err) return cb(err);
             cb(curve25519KeyGen(randomBytes));
         });
+    },
+
+    /**
+     * Generate the signature of a message using the provided private key
+     * @param {buffer=} privateKey A private key
+     * @param {string=} message Message to sign
+     * @param {function=} cb Callback function (optional).
+     * @return {buffer=} signature 
+     */
+    sign: function (privateKey, message, cb) {
+        function curve25519sign(privateKey, message) {
+            return curve25519.sign(privateKey, message, crypto.randomBytes(64))
+        }
+
+        // synchronous key generation if callback not provided
+        if (!isFunction(cb)) {
+            return curve25519sign(this.str2buf(privateKey), this.str2buf(message));
+        }
+
+        // asynchronous
+        cb(curve25519sign(this.str2buf(privateKey), this.str2buf(message)));
+    },
+
+    /**
+     * Check whether a private key was used to generate the 
+     * @param {buffer=} publicKey A public key
+     * @param {string=} message Message to sign
+     * @param {buffer=} signature 
+     * @param {function=} cb Callback function (optional).
+     * @return {boolean=} 
+     */
+    verify: function (publicKey, message, signature, cb) {
+        // synchronous key generation if callback not provided
+        if (!isFunction(cb)) {
+            return curve25519.verify(this.str2buf(publicKey), this.str2buf(message), this.str2buf(signature)) ;
+        }
+
+        // asynchronous
+        cb(curve25519.verify(this.str2buf(publicKey), this.str2buf(message), this.str2buf(signature)));
     },
 
     /**
@@ -375,47 +414,16 @@ module.exports = {
     /**
      * Import key data object from keystore JSON file.
      * (Note: Node.js only!)
-     * @param {string} address Topl address to import.
-     * @param {string=} datadir Topl data directory (default: ~/.Topl).
+     * @param {string} filepath path to stored keyfile
      * @param {function=} cb Callback function (optional).
      * @return {Object} Keystore data file's contents.
      */
-    importFromFile: function (address, datadir, cb) {
-        let keystore, filepath;
-        address = address.toLowerCase();
-
-        function findKeyfile(keystore, address, files) {
-            let i, len, filepath = null;
-            for (i = 0, len = files.length; i < len; ++i) {
-                if (files[i].indexOf(address) > -1) {
-                    filepath = path.join(keystore, files[i]);
-                    if (fs.lstatSync(filepath).isDirectory()) {
-                        filepath = path.join(filepath, files[i]);
-                    }
-                    break;
-                }
-            }
-            return filepath;
-        }
-
-        datadir = datadir || path.join(process.env.HOME, ".Topl");
-        keystore = path.join(datadir, "keystore");
+    importFromFile: function (filepath, cb) {
         if (!isFunction(cb)) {
-            filepath = findKeyfile(keystore, address, fs.readdirSync(keystore));
-            if (!filepath) {
-                throw new Error("could not find key file for address " + address);
-            }
             return JSON.parse(fs.readFileSync(filepath));
         }
-        fs.readdir(keystore, function (ex, files) {
-            let filepath;
-            if (ex) return cb(ex);
-            filepath = findKeyfile(keystore, address, files);
-            if (!filepath) {
-                return cb(new Error("could not find key file for address " + address));
-            }
-            return cb(JSON.parse(fs.readFileSync(filepath)));
-        });
+
+        return cb(JSON.parse(fs.readFileSync(filepath)));
     }
 
 };
