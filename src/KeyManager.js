@@ -51,7 +51,7 @@ module.exports = {
         // Key derivation function parameters
         scrypt: {
             dklen: 32,
-            N: 262144/8, // cost -> 2^18 (as given in bifrost)
+            N: 262144 / 8, // cost -> 2^18 (as given in bifrost)
             r: 8,        // blocksize
             p: 1         // parallelization 
         }
@@ -90,10 +90,10 @@ module.exports = {
      */
     str2buf: function (str, enc) {
         if (!str || str.constructor !== String) return str;
-        if (!enc && this.isHex(str)) enc = "hex";
-        if (!enc && this.isBase64(str)) enc = "base64";
+        // if (!enc && this.isHex(str)) enc = "hex";
+        // if (!enc && this.isBase64(str)) enc = "base64";
         // our keys are Base-58 encoded for now so default to that
-        return enc ? Buffer.from(str, enc) : Base58.decode(Buffer.from(str))
+        return enc ? Buffer.from(str, enc) : Buffer.from(Base58.decode(str))
     },
 
     /**
@@ -146,14 +146,14 @@ module.exports = {
      * the ciphertext key's contents.
      * @param {buffer|string} derivedKey Secret key derived from password.
      * @param {buffer|string} ciphertext Text encrypted with secret key.
-     * @return {string} Hex-encoded MAC.
+     * @return {string} Base58-encoded MAC.
      */
     getMAC: function (derivedKey, ciphertext) {
         if (derivedKey !== undefined && derivedKey !== null && ciphertext !== undefined && ciphertext !== null) {
-            return Base58.encode(keccak256(Buffer.concat([
+            return keccak256(Buffer.concat([
                 this.str2buf(derivedKey).slice(16, 32),
                 this.str2buf(ciphertext)
-            ])));
+            ]));
         }
     },
 
@@ -256,15 +256,15 @@ module.exports = {
         algo = options.cipher || this.constants.cipher;
 
         // encrypt using last 16 bytes of derived key (this matches Bifrost)
-        ciphertext = Base58.encode(this.encrypt(keyObject.privateKey, derivedKey, iv, algo));
+        ciphertext = this.encrypt(keyObject.privateKey, derivedKey, iv, algo);
 
         keyStorage = {
             publicKeyId: Base58.encode(keyObject.publicKey),
             crypto: {
                 cipher: options.cipher || this.constants.cipher,
-                cipherText: ciphertext,
+                cipherText: Base58.encode(ciphertext),
                 cipherParams: { iv: Base58.encode(iv) },
-                mac: this.getMAC(derivedKey, ciphertext)
+                mac: Base58.encode(this.getMAC(derivedKey, ciphertext))
             },
         };
 
@@ -296,7 +296,7 @@ module.exports = {
 
         // synchronous if no callback provided
         if (!isFunction(cb)) {
-            return this.marshal(this.deriveKey(password, salt, options), {privateKey, publicKey}, salt, iv, options);
+            return this.marshal(this.deriveKey(password, salt, options), { privateKey, publicKey }, salt, iv, options);
         }
 
         // asynchronous if callback provided
@@ -316,13 +316,13 @@ module.exports = {
         keyStorageCrypto = keyStorage.Crypto || keyStorage.crypto;
 
         // verify that message authentication codes match, then decrypt
-        function verifyAndDecrypt(derivedKey, salt, iv, ciphertext, algo) {
-            let key;
-            if (self.getMAC(derivedKey, ciphertext) !== keyStorageCrypto.mac) {
+        function verifyAndDecrypt(derivedKey, iv, ciphertext, algo) {
+            if (!self.getMAC(derivedKey, ciphertext).equals(self.str2buf(keyStorageCrypto.mac))) {
                 throw new Error("message authentication code mismatch");
             }
-            key = bifrostBlake2b(derivedKey.slice(0, 16)).slice(0, 16);
-            return self.decrypt(ciphertext, key, iv, algo);
+            // What is going on with this line below ?!?
+            //key = bifrostBlake2b(derivedKey.slice(0, 16)).slice(0, 16);
+            return self.decrypt(ciphertext, derivedKey, iv, algo);
         }
 
         iv = this.str2buf(keyStorageCrypto.cipherParams.iv);
@@ -332,7 +332,7 @@ module.exports = {
 
         // derive secret key from password
         if (!isFunction(cb)) {
-            return verifyAndDecrypt(this.deriveKey(password, salt, keyStorageCrypto), salt, iv, ciphertext, algo);
+            return verifyAndDecrypt(this.deriveKey(password, salt, keyStorageCrypto), iv, ciphertext, algo);
         }
         this.deriveKey(password, salt, keyStorageCrypto, function (derivedKey) {
             try {
@@ -348,13 +348,11 @@ module.exports = {
      * @param {string} publicKeyId Topl address.
      * @return {string} Keystore filename.
      */
-    generateKeystoreFilename: function (publicKeyId) {
-        let filename = "UTC--" + new Date().toISOString() + "--" + publicKeyId;
+    generateKeystoreFilename: function (publicKey) {
+        if (typeof publicKey !== 'string') throw new Error('PublicKey must be given as a string for the filename')
+        let filename = new Date().toISOString() + "-" + publicKey + ".json";
 
-        // Windows does not permit ":" in filenames, replace all with "-"
-        if (process.platform === "win32") filename = filename.split(":").join("-");
-
-        return filename;
+        return filename.split(":").join("-");
     },
 
     /**
@@ -390,7 +388,6 @@ module.exports = {
      */
     importFromFile: function (address, datadir, cb) {
         let keystore, filepath;
-        address = address.replace("0x", "");
         address = address.toLowerCase();
 
         function findKeyfile(keystore, address, files) {
