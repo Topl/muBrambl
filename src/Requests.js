@@ -42,7 +42,6 @@ async function LokiRequest(routeInfo, params, self) {
       headers: self.headers,
       body: JSON.stringify(body)
     };
-    console.log(payload)
     const response = await (await fetch(self.url + route, payload)).json();
     if (response.error) { throw response }
     else { return response }
@@ -224,7 +223,7 @@ LokiLayer.prototype.transferPolys = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.amount) throw new Error("An amount must be specified")
-  if (!params.fee) throw new Error("A fee must be specified")
+  if (!params.fee && params.fee !== 0) throw new Error("A fee must be specified")
   const route = "wallet/"
   const method = "transferPolys"
   return LokiRequest({ route, method, id }, params, this)
@@ -247,7 +246,7 @@ LokiLayer.prototype.transferArbits = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.amount) throw new Error("An amount must be specified")
-  if (!params.fee) throw new Error("A fee must be specified")
+  if (!params.fee && params.fee !== 0) throw new Error("A fee must be specified")
   const route = "wallet/"
   const method = "transferArbits"
   return LokiRequest({ route, method, id }, params, this)
@@ -276,7 +275,7 @@ LokiLayer.prototype.createAssets = async function (params, id = "1") {
   if (!params.assetCode) throw new Error("An assetCode must be specified")
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.amount) throw new Error("An amount must be specified")
-  if (!params.fee) throw new Error("A fee must be specified")
+  if (!params.fee && params.fee !== 0) throw new Error("A fee must be specified")
   const route = "asset/"
   const method = "createAssets"
   return LokiRequest({ route, method, id }, params, this)
@@ -303,7 +302,7 @@ LokiLayer.prototype.transferAssets = async function (params, id = "1") {
   if (!params.assetCode) throw new Error("An assetCode must be specified")
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.amount) throw new Error("An amount must be specified")
-  if (!params.fee) throw new Error("A fee must be specified")
+  if (!params.fee && params.fee !== 0) throw new Error("A fee must be specified")
   const route = "asset/"
   const method = "transferAssets"
   return LokiRequest({ route, method, id }, params, this)
@@ -326,7 +325,7 @@ LokiLayer.prototype.transferTargetAssets = async function (params, id = "1") {
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.assetId) throw new Error("An assetId is required for this request")
   if (!params.amount) throw new Error("An amount must be specified")
-  if (!params.fee) throw new Error("A fee must be specified")
+  if (!params.fee && params.fee !== 0) throw new Error("A fee must be specified")
   const route = "asset/"
   const method = "transferTargetAssets"
   return LokiRequest({ route, method, id }, params, this)
@@ -349,7 +348,7 @@ LokiLayer.prototype.transferTargetAssetsPrototype = async function (params, id =
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.assetId) throw new Error("An assetId is required for this request")
   if (!params.amount) throw new Error("An amount must be specified")
-  if (!params.fee) throw new Error("A fee must be specified")
+  if (!params.fee && params.fee !== 0) throw new Error("A fee must be specified")
   const route = "asset/"
   const method = "transferTargetAssetsPrototype"
   return LokiRequest({ route, method, id }, params, this)
