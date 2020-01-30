@@ -1,5 +1,6 @@
 /**
  * Create, import, and export Topl Bifrost keys.
+ * Also allows for signing of transactions
  * @author James Aman (j.aman@topl.me)
  * 
  * Based on the keythereum library from Jack Peterson
@@ -7,11 +8,12 @@
  */
 
 const crypto = require('crypto')
-const blake = require('blake2')
-const keccak256 = require('keccak256')
-const Base58 = require('base-58')
 const path = require('path')
 const fs = require('fs')
+
+const keccak256 = require('keccak256')
+const Base58 = require('base-58')
+const blake = require('blake2')
 
 // would like to move away from this eventually but NodeJS Crypto
 // doesn't let me define my own format so the key output. We might

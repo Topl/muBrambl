@@ -1,4 +1,4 @@
-const Requests = require('./src/Requests.js');
+const LokiLayer = require('./src/Requests.js');
 const KeyManager = require('./src/KeyManager.js');
 const Hash = {
     file: require('./src/bifrostHashFile'),
@@ -12,4 +12,4 @@ const Hash = {
 //     window.LokiJS = LokiJS;
 // }
 
-module.exports = { Requests, KeyManager, Hash };
+module.exports = { LokiLayer, KeyManager, Hash };
