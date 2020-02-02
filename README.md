@@ -16,9 +16,10 @@ To install locally:
 Create an instance of LokiJS in your JS application by including:<br/>
 `const LokiJS = require('bifrost-lokijs')`
 
-LokiJS provides two primary modules, `Requests` and `KeyManager`. 
+LokiJS provides the following modules:
 * The `Requests` module provides a class for sending json-rpc requests to a targeted instance of Bifrost. 
-* The `KeyManager` module provides functions for creating, importing, and exporting Bifrost compatible keyfiles. Functions are also available to sign raw transactions, received from prototype requests, using locally managed keyfiles.
+* The `KeyManager` module provides functions for creating, importing, and exporting Bifrost compatible keyfiles. 
+* The `Hash` module recreates hashes calculated in Bifrost
 
 ## Requests
 The `Requests` module is compliant with Bifrost's Loki Layer interface documented at https://lokilayer.docs.topl.co <br/>
