@@ -1,10 +1,6 @@
 const LokiLayer = require('./src/Requests.js');
 const KeyManager = require('./src/KeyManager.js');
-const Hash = {
-    file: require('./src/bifrostHashFile'),
-    string: require('./src/bifrostHash'),
-    object: require('./src/bifrostHash'),
-}
+const Hash = require('./src/Hash.js')
 
 // this line might be wrong, I am incorporaing more into LokiJS, so changed the
 // original LokiJS require to be Requests (JAA)
