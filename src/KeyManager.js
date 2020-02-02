@@ -11,7 +11,7 @@ const crypto = require('crypto')
 const path = require('path')
 const fs = require('fs')
 
-const keccak256 = require('keccak256')
+const keccakCreateHash = require('keccak')
 const Base58 = require('base-58')
 const blake = require('blake2')
 
@@ -147,6 +147,7 @@ module.exports = {
      * @return {string} Base58-encoded MAC.
      */
     getMAC: function (derivedKey, ciphertext) {
+        const keccak256 = (msg) => keccakCreateHash('keccak256').update(msg).digest()
         if (derivedKey !== undefined && derivedKey !== null && ciphertext !== undefined && ciphertext !== null) {
             return keccak256(Buffer.concat([
                 this.str2buf(derivedKey).slice(16, 32),
