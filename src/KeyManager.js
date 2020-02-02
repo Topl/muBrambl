@@ -398,12 +398,12 @@ module.exports = {
      * @param {function=} cb Callback function (optional).
      * @return {string} JSON filename 
      */
-    exportToFile: function (keyStorage, keystore, cb) {
+    exportToFile: function (keyStorage, keyPath, cb) {
         let outfile, outpath, json;
-        keystore = keystore || "keystore";
+        keyPath = keyPath || "keyfiles";
         outfile = this.generateKeystoreFilename(keyStorage.publicKeyId);
         json = JSON.stringify(keyStorage);
-        outpath = path.join(keystore, outfile);
+        outpath = path.join(keyPath, outfile);
         if (!isFunction(cb)) {
             fs.writeFileSync(outpath, json);
             return outpath;
