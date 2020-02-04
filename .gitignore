@@ -113,6 +113,7 @@ dist
 # Project specific directories
 keyfiles/
 keystore/
+local/
 
 # Silly DS files
 .DS_Store
