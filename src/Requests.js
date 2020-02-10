@@ -333,6 +333,34 @@ LokiLayer.prototype.transferAssets = async function (params, id = "1") {
   return LokiRequest({ route, method, id }, params, this)
 }
 
+/////////////////transferAssetsPrototype////////////
+/**
+ * Transfer an asset to a recipient
+ * @param {object} params - body parameters passed to the specified json-rpc method
+ * @param {string} params.issuer - Public key of the asset issuer
+ * @param {string} params.assetCode - Identifier of the asset
+ * @param {string} params.recipient - Public key of the asset recipient
+ * @param {string|string[]} params.sender - Array of public keys which you can use to restrict sending from
+ * @param {number} params.amount - Amount of asset to send
+ * @param {number} params.fee - Fee to apply to the transaction
+ * @param {string} [params.changeAddress] - Public key you wish to send change back to
+ * @param {string} [params.data] - Data string which can be associated with this transaction (may be empty)
+ * @param {string} [id] - identifier for the json-rpc request
+ * @return {object} json-rpc response from the chain
+ */
+LokiLayer.prototype.transferAssetsPrototype = async function (params, id = "1") {
+  if (!params) throw new Error("A parameter object must be specified")
+  if (!params.issuer) throw new Error("An asset issuer must be specified")
+  if (!params.assetCode) throw new Error("An assetCode must be specified")
+  if (!params.recipient) throw new Error("A recipient must be specified")
+  if (!params.sender) throw new Error("A sender must be specified")
+  if (!params.amount) throw new Error("An amount must be specified")
+  if (!params.fee && params.fee !== 0) throw new Error("A fee must be specified")
+  const route = "asset/"
+  const method = "transferAssetsPrototype"
+  return LokiRequest({ route, method, id }, params, this)
+}
+
 /////////////////transferTargetAssets////////////
 /**
  * Transfer a specific asset box to a recipient
