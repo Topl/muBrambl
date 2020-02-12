@@ -4,7 +4,7 @@
  * @author James Aman (j.aman@topl.me)
  * 
  * Based on the keythereum library from Jack Peterson
- * https://github.com/Topljs/keythereum
+ * https://github.com/Ethereumjs/keythereum
  */
 
 const crypto = require('crypto')
