@@ -82,12 +82,12 @@ LokiLayer.prototype.setApiKey = function (apiKey) {
 /**
  * Get the balances of a specified public key in the keyfiles directory of the node
  * @param {Object} params - body parameters passed to the specified json-rpc method
- * @param {string|string[]} [params.publicKeys] - An array of public keys to query the balance for
+ * @param {string[]} params.publicKeys - An array of public keys to query the balance for
  * @param {number} id - identifying number for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
 LokiLayer.prototype.getBalancesByKey = async function (params, id = "1") {
-  if (!params.publicKeys) throw new Error("A publicKey field must be specified")
+  if (!params.publicKeys || !Array.isArray(params.publicKeys)) throw new Error("A list of publicKeys must be specified")
   const route = "wallet/"
   const method = "balances"
   return LokiRequest({ route, method, id }, params, this)
