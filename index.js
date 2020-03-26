@@ -1,4 +1,4 @@
-const LokiLayer = require('./src/Requests.js');
+const Requests = require('./src/Requests.js');
 const KeyManager = require('./src/KeyManager.js');
 const Hash = require('./src/Hash.js')
 
@@ -8,4 +8,4 @@ const Hash = require('./src/Hash.js')
 //     window.LokiJS = LokiJS;
 // }
 
-module.exports = { LokiLayer, KeyManager, Hash };
+module.exports = { Requests, KeyManager, Hash };

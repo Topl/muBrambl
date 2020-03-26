@@ -14,17 +14,10 @@ const fs = require('fs')
 const keccakCreateHash = require('keccak')
 const Base58 = require('base-58')
 const blake = require('blake2')
-
-// would like to move away from this eventually but NodeJS Crypto
-// doesn't let me define my own format so the key output. We might
-// eventually move to a standard encrypted encoding of the keyfile (like PEM)
-// but this will require us to change how Bifrost handles keys
 const curve25519 = require("curve25519-js");
 
-
-function isFunction(f) {
-    return typeof f === "function";
-}
+// function for checking the type input as a callback
+function isFunction(f) { return typeof f === "function"; }
 
 // Bifrost restricts the digest length to 32 bytes currently. Node crypto does not
 // currently allow me to set a digest length so we are using an external library.
@@ -32,401 +25,391 @@ function bifrostBlake2b(buffer) {
     return blake.createHash("blake2b", { digestLength: 32 }).update(buffer).digest();
 }
 
-module.exports = {
-    // Default options for key generation as of 2020.01.25
-    constants: {
+/**
+ * Convert a string to a Buffer.  If encoding is not specified, hex-encoding
+ * will be used if the input is valid hex.  If the input is valid base64 but
+ * not valid hex, base64 will be used.  Otherwise, utf8 will be used.
+ * @param {string} str String to be converted.
+ * @param {string=} enc Encoding of the input string (optional).
+ * @return {buffer} Buffer (bytearray) containing the input data.
+ */
+function str2buf(str, enc) {
+    if (!str || str.constructor !== String) return str;
+    return enc ? Buffer.from(str, enc) : Buffer.from(Base58.decode(str))
+}
 
-        // Symmetric cipher for private key encryption
-        //--- anything from crypto.getCiphers() is eligible
-        cipher: "aes-256-ctr",
+/**
+ * Check if the selected cipher is available.
+ * @param {string} algo Encryption algorithm.
+ * @return {boolean} If available true, otherwise false.
+ */
+function isCipherAvailable(cipher) {
+    return crypto.getCiphers().some(function (name) { return name === cipher; });
+}
 
-        // Initialization vector size in bytes
-        ivBytes: 16,
+/**
+ * Symmetric private key encryption using secret (derived) key.
+ * @param {buffer|string} plaintext Data to be encrypted.
+ * @param {buffer|string} key Secret key.
+ * @param {buffer|string} iv Initialization vector.
+ * @param {string=} algo Encryption algorithm (default: constants.cipher).
+ * @return {buffer} Encrypted data.
+ */
+function encrypt(plaintext, key, iv, algo) {
+    if (!isCipherAvailable(algo)) throw new Error(algo + " is not available");
+    const cipher = crypto.createCipheriv(algo, str2buf(key), str2buf(iv));
+    const ciphertext = cipher.update(str2buf(plaintext));
+    return Buffer.concat([ciphertext, cipher.final()]);
+}
 
-        // Private key size in bytes
-        keyBytes: 32,
+/**
+ * Symmetric private key decryption using secret (derived) key.
+ * @param {buffer|string} ciphertext Data to be decrypted.
+ * @param {buffer|string} key Secret key.
+ * @param {buffer|string} iv Initialization vector.
+ * @param {string=} algo Encryption algorithm (default: constants.cipher).
+ * @return {buffer} Decrypted data.
+ */
+function decrypt(ciphertext, key, iv, algo) {
+    if (!isCipherAvailable(algo)) throw new Error(algo + " is not available");
+    const decipher = crypto.createDecipheriv(algo, str2buf(key), str2buf(iv));
+    const plaintext = decipher.update(str2buf(ciphertext));
+    return Buffer.concat([plaintext, decipher.final()]);
+}
 
-        // Key derivation function parameters
-        scrypt: {
-            dklen: 32,
-            n: Math.pow(2, 18), // cost (as given in bifrost)
-            r: 8,        // blocksize
-            p: 1         // parallelization
-        }
-    },
+/**
+ * Calculate message authentication code from secret (derived) key and
+ * encrypted text.  The MAC is the keccak-256 hash of the byte array
+ * formed by concatenating the second 16 bytes of the derived key with
+ * the ciphertext key's contents.
+ * @param {buffer|string} derivedKey Secret key derived from password.
+ * @param {buffer|string} ciphertext Text encrypted with secret key.
+ * @return {string} Base58-encoded MAC.
+ */
+function getMAC(derivedKey, ciphertext) {
+    const keccak256 = (msg) => keccakCreateHash('keccak256').update(msg).digest()
+    if (derivedKey !== undefined && derivedKey !== null && ciphertext !== undefined && ciphertext !== null) {
+        return keccak256(Buffer.concat([
+            str2buf(derivedKey).slice(16, 32),
+            str2buf(ciphertext)
+        ]));
+    }
+}
 
-    /**
-     * Check whether a string is valid hex.
-     * @param {string} str String to validate.
-     * @return {boolean} True if the string is valid hex, false otherwise.
-     */
-    isHex: function (str) {
-        if (str.length % 2 === 0 && str.match(/^[0-9a-f]+$/i)) return true;
-        return false;
-    },
+/**
+ * Generate random numbers for private key, initialization vector,
+ * and salt (for key derivation).
+ * @param {Object} params Encryption options.
+ * @param {string} params.keyBytes Private key size in bytes.
+ * @param {string} params.ivBytes Initialization vector size in bytes.
+ * @param {function=} cb Callback function (optional).
+ * @return {Object} Keys, IV and salt.
+ */
+function create(params, cb) {
+    const keyBytes = params.keyBytes
+    const ivBytes = params.ivBytes
 
-    /**
-     * Check whether a string is valid base-64.
-     * @param {string} str String to validate.
-     * @return {boolean} True if the string is valid base-64, false otherwise.
-     */
-    isBase64: function (str) {
-        let index;
-        if (str.length % 4 > 0 || str.match(/[^0-9a-z+\/=]/i)) return false;
-        index = str.indexOf("=");
-        if (index === -1 || str.slice(index).match(/={1,2}/)) return true;
-        return false;
-    },
-
-    /**
-     * Convert a string to a Buffer.  If encoding is not specified, hex-encoding
-     * will be used if the input is valid hex.  If the input is valid base64 but
-     * not valid hex, base64 will be used.  Otherwise, utf8 will be used.
-     * @param {string} str String to be converted.
-     * @param {string=} enc Encoding of the input string (optional).
-     * @return {buffer} Buffer (bytearray) containing the input data.
-     */
-    str2buf: function (str, enc) {
-        if (!str || str.constructor !== String) return str;
-        // if (!enc && this.isHex(str)) enc = "hex";
-        // if (!enc && this.isBase64(str)) enc = "base64";
-        // our keys are Base-58 encoded for now so default to that
-        return enc ? Buffer.from(str, enc) : Buffer.from(Base58.decode(str))
-    },
-
-    /**
-     * Check if the selected cipher is available.
-     * @param {string} algo Encryption algorithm.
-     * @return {boolean} If available true, otherwise false.
-     */
-    isCipherAvailable: function (cipher) {
-        return crypto.getCiphers().some(function (name) { return name === cipher; });
-    },
-
-    /**
-     * Symmetric private key encryption using secret (derived) key.
-     * @param {buffer|string} plaintext Data to be encrypted.
-     * @param {buffer|string} key Secret key.
-     * @param {buffer|string} iv Initialization vector.
-     * @param {string=} algo Encryption algorithm (default: constants.cipher).
-     * @return {buffer} Encrypted data.
-     */
-    encrypt: function (plaintext, key, iv, algo) {
-        let cipher, ciphertext;
-        algo = algo || this.constants.cipher;
-        if (!this.isCipherAvailable(algo)) throw new Error(algo + " is not available");
-        cipher = crypto.createCipheriv(algo, this.str2buf(key), this.str2buf(iv));
-        ciphertext = cipher.update(this.str2buf(plaintext));
-        return Buffer.concat([ciphertext, cipher.final()]);
-    },
-
-    /**
-     * Symmetric private key decryption using secret (derived) key.
-     * @param {buffer|string} ciphertext Data to be decrypted.
-     * @param {buffer|string} key Secret key.
-     * @param {buffer|string} iv Initialization vector.
-     * @param {string=} algo Encryption algorithm (default: constants.cipher).
-     * @return {buffer} Decrypted data.
-     */
-    decrypt: function (ciphertext, key, iv, algo) {
-        let decipher, plaintext;
-        algo = algo || this.constants.cipher;
-        if (!this.isCipherAvailable(algo)) throw new Error(algo + " is not available");
-        decipher = crypto.createDecipheriv(algo, this.str2buf(key), this.str2buf(iv));
-        plaintext = decipher.update(this.str2buf(ciphertext));
-        return Buffer.concat([plaintext, decipher.final()]);
-    },
-
-    /**
-     * Calculate message authentication code from secret (derived) key and
-     * encrypted text.  The MAC is the keccak-256 hash of the byte array
-     * formed by concatenating the second 16 bytes of the derived key with
-     * the ciphertext key's contents.
-     * @param {buffer|string} derivedKey Secret key derived from password.
-     * @param {buffer|string} ciphertext Text encrypted with secret key.
-     * @return {string} Base58-encoded MAC.
-     */
-    getMAC: function (derivedKey, ciphertext) {
-        const keccak256 = (msg) => keccakCreateHash('keccak256').update(msg).digest()
-        if (derivedKey !== undefined && derivedKey !== null && ciphertext !== undefined && ciphertext !== null) {
-            return keccak256(Buffer.concat([
-                this.str2buf(derivedKey).slice(16, 32),
-                this.str2buf(ciphertext)
-            ]));
-        }
-    },
-
-    /**
-     * Derive secret key from password with key derivation function.
-     * @param {string|buffer} password User-supplied password.
-     * @param {string|buffer} salt Randomly generated salt.
-     * @param {Object=} options Encryption parameters.
-     * @param {string=} options.kdf Key derivation function (default: scrypt).
-     * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
-     * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
-     * @param {function=} cb Callback function (optional).
-     * @return {buffer} Secret key derived from password.
-     */
-    deriveKey: function (password, salt, options, cb) {
-        if (typeof password === "undefined" || password === null || !salt) {
-            throw new Error("Must provide password and salt to derive a key");
-        }
-        options = options || {};
-        options.kdfparams = options.kdfparams || {};
-
-        // convert strings to buffers
-        password = this.str2buf(password, "utf8");
-        salt = this.str2buf(salt);
-
-        // get scrypt parameters
-        N = options.kdfparams.n || this.constants.scrypt.n
-        r = options.kdfparams.r || this.constants.scrypt.r
-        p = options.kdfparams.p || this.constants.scrypt.p
-        maxmem = 2 * 128 * N * r
-
-        // use scrypt as key derivation function
-        // synchronous key generation if callback not provided
-        if (!isFunction(cb)) {
-            return crypto.scryptSync(password, salt, this.constants.scrypt.dklen, { N, r, p, maxmem })
-        }
-
-        // asynchronous key generation
-        cb(function (err, deriveKey) {
-            if (err) return cb(err);
-            crypto.scrypt(password, salt, this.constants.scrypt.dklen, { N, r, p, maxmem })
-        });
-    },
-
-    /**
-     * Generate random numbers for private key, initialization vector,
-     * and salt (for key derivation).
-     * @param {Object=} params Encryption options (defaults: constants).
-     * @param {string=} params.keyBytes Private key size in bytes.
-     * @param {string=} params.ivBytes Initialization vector size in bytes.
-     * @param {function=} cb Callback function (optional).
-     * @return {Object<string,buffer>} Keys, IV and salt.
-     */
-    create: function (params, cb) {
-        let keyBytes, ivBytes
-        params = params || {};
-        keyBytes = params.keyBytes || this.constants.keyBytes;
-        ivBytes = params.ivBytes || this.constants.ivBytes;
-
-        function curve25519KeyGen(randomBytes) {
-            const { public, private } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
-            return {
-                publicKey: Buffer.from(public),
-                privateKey: Buffer.from(private),
-                iv: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes + keyBytes)).slice(0, ivBytes),
-                salt: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes))
-            };
-        }
-
-        // synchronous key generation if callback not provided
-        if (!isFunction(cb)) {
-            return curve25519KeyGen(crypto.randomBytes(keyBytes + ivBytes + keyBytes));
-        }
-
-        // asynchronous key generation
-        crypto.randomBytes(keyBytes + ivBytes + keyBytes, function (err, randomBytes) {
-            if (err) return cb(err);
-            cb(curve25519KeyGen(randomBytes));
-        });
-    },
-
-    /**
-     * Generate the signature of a message using the provided private key
-     * @param {buffer=} privateKey A private key
-     * @param {string=} message Message to sign
-     * @param {function=} cb Callback function (optional).
-     * @return {buffer=} signature 
-     */
-    sign: function (privateKey, message, cb) {
-        function curve25519sign(privateKey, message) {
-            return curve25519.sign(privateKey, message, crypto.randomBytes(64))
-        }
-
-        // synchronous key generation if callback not provided
-        if (!isFunction(cb)) {
-            return curve25519sign(this.str2buf(privateKey), this.str2buf(message));
-        }
-
-        // asynchronous
-        cb(curve25519sign(this.str2buf(privateKey), this.str2buf(message)));
-    },
-
-    /**
-     * Check whether a private key was used to generate the 
-     * @param {buffer=} publicKey A public key
-     * @param {string=} message Message to sign
-     * @param {buffer=} signature 
-     * @param {function=} cb Callback function (optional).
-     * @return {boolean=} 
-     */
-    verify: function (publicKey, message, signature, cb) {
-        // synchronous key generation if callback not provided
-        if (!isFunction(cb)) {
-            return curve25519.verify(this.str2buf(publicKey), this.str2buf(message), this.str2buf(signature)) ;
-        }
-
-        // asynchronous
-        cb(curve25519.verify(this.str2buf(publicKey), this.str2buf(message), this.str2buf(signature)));
-    },
-
-    /**
-     * Assemble key data object in secret-storage format.
-     * @param {buffer} derivedKey Password-derived secret key.
-     * @param {Object} keyObject Object containing the raw public / private keypair 
-     * @param {buffer} salt Randomly generated salt.
-     * @param {buffer} iv Initialization vector.
-     * @param {Object=} options Encryption parameters.
-     * @param {string=} options.kdf Key derivation function (default: scrypt).
-     * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
-     * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
-     * @return {Object} key data object in secret-storage format
-     */
-    marshal: function (derivedKey, keyObject, salt, iv, options) {
-        let ciphertext, keyStorage, algo;
-        options = options || {};
-        options.kdfparams = options.kdfparams || {};
-        algo = options.cipher || this.constants.cipher;
-
-        // encrypt using last 16 bytes of derived key (this matches Bifrost)
-        ciphertext = this.encrypt(keyObject.privateKey, derivedKey, iv, algo);
-
-        keyStorage = {
-            publicKeyId: Base58.encode(keyObject.publicKey),
-            crypto: {
-                cipher: options.cipher || this.constants.cipher,
-                cipherText: Base58.encode(ciphertext),
-                cipherParams: { iv: Base58.encode(iv) },
-                mac: Base58.encode(this.getMAC(derivedKey, ciphertext))
-            },
+    function curve25519KeyGen(randomBytes) {
+        const { public, private } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
+        return {
+            publicKey: Buffer.from(public),
+            privateKey: Buffer.from(private),
+            iv: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes + keyBytes)).slice(0, ivBytes),
+            salt: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes))
         };
-
-        keyStorage.crypto.kdf = "scrypt";
-        keyStorage.crypto.kdfSalt = Base58.encode(salt)
-
-        return keyStorage;
-    },
-
-    /**
-     * Export private key to keystore secret-storage format.
-     * @param {string|buffer} password User-supplied password.
-     * @param {Object} keyObject Object containing the raw public / private keypair 
-     * @param {string|buffer} salt Randomly generated salt.
-     * @param {string|buffer} iv Initialization vector.
-     * @param {Object=} options Encryption parameters.
-     * @param {string=} options.kdf Key derivation function (default: scrypt).
-     * @param {string=} options.cipher Symmetric cipher (default: constants.cipher).
-     * @param {Object=} options.kdfparams KDF parameters (default: constants.<kdf>).
-     * @param {function=} cb Callback function (optional).
-     * @return {Object} keyStorage for use with exportToFile
-     */
-    dump: function (password, keyObject, options, cb) {
-        options = options || {};
-        iv = this.str2buf(keyObject.iv);
-        salt = this.str2buf(keyObject.salt);
-        privateKey = this.str2buf(keyObject.privateKey);
-        publicKey = this.str2buf(keyObject.publicKey);
-
-        // synchronous if no callback provided
-        if (!isFunction(cb)) {
-            return this.marshal(this.deriveKey(password, salt, options), { privateKey, publicKey }, salt, iv, options);
-        }
-
-        // asynchronous if callback provided
-        this.deriveKey(password, salt, options, function (derivedKey) {
-            cb(this.marshal(derivedKey, privateKey, salt, iv, options));
-        }.bind(this));
-    },
-
-    /**
-     * Recover plaintext private key from secret-storage key object.
-     * @param {Object} keyStorage Keystore object.
-     * @param {function=} cb Callback function (optional).
-     * @return {buffer} Plaintext private key.
-     */
-    recover: function (password, keyStorage, cb) {
-        let keyStorageCrypto, iv, salt, ciphertext, algo, self = this;
-        keyStorageCrypto = keyStorage.Crypto || keyStorage.crypto;
-
-        // verify that message authentication codes match, then decrypt
-        function verifyAndDecrypt(derivedKey, iv, ciphertext, algo) {
-            if (!self.getMAC(derivedKey, ciphertext).equals(self.str2buf(keyStorageCrypto.mac))) {
-                throw new Error("message authentication code mismatch");
-            }
-            // What is going on with this line below ?!?
-            //key = bifrostBlake2b(derivedKey.slice(0, 16)).slice(0, 16);
-            return self.decrypt(ciphertext, derivedKey, iv, algo);
-        }
-
-        iv = this.str2buf(keyStorageCrypto.cipherParams.iv);
-        salt = this.str2buf(keyStorageCrypto.kdfSalt);
-        ciphertext = this.str2buf(keyStorageCrypto.cipherText);
-        algo = keyStorageCrypto.cipher;
-
-        // derive secret key from password
-        if (!isFunction(cb)) {
-            return verifyAndDecrypt(this.deriveKey(password, salt, keyStorageCrypto), iv, ciphertext, algo);
-        }
-        this.deriveKey(password, salt, keyStorageCrypto, function (derivedKey) {
-            try {
-                cb(verifyAndDecrypt(derivedKey, salt, iv, ciphertext, algo));
-            } catch (exc) {
-                cb(exc);
-            }
-        });
-    },
-
-    /**
-     * Generate filename for a keystore file.
-     * @param {string} publicKeyId Topl address.
-     * @return {string} Keystore filename.
-     */
-    generateKeystoreFilename: function (publicKey) {
-        if (typeof publicKey !== 'string') throw new Error('PublicKey must be given as a string for the filename')
-        let filename = new Date().toISOString() + "-" + publicKey + ".json";
-
-        return filename.split(":").join("-");
-    },
-
-    /**
-     * Export formatted JSON to keystore file.
-     * @param {Object} keyStorage Keystore object.
-     * @param {string=} keystore Path to keystore folder (default: "keystore").
-     * @param {function=} cb Callback function (optional).
-     * @return {string} JSON filename 
-     */
-    exportToFile: function (keyStorage, keyPath, cb) {
-        let outfile, outpath, json;
-        keyPath = keyPath || "keyfiles";
-        outfile = this.generateKeystoreFilename(keyStorage.publicKeyId);
-        json = JSON.stringify(keyStorage);
-        outpath = path.join(keyPath, outfile);
-        if (!isFunction(cb)) {
-            fs.writeFileSync(outpath, json);
-            return outpath;
-        }
-        fs.writeFile(outpath, json, function (err) {
-            if (err) return cb(err);
-            cb(outpath);
-        });
-    },
-
-    /**
-     * Import key data object from keystore JSON file.
-     * (Note: Node.js only!)
-     * @param {string} filepath path to stored keyfile
-     * @param {function=} cb Callback function (optional).
-     * @return {Object} Keystore data file's contents.
-     */
-    importFromFile: function (filepath, cb) {
-        if (!isFunction(cb)) {
-            return JSON.parse(fs.readFileSync(filepath));
-        }
-
-        return cb(JSON.parse(fs.readFileSync(filepath)));
     }
 
+    // synchronous key generation if callback not provided
+    if (!isFunction(cb)) {
+        return curve25519KeyGen(crypto.randomBytes(keyBytes + ivBytes + keyBytes));
+    }
+
+    // asynchronous key generation
+    crypto.randomBytes(keyBytes + ivBytes + keyBytes, function (randomBytes) {
+        cb(curve25519KeyGen(randomBytes));
+    });
+}
+
+/**
+ * Derive secret key from password with key derivation function.
+ * @param {string|buffer} password User-supplied password.
+ * @param {string|buffer} salt Randomly generated salt.
+ * @return {buffer} Secret key derived from password.
+ */
+function deriveKey(password, salt, kdfParams, cb) {
+    if (typeof password === "undefined" || password === null || !salt) {
+        throw new Error("Must provide password and salt to derive a key");
+    }
+
+    // convert strings to buffers
+    password = str2buf(password, "utf8");
+    salt = str2buf(salt);
+
+    // get scrypt parameters
+    const dkLen = kdfParams.dkLen
+    const N = kdfParams.n
+    const r = kdfParams.r
+    const p = kdfParams.p
+    const maxmem = 2 * 128 * N * r
+
+    // use scrypt as key derivation function
+    if (!isFunction(cb)) {
+        return crypto.scryptSync(password, salt, dkLen, { N, r, p, maxmem })
+    }
+
+    // asynchronous key generation
+    cb(crypto.scryptSync(password, salt, dkLen, { N, r, p, maxmem }));
+}
+
+/**
+ * Assemble key data object in secret-storage format.
+ * @param {buffer} derivedKey Password-derived secret key.
+ * @param {Object} keyObject Object containing the raw public / private keypair 
+ * @param {buffer} salt Randomly generated salt.
+ * @param {buffer} iv Initialization vector.
+ * @param {buffer} algo encryption algorithm to be used
+ * @return {Object} key data object in secret-storage format
+ */
+function marshal(derivedKey, keyObject, salt, iv, algo) {
+    // encrypt using last 16 bytes of derived key (this matches Bifrost)
+    const ciphertext = encrypt(keyObject.privateKey, derivedKey, iv, algo);
+
+    const keyStorage = {
+        publicKeyId: Base58.encode(keyObject.publicKey),
+        crypto: {
+            cipher: algo,
+            cipherText: Base58.encode(ciphertext),
+            cipherParams: { iv: Base58.encode(iv) },
+            mac: Base58.encode(getMAC(derivedKey, ciphertext))
+        },
+    };
+
+    keyStorage.crypto.kdf = "scrypt";
+    keyStorage.crypto.kdfSalt = Base58.encode(salt)
+
+    return keyStorage;
+}
+
+/**
+ * Export private key to keystore secret-storage format.
+ * @param {string|buffer} password User-supplied password.
+ * @param {Object} keyObject Object containing the raw public / private keypair 
+ * @param {buffer} algo encryption algorithm to be used
+ * @param {function=} cb Callback function (optional).
+ * @return {Object} keyStorage for use with exportToFile
+ */
+function dump(password, keyObject, options, cb) {
+    const kdfParams = options.kdfParams || options.scrypt
+    const iv = str2buf(keyObject.iv);
+    const salt = str2buf(keyObject.salt);
+    const privateKey = str2buf(keyObject.privateKey);
+    const publicKey = str2buf(keyObject.publicKey);
+
+    // synchronous if no callback provided
+    if (!isFunction(cb)) {
+        return marshal(deriveKey(password, salt, kdfParams), { privateKey, publicKey }, salt, iv, options.cipher);
+    }
+
+    // asynchronous if callback provided
+    deriveKey(password, salt, function (derivedKey) {
+        cb(marshal(derivedKey, privateKey, salt, iv, options.cipher));
+    }.bind(this));
+}
+
+/**
+ * Recover plaintext private key from secret-storage key object.
+ * @param {Object} keyStorage Keystore object.
+ * @param {function=} cb Callback function (optional).
+ * @param {Object} kdfParams 
+ * @return {buffer} Plaintext private key.
+ */
+function recover(password, keyStorage, kdfParams, cb) {
+    // verify that message authentication codes match, then decrypt
+    function verifyAndDecrypt(derivedKey, iv, ciphertext, mac, algo) {
+        if (!getMAC(derivedKey, ciphertext).equals(mac)) {
+            throw new Error("message authentication code mismatch");
+        }
+        return decrypt(ciphertext, derivedKey, iv, algo);
+    }
+
+    const iv = str2buf(keyStorage.crypto.cipherParams.iv);
+    const salt = str2buf(keyStorage.crypto.kdfSalt);
+    const ciphertext = str2buf(keyStorage.crypto.cipherText);
+    const mac = str2buf(keyStorage.crypto.mac);
+    const algo = keyStorage.crypto.cipher;
+
+    // derive secret key from password
+    if (!isFunction(cb)) {
+        return verifyAndDecrypt(deriveKey(password, salt, kdfParams), iv, ciphertext, mac, algo);
+    }
+
+    deriveKey(password, salt, kdfParams, derivedKey => {
+        cb(verifyAndDecrypt(derivedKey, iv, ciphertext, mac, algo));
+    });
+}
+
+/**
+ * Generate filename for a keystore file.
+ * @param {string} publicKeyId Topl address.
+ * @return {string} Keystore filename.
+ */
+function generateKeystoreFilename(publicKey) {
+    if (typeof publicKey !== 'string') throw new Error('PublicKey must be given as a string for the filename')
+    let filename = new Date().toISOString() + "-" + publicKey + ".json";
+
+    return filename.split(":").join("-");
+}
+
+/**
+ * Check that a keyStorage object exists for the class
+ * @param {object} keyStorage The keyStorage from the class
+ * @return {object} 
+ */
+function isKeyInitialized(pk) {
+    if (!pk) throw new Error('A key must be initialized before using this key manager')
+    return true
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///// Key Manager Class //////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Default options for key generation as of 2020.01.25  
+const defaultOptions = {
+    // Symmetric cipher for private key encryption
+    //--- anything from crypto.getCiphers() is eligible
+    cipher: "aes-256-ctr",
+
+    // Initialization vector size in bytes
+    ivBytes: 16,
+
+    // Private key size in bytes
+    keyBytes: 32,
+
+    // Key derivation function parameters
+    scrypt: {
+        dkLen: 32,
+        n: Math.pow(2, 18), // cost (as given in bifrost)
+        r: 8,        // blocksize
+        p: 1         // parallelization
+    }
+}
+
+
+/**
+ * The Key management interface object.
+ * 
+ * @param {object} [constants]
+ */
+class KeyManager {
+    constructor (constants) {
+        this.constants = constants || defaultOptions 
+        this.key = {}
+    }
+
+    initKeyStorage(keyStorage, password) {
+        this.key.pk = keyStorage.publicKeyId;
+        this.key.sk = keyStorage.crypto;
+        this.key.password = password;
+    };
+
+    getKeyStorage() {
+        if (isKeyInitialized(this.key.pk)) return { publicKeyId: this.key.pk, crypto: this.key.sk }
+    }
 };
+
+/** 
+ * Generate a new keyfile and encrypt it using the given password
+ * @param {string=} password Encryption password
+ * @param {object?} [params] key creation parameters
+ * @return {Object} keyStorage for use with exportToFile
+ */
+KeyManager.prototype.generateKey = function (password) {
+    const params = this.constants
+    this.initKeyStorage(dump(password, create(params), params), password)
+}
+
+/**
+ * Generate the signature of a message using the provided private key
+ * @param {buffer=} privateKey A private key
+ * @param {string=} message Message to sign
+ * @param {function=} cb Callback function (optional).
+ * @return {buffer=} signature 
+ */
+KeyManager.prototype.sign = function (message, cb) {
+    const kdfParams = this.constants.scrypt
+    const keyStorage = this.getKeyStorage()
+    const password = this.key.password
+    
+
+    function curve25519sign(privateKey, message) {
+        return curve25519.sign(str2buf(privateKey), str2buf(message, 'utf8'), crypto.randomBytes(64))
+    }
+
+    // synchronous key generation if callback not provided
+    if (!isFunction(cb)) {
+        return curve25519sign(recover(password, keyStorage, kdfParams), message);
+    }
+
+    // asynchronous
+    let sig = {}
+    recover(password, keyStorage, kdfParams, sk => { sig = cb(curve25519sign(sk, message)) });
+    return sig
+}
+
+/**
+ * Check whether a private key was used to generate the 
+ * @param {buffer=} publicKey A public key
+ * @param {string=} message Message to sign
+ * @param {buffer=} signature 
+ * @param {function=} cb Callback function (optional).
+ * @return {boolean=} 
+ */
+KeyManager.prototype.verify = function (publicKey, message, signature, cb) {
+    const pk = str2buf(publicKey)
+    const msg = str2buf(message, 'utf8')
+    const sig = str2buf(signature)
+
+    // synchronous key generation if callback not provided
+    if (!isFunction(cb)) {
+        return curve25519.verify(pk, msg, sig);
+    }
+
+    // asynchronous
+    cb(curve25519.verify(pk, msg, sug));
+}
+
+/**
+ * Export formatted JSON to keystore file.
+ * @param {Object} keyStorage Keystore object.
+ * @param {string=} keystore Path to keystore folder (default: "keystore").
+ * @return {string} JSON filename 
+ */
+KeyManager.prototype.exportToFile = function (_keyPath) {
+    const keyPath = _keyPath || "keyfiles";
+    const keyStorage = this.getKeyStorage();
+
+    outfile = generateKeystoreFilename(keyStorage.publicKeyId);
+    json = JSON.stringify(keyStorage);
+    outpath = path.join(keyPath, outfile);
+
+    fs.writeFileSync(outpath, json);
+    return outpath;
+}
+
+/**
+ * Import key data object from keystore JSON file.
+ * (Note: Node.js only!)
+ * @param {string} filepath path to stored keyfile
+ * @return {Object} Keystore data file's contents.
+ */
+KeyManager.prototype.importFromFile = function (filepath, password) {
+    const keyStorage = JSON.parse(fs.readFileSync(filepath));
+    this.initKeyStorage(keyStorage, password)
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module.exports = KeyManager;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 /** A Javascript API wrapper module for the Bifrost Protocol.
  * Currently supports version 4.1 of Bifrost's Loki-Layer API
- * Documentation for Loki-layer is available at https://lokilayer.docs.topl.co
+ * Documentation for Loki-layer is available at https://Requests.docs.topl.co
  *
  * @author James Ama (j.aman@topl.me)
  * @version 4.1.0
@@ -57,7 +57,7 @@ async function LokiRequest(routeInfo, params, self) {
  * @param {string} [url="http://localhost:9085/"]
  * @param {string} [apiKey="topl_the_world!"]
  */
-const LokiLayer = function (url = "http://localhost:9085/", apiKey = "topl_the_world!") {
+const Requests = function (url = "http://localhost:9085/", apiKey = "topl_the_world!") {
   this.url = url;
   this.headers = {
     "Content-Type": "application/json",
@@ -66,11 +66,11 @@ const LokiLayer = function (url = "http://localhost:9085/", apiKey = "topl_the_w
 };
 
 //Allows setting a different url than the default from which to create and accept RPC connections
-LokiLayer.prototype.setUrl = function (url) {
+Requests.prototype.setUrl = function (url) {
   this.url = url;
 };
 
-LokiLayer.prototype.setApiKey = function (apiKey) {
+Requests.prototype.setApiKey = function (apiKey) {
   this.headers["x-api-key"] = apiKey
 };
 
@@ -86,7 +86,7 @@ LokiLayer.prototype.setApiKey = function (apiKey) {
  * @param {number} id - identifying number for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.getBalancesByKey = async function (params, id = "1") {
+Requests.prototype.getBalancesByKey = async function (params, id = "1") {
   if (!params.publicKeys || !Array.isArray(params.publicKeys)) throw new Error("A list of publicKeys must be specified")
   const route = "wallet/"
   const method = "balances"
@@ -100,7 +100,7 @@ LokiLayer.prototype.getBalancesByKey = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.listOpenKeyfiles = async function (id = "1") {
+Requests.prototype.listOpenKeyfiles = async function (id = "1") {
   const params = {};
   const route = "wallet/"
   const method = "listOpenKeyfiles"
@@ -115,7 +115,7 @@ LokiLayer.prototype.listOpenKeyfiles = async function (id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.generateKeyfile = async function (params, id = "1") {
+Requests.prototype.generateKeyfile = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.password) throw new Error("A password must be provided to encrypt the keyfile")
   const route = "wallet/"
@@ -132,7 +132,7 @@ LokiLayer.prototype.generateKeyfile = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.lockKeyfile = async function (params, id = "1") {
+Requests.prototype.lockKeyfile = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.publicKey) throw new Error("A publicKey field must be specified")
   if (!params.password) throw new Error("A password must be provided to encrypt the keyfile")
@@ -150,7 +150,7 @@ LokiLayer.prototype.lockKeyfile = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.unlockKeyfile = async function (params, id = "1") {
+Requests.prototype.unlockKeyfile = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.publicKey) throw new Error("A publicKey field must be specified")
   if (!params.password) throw new Error("A password must be provided to encrypt the keyfile")
@@ -168,7 +168,7 @@ LokiLayer.prototype.unlockKeyfile = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.signTransaction = async function (params, id = "1") {
+Requests.prototype.signTransaction = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.publicKey) throw new Error("A publicKey field must be specified")
   if (!params.tx) throw new Error("A tx object must be specified")
@@ -185,7 +185,7 @@ LokiLayer.prototype.signTransaction = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.broadcastTx = async function (params, id = "1") {
+Requests.prototype.broadcastTx = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.tx) throw new Error("A tx object must be specified")
   const route = "wallet/"
@@ -206,7 +206,7 @@ LokiLayer.prototype.broadcastTx = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.transferPolys = async function (params, id = "1") {
+Requests.prototype.transferPolys = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.amount) throw new Error("An amount must be specified")
@@ -229,7 +229,7 @@ LokiLayer.prototype.transferPolys = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.transferArbits = async function (params, id = "1") {
+Requests.prototype.transferArbits = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.amount) throw new Error("An amount must be specified")
@@ -256,7 +256,7 @@ LokiLayer.prototype.transferArbits = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.createAssets = async function (params, id = "1") {
+Requests.prototype.createAssets = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.issuer) throw new Error("An asset issuer must be specified")
   if (!params.assetCode) throw new Error("An assetCode must be specified")
@@ -281,7 +281,7 @@ LokiLayer.prototype.createAssets = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.createAssetsPrototype = async function (params, id = "1") {
+Requests.prototype.createAssetsPrototype = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.issuer) throw new Error("An asset issuer must be specified")
   if (!params.assetCode) throw new Error("An assetCode must be specified")
@@ -308,7 +308,7 @@ LokiLayer.prototype.createAssetsPrototype = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.transferAssets = async function (params, id = "1") {
+Requests.prototype.transferAssets = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.issuer) throw new Error("An asset issuer must be specified")
   if (!params.assetCode) throw new Error("An assetCode must be specified")
@@ -335,7 +335,7 @@ LokiLayer.prototype.transferAssets = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.transferAssetsPrototype = async function (params, id = "1") {
+Requests.prototype.transferAssetsPrototype = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.issuer) throw new Error("An asset issuer must be specified")
   if (!params.assetCode) throw new Error("An assetCode must be specified")
@@ -360,7 +360,7 @@ LokiLayer.prototype.transferAssetsPrototype = async function (params, id = "1") 
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.transferTargetAssets = async function (params, id = "1") {
+Requests.prototype.transferTargetAssets = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.assetId) throw new Error("An assetId is required for this request")
@@ -384,7 +384,7 @@ LokiLayer.prototype.transferTargetAssets = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.transferTargetAssetsPrototype = async function (params, id = "1") {
+Requests.prototype.transferTargetAssetsPrototype = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.recipient) throw new Error("A recipient must be specified")
   if (!params.sender) throw new Error("A sender must be specified")
@@ -408,7 +408,7 @@ LokiLayer.prototype.transferTargetAssetsPrototype = async function (params, id =
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.getTransactionById = async function (params, id = "1") {
+Requests.prototype.getTransactionById = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.transactionId) throw new Error("A transactionId must be specified")
   const route = "nodeView/"
@@ -424,7 +424,7 @@ LokiLayer.prototype.getTransactionById = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.getTransactionFromMempool = async function (params, id = "1") {
+Requests.prototype.getTransactionFromMempool = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.transactionId) throw new Error("A transactionId must be specified")
   const route = "nodeView/"
@@ -438,7 +438,7 @@ LokiLayer.prototype.getTransactionFromMempool = async function (params, id = "1"
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.getMempool = async function (id = "1") {
+Requests.prototype.getMempool = async function (id = "1") {
   const params = {};
   const route = "nodeView/"
   const method = "mempool"
@@ -453,7 +453,7 @@ LokiLayer.prototype.getMempool = async function (id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.getBlockById = async function (params, id = "1") {
+Requests.prototype.getBlockById = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.blockId) throw new Error("A blockId must be specified")
   const route = "nodeView/"
@@ -471,7 +471,7 @@ LokiLayer.prototype.getBlockById = async function (params, id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.chainInfo = async function (id = "1") {
+Requests.prototype.chainInfo = async function (id = "1") {
   const params = {};
   const route = "debug/"
   const method = "info"
@@ -487,7 +487,7 @@ LokiLayer.prototype.chainInfo = async function (id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.calcDelay = async function (id = "1") {
+Requests.prototype.calcDelay = async function (id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.blockId) throw new Error("A blockId must be specified")
   if (!params.numBlocks) throw new Error("A number of blocks must be specified")
@@ -502,7 +502,7 @@ LokiLayer.prototype.calcDelay = async function (id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.myBlocks = async function (id = "1") {
+Requests.prototype.myBlocks = async function (id = "1") {
   const params = {};
   const route = "debug/"
   const method = "myBlocks"
@@ -515,7 +515,7 @@ LokiLayer.prototype.myBlocks = async function (id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.blockGenerators = async function (id = "1") {
+Requests.prototype.blockGenerators = async function (id = "1") {
   const params = {};
   const route = "debug/"
   const method = "generators"
@@ -528,7 +528,7 @@ LokiLayer.prototype.blockGenerators = async function (id = "1") {
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */
-LokiLayer.prototype.printChain = async function (id = "1") {
+Requests.prototype.printChain = async function (id = "1") {
   const params = {};
   const route = "debug/"
   const method = "chain"
@@ -543,7 +543,7 @@ LokiLayer.prototype.printChain = async function (id = "1") {
 // the first call of getTx to fail and thus the whole thing is failing.
 
 // //Trying to couple setInterval and setTimeout to wrap the findTransactionById fetch request
-// LokiLayer.prototype.onConfirm = function (
+// Requests.prototype.onConfirm = function (
 //   transactionResult,
 //   timeout = 60000,
 //   interval = 3000
@@ -604,6 +604,6 @@ LokiLayer.prototype.printChain = async function (id = "1") {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module.exports = LokiLayer;
+module.exports = Requests;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
