@@ -1,7 +1,7 @@
 {
   "name": "bifrost-lokijs",
   "repository": "https://github.com/Topl/LokiJS",
-  "version": "2.1.3",
+  "version": "2.2.0",
   "main": "index.js",
   "scripts": {
     "mochaTest": "mocha test/it",
