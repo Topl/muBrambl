@@ -295,26 +295,49 @@ const defaultOptions = {
     }
 }
 
-
 /**
  * The Key management interface object.
  * 
  * @param {object} [constants]
  */
 class KeyManager {
+    #sk;
+    #password;
+
     constructor (constants) {
         this.constants = constants || defaultOptions 
-        this.key = {}
+        this.pk = null;
+        this.isLocked = false;
+        this.#sk = {};
+        this.#password = null;
     }
 
     initKeyStorage(keyStorage, password) {
-        this.key.pk = keyStorage.publicKeyId;
-        this.key.sk = keyStorage.crypto;
-        this.key.password = password;
+        this.pk = keyStorage.publicKeyId;
+        this.isLocked = false
+        this.#sk = keyStorage.crypto;
+        this.#password = password;
     };
 
+    lockKey() {
+        this.isLocked = true;
+    }
+
+    unlockKey(_password) {
+        if (!this.isLocked) throw new Error('The key is already unlocked')
+        if (_password !== this.#password) throw new Error('Invalid password')
+        this.isLocked = false;
+    }
+
     getKeyStorage() {
-        if (isKeyInitialized(this.key.pk)) return { publicKeyId: this.key.pk, crypto: this.key.sk }
+        if (isKeyInitialized(this.pk)) return { publicKeyId: this.pk, crypto: this.#sk }
+    }
+
+    getPassword() {
+        if (this.isLocked) {
+            throw new Error('Key manager is currently locked. Please unlock and try again.')
+        }
+        return this.#password
     }
 };
 
@@ -325,13 +348,12 @@ class KeyManager {
  * @return {Object} keyStorage for use with exportToFile
  */
 KeyManager.prototype.generateKey = function (password) {
-    const params = this.constants
-    this.initKeyStorage(dump(password, create(params), params), password)
+    if (!password) throw new Error('An encryption password must be provided to secure your key')
+    this.initKeyStorage(dump(password, create(this.constants), this.constants), password)
 }
 
 /**
  * Generate the signature of a message using the provided private key
- * @param {buffer=} privateKey A private key
  * @param {string=} message Message to sign
  * @param {function=} cb Callback function (optional).
  * @return {buffer=} signature 
@@ -339,7 +361,7 @@ KeyManager.prototype.generateKey = function (password) {
 KeyManager.prototype.sign = function (message, cb) {
     const kdfParams = this.constants.scrypt
     const keyStorage = this.getKeyStorage()
-    const password = this.key.password
+    const password = this.getPassword()
     
 
     function curve25519sign(privateKey, message) {
