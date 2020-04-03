@@ -1,3 +1,12 @@
+/** A helper library for interacting with the Topl protocol.
+ * Requests to the API layer of a chain provider conform to JSON-RPC standards and are managed by the Requests module
+ * Key Management conforms to the Monon specification of the Topl protocol as implemented in the reference client Bifrost v0.2.5
+ *
+ * @author James Aman (j.aman@topl.me)
+ * @version 3.0.0
+ * @date 2020.4.03
+ **/
+
 const base58 = require('base-58')
 
 // internal classes
@@ -15,12 +24,16 @@ const validTxMethods = [
 ]
 
 /**
- * A class for simplifying interactions with the Topl blockchain
- *
+ * Primary class defintion
  * @class Loki
  */
 class Loki {
 
+    /**
+     *Creates an instance of Loki.
+     * @param {*} [params={}]
+     * @memberof Loki
+     */
     constructor(params = {}) {
         // default values for the constructor arguement
         const keyManagerVar = params.KeyManager || {};
@@ -52,7 +65,6 @@ class Loki {
 
         // Import utilities
         this.utils = { hash }
-
     }
 }
 

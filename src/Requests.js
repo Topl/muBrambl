@@ -3,7 +3,6 @@
  * Documentation for Loki-layer is available at https://Requests.docs.topl.co
  *
  * @author James Ama (j.aman@topl.me)
- * @version 4.1.0
  * @date 2020.0.29
  * 
  * Based on the original work of Yamir Tainwala - 2019
