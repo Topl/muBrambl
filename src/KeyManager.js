@@ -298,7 +298,7 @@ const defaultOptions = {
 /**
  * The Key management interface object.
  * 
- * @param {object} [constants]
+ * @param {object} [constants] default encryption options for storing keyfiles
  */
 class KeyManager {
     #sk;
@@ -312,6 +312,11 @@ class KeyManager {
         this.#password = null;
     }
 
+    /**
+     * Initialize a key manager object with a key storage object
+     * @param {Object} keyStorage Keystore object (encrypted key file)
+     * @param {string} password encryption password for accessing the keystorage object
+     */
     initKeyStorage(keyStorage, password) {
         this.pk = keyStorage.publicKeyId;
         this.isLocked = false
@@ -319,21 +324,35 @@ class KeyManager {
         this.#password = password;
     };
 
+    /**
+     * Set the key manager to locked so that the private key may not be decrypted
+     */
     lockKey() {
         this.isLocked = true;
     }
 
+    /**
+     * Unlock the key manager to be used in transactions
+     * @param {string} _password encryption password for accessing the keystorage object
+     */
     unlockKey(_password) {
         if (!this.isLocked) throw new Error('The key is already unlocked')
         if (_password !== this.#password) throw new Error('Invalid password')
         this.isLocked = false;
     }
 
-    getKeyStorage() {
+    /**
+     * Getter function to retrieve key storage in the Bifrost compatible format
+     */
+    _getKeyStorage() {
         if (isKeyInitialized(this.pk)) return { publicKeyId: this.pk, crypto: this.#sk }
     }
 
-    getPassword() {
+    /**
+     * Getter function to retrieve private passwrod variable for decrypting the key storage object
+     * @return {string} the saved password
+     */
+    _getPassword() {
         if (this.isLocked) {
             throw new Error('Key manager is currently locked. Please unlock and try again.')
         }
@@ -360,9 +379,8 @@ KeyManager.prototype.generateKey = function (password) {
  */
 KeyManager.prototype.sign = function (message, cb) {
     const kdfParams = this.constants.scrypt
-    const keyStorage = this.getKeyStorage()
-    const password = this.getPassword()
-    
+    const keyStorage = this._getKeyStorage()
+    const password = this._getPassword()
 
     function curve25519sign(privateKey, message) {
         return curve25519.sign(str2buf(privateKey), str2buf(message, 'utf8'), crypto.randomBytes(64))
@@ -409,7 +427,7 @@ KeyManager.prototype.verify = function (publicKey, message, signature, cb) {
  */
 KeyManager.prototype.exportToFile = function (_keyPath) {
     const keyPath = _keyPath || "keyfiles";
-    const keyStorage = this.getKeyStorage();
+    const keyStorage = this._getKeyStorage();
 
     outfile = generateKeystoreFilename(keyStorage.publicKeyId);
     json = JSON.stringify(keyStorage);

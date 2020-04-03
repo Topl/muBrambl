@@ -117,3 +117,5 @@ local/
 
 # Silly DS files
 .DS_Store
+
+.env

@@ -1,5 +1,9 @@
-const Requests = require('./src/Requests.js');
-const KeyManager = require('./src/KeyManager.js');
-const Hash = require('./src/Hash.js')
+const Requests = require('./src/Requests');
+const KeyManager = require('./src/KeyManager');
 
-module.exports = { Requests, KeyManager, Hash };
+// Utilities
+const hash = require('./src/utils/Hash')
+const transactions = require('./src/utils/Transactions')
+const utils = {hash, transactions}
+
+module.exports = { Requests, KeyManager, utils };
