@@ -297,19 +297,32 @@ const defaultOptions = {
 
 /**
  * The Key management interface object.
- * 
- * @param {object} [constants] default encryption options for storing keyfiles
+ * @param {object} [params] constructor object for key manager
+ * @param {string} [params.path] path to import keyfile
+ * @param {string} [params.password] password for encrypting (decrypting) the keyfile
+ * @param {object} [params.constants] default encryption options for storing keyfiles
  */
 class KeyManager {
     #sk;
     #password;
 
-    constructor (constants) {
-        this.constants = constants || defaultOptions 
+    constructor(params) {
+        // initialize vatiables
+        this.constants = params.constants || defaultOptions
         this.pk = null;
         this.isLocked = false;
         this.#sk = {};
         this.#password = null;
+
+        // enforce that a password must be provided
+        if (!params.password) throw new Error('A password must be provided at initialization')
+
+        // load in keyfile if a path was given
+        if (params.keyPath) {
+            try { this.importFromFile(params.keyPath, params.password) } catch (err) { throw new Error('Error importing keyfile') }
+        } else {
+            this.generateKey(params.password)
+        }
     }
 
     /**

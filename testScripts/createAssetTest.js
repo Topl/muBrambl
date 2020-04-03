@@ -1,5 +1,5 @@
 const loki = require('../index')
-require('dotenv')
+require('dotenv').config()
 
 const lokiLayer = new loki.Requests("https://valhalla.torus.topl.co:9585/", process.env.VALHALLA_KEY)
 const keyMan = new loki.KeyManager; keyMan.importFromFile('./keystore/itGuy.json' , 'genesis')
