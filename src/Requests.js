@@ -8,10 +8,13 @@
  * Based on the original work of Yamir Tainwala - 2019
  */
 
-require("fetch-everywhere");
-require("es6-promise").polyfill();
+//require("fetch-everywhere");
+//require("es6-promise").polyfill();
 
 ("use strict");
+
+const fetch = require('node-fetch')
+const pollingConfirm = require('./lib/polling')
 
 /**
  * General builder function for formatting API request
@@ -410,7 +413,7 @@ Requests.prototype.getTransactionById = async function (params, id = "1") {
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.transactionId) throw new Error("A transactionId must be specified")
   const route = "nodeView/"
-  const method = "getTransactionById"
+  const method = "transactionById"
   return LokiRequest({ route, method, id }, params, this)
 }
 
@@ -426,7 +429,7 @@ Requests.prototype.getTransactionFromMempool = async function (params, id = "1")
   if (!params) throw new Error("A parameter object must be specified")
   if (!params.transactionId) throw new Error("A transactionId must be specified")
   const route = "nodeView/"
-  const method = "getTransactionFromMempool"
+  const method = "transactionFromMempool"
   return LokiRequest({ route, method, id }, params, this)
 }
 
@@ -532,73 +535,6 @@ Requests.prototype.printChain = async function (id = "1") {
   const method = "chain"
   return LokiRequest({ route, method, id }, params, this)
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////Check if a transaction is confirmed///////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 2020.02.03 - JAA - Currently not working because I changed how errors propoagate back to the API, this is causing
-// the first call of getTx to fail and thus the whole thing is failing.
-
-// //Trying to couple setInterval and setTimeout to wrap the findTransactionById fetch request
-// Requests.prototype.onConfirm = function (
-//   transactionResult,
-//   timeout = 60000,
-//   interval = 3000
-// ) {
-//   //const transactionRes = JSON.parse(transactionResult);
-//   const transactionRes = transactionResult;
-
-//   const self = this;
-//   return new Promise((resolve, reject) => {
-//     var failureResponse;
-//     var intervalID = setInterval(function () {
-//       self
-//         .getTransactionById({transactionId: transactionRes.result.txHash})
-//         .then(
-//           function (response) {
-//             try {
-//               failureResponse = response;
-//               //const confirmationRes = JSON.parse(response);
-//               const confirmationRes = response;
-//               console.log(response)
-//               //If result is non-null (transaction found)
-//               //resolve the promise with json of result
-//               //and stop interval and timeout threads
-//               if (confirmationRes.result != undefined) {
-//                 clearInterval(intervalID);
-//                 clearTimeout(timeoutID);
-//                 resolve(response);
-//               }
-//             } catch (error) {
-//               //Catch if response cannot be parsed correctly
-//               reject(
-//                 "Unexepected API response from findTransactionById" +
-//                 "\n" +
-//                 error
-//               );
-//             }
-//           },
-//           function (error) {
-//             //Failure callback for .then() on findTransactionById
-//             //console.error(error)
-//             reject(new Error("findTransactionById promise failed to resolve"));
-//           }
-//         )
-//         .catch(function (error) {
-//           //Catch for findTransactionById
-//           reject(error);
-//         });
-//     }, interval);
-//     //Setting timeout thread to clear interval thread after timeout duration
-//     var timeoutID = setTimeout(function () {
-//       clearInterval(intervalID);
-//       reject(
-//         new Error("Request timed out, transaction not found" + failureResponse)
-//       );
-//     }, timeout);
-//   });
-// };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

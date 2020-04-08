@@ -7,14 +7,18 @@
  * @date 2020.4.03
  **/
 
+ // Dependencies
 const base58 = require('base-58')
 
-// internal classes
+// Classes
 const Requests = require('./src/Requests');
 const KeyManager = require('./src/KeyManager');
 
 // Utilities
 const hash = require('./src/utils/Hash')
+
+// Libraries
+const pollTx = require('./src/lib/polling')
 
 // Constants definitions
 const validTxMethods = [
@@ -147,6 +151,24 @@ Loki.prototype.signAndBroadcast = async function (prototypeTx) {
 Loki.prototype.transaction = async function (method, params) {
     if (!validTxMethods.includes(method)) throw new Error('Invalid transaction method')
     return this.requests[method](params).then(res => this.signAndBroadcast(res.result))
+}
+
+/** 
+ * A function to initiate polling of the chain provider for a specified transaction.
+ * This function begins by querying 'getTransactionById' which looks for confirmed transactions only.
+ * If the transaction is not confirmed, the mempool is checked using 'getTransactionFromMemPool' to
+ * ensure that the transaction is pending. The parameter 'numFailedQueries' specifies the number of consecutive
+ * failures (when resorting to querying the mempool) before ending the polling operation prematurely.
+ * 
+ * @param {string} txId The unique transaction ID to look for
+ * @param {object} [options] Optional parameters to control the polling behavior
+ * @param {number} [options.timeout] The timeout (in seconds) before the polling operation is stopped
+ * @param {number} [options.interval] The interval (in seconds) between attempts
+ * @param {number} [options.numFailedQueries] The maximum number of consecutive failures (to find the unconfirmed transaction) before ending the poll execution
+*/
+Loki.prototype.pollTx = async function(txId, options) {
+    const opts = options || { timeout: 60, interval: 3, numFailedQueries: 5 }
+    return pollTx(this.requests, txId, opts)
 }
 
 module.exports = Loki

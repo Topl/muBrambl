@@ -20,4 +20,8 @@ const createParams = {
     fee: 0
 };
 
-loki.transaction('createAssetsPrototype', createParams).then(console.log)
+loki.transaction('createAssetsPrototype', createParams)
+    .then(res => { console.log('Unconfirmed transaction'); console.log(res); return res })
+    .then(res => loki.pollTx(res.result.txHash))
+    .then(res => { console.log('\nConfirmed transaction'); console.log(res) })
+    .catch(console.log)
