@@ -30,8 +30,21 @@ const validTxMethods = [
 class Loki {
 
     /**
-     *Creates an instance of Loki.
-     * @param {*} [params={}]
+     * Creates an instance of Loki. Each sub-module may be initialized in one of three ways
+     * 1) Providing a separetly initialized Request and KeyManager instance
+     * 2) Providing custom configuration parameter needed to create new instances of each sub-module with the specified parameters
+     * 3) Providing minimal inputs (i.e. calling Loki with only a string constructor arguement). This will create new instances of
+     *    the sub-modules with default parameters. KeyManager will create a new keyfile and Requests will target a locally running
+     *    instance of Bifrost. 
+     * @param {object|string} [params={}]
+     * @param {object} params.KeyManager KeyManager object (may be either an instance or config parameters)
+     * @param {object} [params.KeyManager.instance] A previously initialized instance of KeyManager
+     * @param {string} [params.KeyManager.password] The password used to encrpt the keyfile
+     * @param {string} [params.KeyManager.keyPath] Path to a keyfile
+     * @param {string} [params.KeyManager.constants] Parameters for encrypting the user's keyfile
+     * @param {object} params.Requests Request object (may be either an instance or config parameters)
+     * @param {string} [params.Requests.url] The chain provider to send requests to
+     * @param {string} [params.Requests.apikey] Api key for authorizing access to the chain provider
      * @memberof Loki
      */
     constructor(params = {}) {
@@ -66,6 +79,32 @@ class Loki {
         // Import utilities
         this.utils = { hash }
     }
+
+    /**
+     * Method for creating a separate Requests instance
+     * @static
+     * 
+     * @param {string} [url="http://localhost:9085/"] Chain provider location
+     * @param {string} [apiKey="topl_the_world!"] Access key for authorizing requests to the client API
+     * @memberof Loki
+     */
+    static Requests(url, apiKey) {
+        return new Requests(url, apiKey)
+    }
+
+    /**
+     * Method for creating a separate KeyManager instance
+     * @static
+     * 
+     * @param {object} params constructor object for key manager
+     * @param {string} params.password password for encrypting (decrypting) the keyfile
+     * @param {string} [params.path] path to import keyfile
+     * @param {object} [params.constants] default encryption options for storing keyfiles
+     * @memberof Loki
+     */
+    static KeyManager(params) {
+        return new KeyManager(params)
+    }
 }
 
 /**  
@@ -74,7 +113,7 @@ class Loki {
  * @param {object} prototypeTx An unsigned transaction JSON object
  * @param {object|object[]} userKeys A keyManager object containing the user's key (may be an array)
 */
-Loki.prototype.addSig = async function (prototypeTx, userKeys) {
+Loki.prototype.addSigToTx = async function (prototypeTx, userKeys) {
     // function for generating a signature in the correct format
     const genSig = (keys, txBytes) => {
         return Object.fromEntries( keys.map( key => [key.pk, base58.encode(key.sign(txBytes))]));
@@ -93,21 +132,21 @@ Loki.prototype.addSig = async function (prototypeTx, userKeys) {
 /**
  * Used to sign a prototype transaction and broadcast to a chain provider
  *
- * @param {object} prototypeTx
+ * @param {object} prototypeTx An unsigned transaction JSON object
  */
 Loki.prototype.signAndBroadcast = async function (prototypeTx) {
-    const formattedTx = await this.addSig(prototypeTx, this.keyManager)
+    const formattedTx = await this.addSigToTx(prototypeTx, this.keyManager)
     return this.requests.broadcastTx({ tx: formattedTx }).catch(e => { console.error(e); throw e })
 }
 
 /** 
  * Create a new transaction, then sign and broadcast
  * 
- * @param {string} method The method to 
+ * @param {string} method The chain resource method to create a transaction for
 */
 Loki.prototype.transaction = async function (method, params) {
     if (!validTxMethods.includes(method)) throw new Error('Invalid transaction method')
     return this.requests[method](params).then(res => this.signAndBroadcast(res.result))
 }
 
-module.exports = Loki;
+module.exports = Loki

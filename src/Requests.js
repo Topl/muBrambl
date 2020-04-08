@@ -53,8 +53,8 @@ async function LokiRequest(routeInfo, params, self) {
 /**
  * The Loki layer interface object.
  * 
- * @param {string} [url="http://localhost:9085/"]
- * @param {string} [apiKey="topl_the_world!"]
+ * @param {string} [url="http://localhost:9085/"] Chain provider location
+ * @param {string} [apiKey="topl_the_world!"] Access key for authorizing requests to the client API
  */
 const Requests = function (url = "http://localhost:9085/", apiKey = "topl_the_world!") {
   this.url = url;
@@ -95,7 +95,6 @@ Requests.prototype.getBalancesByKey = async function (params, id = "1") {
 //////listOpenKeyfiles////////////////
 /**
  * Get a list of all open keyfiles
- * @param {string} [id] - identifier for the json-rpc request
  * @param {string} [id] - identifier for the json-rpc request
  * @return {object} json-rpc response from the chain
  */

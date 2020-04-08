@@ -9,7 +9,6 @@ To install from npm run ``npm install bifrost-lokijs`` in your project directory
 To install locally:
 - Git clone using ``git clone https://github.com/topl/LokiJS``
 - Run `npm run install` within the cloned repo to install all dependencies
-- NOTE: It is recommended to use NodeJS version ``12.4.x`` (lts/erbium). Known issues exist using NodeJS ~``13.x.x``
 
 # Usage
 
@@ -39,8 +38,9 @@ The `KeyManager` module is compliant with Bifrost's Gjallarhorn Key Manager serv
   2. Signing the raw transaction bytes using the locally managed keyfile thruogh LokiJS.
   3. Sending the fully formed transaction to the ``broadcast`` method of your chosen network provider.
 
-Access to the  ``KeyManager`` is acheived by<br/>
-``const keyManager = LokiJS.KeyManager``
+A new  ``KeyManager`` may be created directly using<br/>
+``const keyManager = new LokiJS.KeyManager(<PASSWORD>)``<br/>
+where `<PASSWORD>` is the user provided encryption password for the keyfile.
 
 
 # Loki-layer API key protection
