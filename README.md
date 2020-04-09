@@ -20,12 +20,12 @@ const loki = new LokiJS('PASSWORD')
 This will create a new `Requests` instance targetting a local node running at `http://localhost:9085` and generate a new `KeyManager` instance for signing transactions, using Curve25519 and encrypted with `PASSWORD`
 
 LokiJS provides the following modules:
-* `Loki` - [(link)](./Loki.html) - primary module that provides high-level capabilities and access to 
-* `Requests` - [(link)](./Requests.html) - sub-module for sending json-rpc requests to a specified chain provider.
-* `KeyManager` - [(link)](./KeyManager.html) - sub-module that provides functions for creating, importing, and exporting Bifrost compatible keyfiles. 
-* `Hash` - [(link)](./Hash.html) - utility to recreates hashes calculated in Bifrost
+* `Loki` - primary module that provides high-level capabilities and access to 
+* `Requests` - sub-module for sending json-rpc requests to a specified chain provider.
+* `KeyManager` - sub-module that provides functions for creating, importing, and exporting Bifrost compatible keyfiles. 
+* `Hash` - utility to recreates hashes calculated in Bifrost
 
-A brief overview of each module is given below but for a detailed descriptions of all available methods, please use the links given for each class above.
+A brief overview of each module is given below but for a detailed descriptions of all available methods, please visit https://lokijs.docs.topl.co
 
 ## Loki
 A helper library for interacting with the Topl protocol. Requests to the API layer of a chain provider conform to JSON-RPC standards and are managed by the Requests module. Key Management conforms to the Dion specification of the Topl protocol as implemented in the reference client Bifrost v1.0.0.

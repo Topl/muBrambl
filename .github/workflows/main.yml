@@ -15,9 +15,10 @@ jobs:
       - name: Build
         uses: andstor/jsdoc-action@v1
         with:
-          config_file: jsdoc.config.json
+          source_dir: ./src
+          output_dir: ./docs
+          recurse: true
           template_name: minami
-          front_page: README.md
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
