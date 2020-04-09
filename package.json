@@ -1,7 +1,7 @@
 {
   "name": "bifrost-lokijs",
   "repository": "https://github.com/Topl/LokiJS",
-  "version": "2.3.2",
+  "version": "3.0.0",
   "main": "index.js",
   "scripts": {
     "mochaTest": "mocha test/it",
@@ -15,11 +15,11 @@
     "blake2": "^4.0.0",
     "canonicalize": "^1.0.1",
     "curve25519-js": "0.0.4",
-    "dotenv": "^8.2.0",
     "keccak": "^3.0.0",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
+    "dotenv": "^8.2.0",
     "chai": "^4.2.0",
     "jsdoc-to-markdown": "^5.0.3",
     "mocha": "^7.1.1"

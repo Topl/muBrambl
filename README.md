@@ -1,6 +1,6 @@
 # LokiJS
 
-A NodeJS library to facilitate interaction with the Topl blockchain network. This library currently supports Topl's Bifrost client.
+A NodeJS library to facilitate interaction with the Topl blockchain network. This library is compliant with the Dion version of the Topl protocol as defined by the reference implementation, Bifrost client.
 
 # Installation
 
@@ -16,6 +16,7 @@ Create an instance of LokiJS in your JS application by including:<br/>
 `const LokiJS = require('bifrost-lokijs')`
 
 LokiJS provides the following modules:
+* The `Loki` parent module provides high-level capabilities required 
 * The `Requests` module provides a class for sending json-rpc requests to a targeted instance of Bifrost. 
 * The `KeyManager` module provides functions for creating, importing, and exporting Bifrost compatible keyfiles. 
 * The `Hash` module recreates hashes calculated in Bifrost

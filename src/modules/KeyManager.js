@@ -7,14 +7,16 @@
  * https://github.com/Ethereumjs/keythereum
  */
 
-const crypto = require('crypto')
-const path = require('path')
-const fs = require('fs')
+("use strict");
 
-const keccakCreateHash = require('keccak')
-const Base58 = require('base-58')
+// Dependencies
+const fs = require('fs')
+const path = require('path')
 const blake = require('blake2')
-const curve25519 = require("curve25519-js");
+const crypto = require('crypto')
+const Base58 = require('base-58')
+const keccakHash = require('keccak')
+const curve25519 = require("curve25519-js")
 
 // Default options for key generation as of 2020.01.25  
 const defaultOptions = {
@@ -104,7 +106,7 @@ function decrypt(ciphertext, key, iv, algo) {
  * @return {string} Base58-encoded MAC.
  */
 function getMAC(derivedKey, ciphertext) {
-    const keccak256 = (msg) => keccakCreateHash('keccak256').update(msg).digest()
+    const keccak256 = (msg) => keccakHash('keccak256').update(msg).digest()
     if (derivedKey !== undefined && derivedKey !== null && ciphertext !== undefined && ciphertext !== null) {
         return keccak256(Buffer.concat([
             str2buf(derivedKey).slice(16, 32),
@@ -131,10 +133,10 @@ function create(params, cb) {
     }
 
     function curve25519KeyGen(randomBytes) {
-        const { public, private } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
+        const { pk, sk } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
         return {
-            publicKey: Buffer.from(public),
-            privateKey: Buffer.from(private),
+            publicKey: Buffer.from(pk),
+            privateKey: Buffer.from(sk),
             iv: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes + keyBytes)).slice(0, ivBytes),
             salt: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes))
         };
