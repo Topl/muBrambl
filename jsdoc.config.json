@@ -6,7 +6,6 @@
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "opts": {
-        "readme": "./README.md",
         "changelog": "./CHANGELOG.md",
         "destination": "./docs",
         "recurse": true
