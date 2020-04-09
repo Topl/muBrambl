@@ -19,6 +19,7 @@ jobs:
           output_dir: ./docs
           recurse: true
           template_name: minami
+          front_page: ./README.me 
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
