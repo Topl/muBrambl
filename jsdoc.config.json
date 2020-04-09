@@ -1,9 +1,5 @@
 {
     "plugins": [],
-    "templates": {
-        "cleverLinks": true,
-        "monospaceLinks": false
-    },
     "source": {
         "include": ["./src"],
         "includePattern": ".+\\.js(doc|x)?$",
