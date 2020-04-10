@@ -110,12 +110,12 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
-# Project specific directories
+# Project specific directories & files
 keyfiles/
 keystore/
 local/
+docs/
+.env
 
 # Silly DS files
 .DS_Store
-
-.env
