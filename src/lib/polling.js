@@ -27,7 +27,7 @@ module.exports = (requests, txId, options) => {
             },
             // on rejected promise, see if ithe transaction can be found in the mempool
             function (response) {
-              failureResponse = response.error.message
+              failureResponse = response.error ? response.error.message : 'Uncaught exception'
               requests.getTransactionFromMempool({ transactionId: txId })
                 .then(
                   // on finding the tx in the mempool

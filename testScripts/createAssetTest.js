@@ -1,7 +1,7 @@
 const loki = require('../index')
 require('dotenv').config()
 
-const lokiLayer = new loki.Requests("https://valhalla.torus.topl.co:9585/", process.env.VALHALLA_KEY)
+const lokiLayer = new loki.Requests("https://valhalla.torus.topl.co", process.env.VALHALLA_KEY)
 const keyMan = new loki.KeyManager; keyMan.importFromFile('./keystore/itGuy.json' , 'genesis')
 const signAndBroadcast = (tx) => loki.utils.transactions.signAndBroadcast(lokiLayer, keyMan, tx)
 

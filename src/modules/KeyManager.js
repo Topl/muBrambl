@@ -133,7 +133,7 @@ function create(params, cb) {
     }
 
     function curve25519KeyGen(randomBytes) {
-        const { pk, sk } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
+        const { public: pk, private: sk } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
         return {
             publicKey: Buffer.from(pk),
             privateKey: Buffer.from(sk),
@@ -301,6 +301,7 @@ class KeyManager {
     #sk;
     #isLocked;
     #password;
+    #keyStorage;
 
     //// Instance constructor //////////////////////////////////////////////////////////////////////////////////////////////
     constructor(params) {
@@ -309,10 +310,12 @@ class KeyManager {
 
         // Initialize a key manager object with a key storage object
         const initKeyStorage = (keyStorage, password) => {
-            this.#isLocked = false
             this.pk = keyStorage.publicKeyId;
-            this.#sk = keyStorage.crypto;
+            this.#isLocked = false
             this.#password = password;
+            this.#keyStorage = keyStorage;
+
+            if (this.pk) this.#sk = recover(password, keyStorage, this.constants.scrypt)
         };
 
         const generateKey = (password) => {
@@ -374,7 +377,7 @@ class KeyManager {
     getKeyStorage() {
         if (this.#isLocked) throw new Error('Key manager is currently locked. Please unlock and try again.')
         if (!this.pk) throw new Error('A key must be initialized before using this key manager')
-        return { publicKeyId: this.pk, crypto: this.#sk }
+        return this.#keyStorage
     }
 
     /**
@@ -387,12 +390,12 @@ class KeyManager {
 
     /**
      * Unlock the key manager to be used in transactions
-     * @param {string} _password encryption password for accessing the keystorage object
+     * @param {string} password encryption password for accessing the keystorage object
      * @memberof KeyManager
      */
     unlockKey(password) {
         if (!this.#isLocked) throw new Error('The key is already unlocked')
-        if (password !== this.getPassword()) throw new Error('Invalid password')
+        if (password !== this.#password) throw new Error('Invalid password')
         this.#isLocked = false;
     }
 
@@ -409,7 +412,7 @@ class KeyManager {
             return curve25519.sign(str2buf(privateKey), str2buf(message, 'utf8'), crypto.randomBytes(64))
         }
 
-        return curve25519sign(recover(this.#password, this.getKeyStorage(), this.constants.scrypt), message);
+        return curve25519sign(this.#sk, message);
     }
 
     /**
