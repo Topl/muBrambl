@@ -4,7 +4,7 @@ A NodeJS library to facilitate interaction with the Topl blockchain network. Thi
 
 # Installation
 
-To install from npm run ``npm install --save bifrost-brambljs`` in your project directory<br/>
+To install from npm run ``npm install --save brambljs`` in your project directory<br/>
 
 To install from source:
 - Git clone using ``git clone https://github.com/topl/BramblJS``
@@ -14,7 +14,7 @@ To install from source:
 
 To create a minimal instance of BramblJS in your application, include the following commands:<br/>
 ```
-const BramblJS = require('bifrost-brambljs');
+const BramblJS = require('brambljs');
 const brambl = new BramblJS('PASSWORD')
 ```
 This will create a new `Requests` instance targetting a local node running at `http://localhost:9085` and generate a new `KeyManager` instance for signing transactions, using Curve25519 and encrypted with `PASSWORD`
