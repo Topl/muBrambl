@@ -1,13 +1,13 @@
 const assert = require("assert");
-const LokiJS = require("./../../src/Requests");
+const BramblJS = require("./../../src/Requests");
 
 describe("Arbit", () => {
   before(() => {
-    lokijs = new LokiJS();
+    brambljs = new BramblJS();
   });
 
   it("should transfer arbits", done => {
-    lokijs
+    brambljs
       .transferArbits(
         "A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb",
         ["6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ"],

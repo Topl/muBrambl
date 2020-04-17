@@ -1,8 +1,8 @@
-const LokiJS = require('../index.js')
+const BramblJS = require('../index.js')
 
-const loki = new LokiJS('test')
-const lokiLayer = LokiJS.Requests()
-const gjal = LokiJS.KeyManager('test')
+const brambl = new BramblJS('test')
+const bramblLayer = BramblJS.Requests()
+const gjal = BramblJS.KeyManager('test')
 
 function getAllFuncs(toCheck) {
     var props = [];
@@ -16,4 +16,4 @@ function getAllFuncs(toCheck) {
     });
 }
 
-[loki, lokiLayer, gjal].map(x => console.log(getAllFuncs(x)))
+[brambl, bramblLayer, gjal].map(x => console.log(getAllFuncs(x)))

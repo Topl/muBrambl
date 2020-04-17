@@ -1,10 +1,11 @@
 require('dotenv').config()
-const loki = require('../index')
+const brambl = require('../../index')
 
-loki.Requests("https://valhalla.torus.topl.co:9585/", process.env.VALHALLA_KEY)
+brambl.Requests("https://valhalla.torus.topl.co/", process.env.VALHALLA_KEY)
     .chainInfo()
     .then(x => {
         const timestamp = new Date(x.result.bestBlock.timestamp)
+        const timeDiff = Date.now() - timestamp;
         const blockHeight = x.result.height
-        console.log('Block #' + blockHeight + ' forged at ' + timestamp)
+        console.log('Block #' + blockHeight + ' forged at ' + timestamp + ".\nThe latest block was created approx. " + Math.floor(timeDiff/1000) + " seconds ago.")
     })

@@ -1,9 +1,9 @@
 require('dotenv').config()
-const LokiJS = require('../index')
+const BramblJS = require('../../index')
 
-const loki = new LokiJS({
+const brambl = new BramblJS({
     Requests: {
-        url: 'https://valhalla.torus.topl.co',
+        url: 'https://valhalla.torus.topl.co/',
         apiKey: process.env.VALHALLA_KEY
     },
     KeyManager: {
@@ -13,15 +13,15 @@ const loki = new LokiJS({
 })
 
 const createParams = {
-    issuer: loki.keyManager.pk,
+    issuer: brambl.keyManager.pk,
     assetCode: "test-" + Date.now(),
-    recipient: loki.keyManager.pk,
+    recipient: brambl.keyManager.pk,
     amount: 1,
     fee: 0
 };
 
-loki.transaction('createAssetsPrototype', createParams)
+brambl.transaction('createAssetsPrototype', createParams)
     .then(res => { console.log('Unconfirmed transaction'); console.log(res); return res })
-    .then(res => loki.pollTx(res.result.txHash))
+    .then(res => brambl.pollTx(res.result.txHash))
     .then(res => { console.log('\nConfirmed transaction'); console.log(res) })
     .catch(console.log)

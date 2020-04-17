@@ -1,13 +1,13 @@
 const assert = require("assert");
-const LokiJS = require("./../../src/Requests");
+const BramblJS = require("./../../src/Requests");
 
 describe("Keyfile", () => {
   before(() => {
-    lokijs = new LokiJS();
+    brambljs = new BramblJS();
   });
 
   it("should return a list of open keyfiles", done => {
-    lokijs
+    brambljs
       .getOpenKeyfiles()
       .then(response => {
         console.log(response);
@@ -20,7 +20,7 @@ describe("Keyfile", () => {
   });
 
   it("should return a newly generated keyfile", done => {
-    lokijs
+    brambljs
       .generateKeyfile("password")
       .then(response => {
         console.log(response);
@@ -33,7 +33,7 @@ describe("Keyfile", () => {
   });
 
   it("should return a successfully locked keyfile", done => {
-    lokijs
+    brambljs
       .lockKeyfile("6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ", "genesis")
       .then(response => {
         console.log(response);
@@ -46,7 +46,7 @@ describe("Keyfile", () => {
   });
 
   it("should return a successfully unlocked keyfile", done => {
-    lokijs
+    brambljs
       .unlockKeyfile("6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ", "genesis")
       .then(response => {
         assert.equal(typeof response.result, "object");

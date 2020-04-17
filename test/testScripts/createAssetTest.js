@@ -1,9 +1,9 @@
-const loki = require('../index')
+const brambl = require('../index')
 require('dotenv').config()
 
-const lokiLayer = new loki.Requests("https://valhalla.torus.topl.co", process.env.VALHALLA_KEY)
-const keyMan = new loki.KeyManager; keyMan.importFromFile('./keystore/itGuy.json' , 'genesis')
-const signAndBroadcast = (tx) => loki.utils.transactions.signAndBroadcast(lokiLayer, keyMan, tx)
+const bramblLayer = new brambl.Requests("https://valhalla.torus.topl.co", process.env.VALHALLA_KEY)
+const keyMan = new brambl.KeyManager; keyMan.importFromFile('./keystore/itGuy.json' , 'genesis')
+const signAndBroadcast = (tx) => brambl.utils.transactions.signAndBroadcast(bramblLayer, keyMan, tx)
 
 const createParams = {
     issuer: keyMan.pk,
@@ -13,6 +13,6 @@ const createParams = {
     fee: 0
 };
 
-lokiLayer.createAssetsPrototype(createParams)
+bramblLayer.createAssetsPrototype(createParams)
     .then(res => signAndBroadcast(res.result))
     .then(res => console.log(res))

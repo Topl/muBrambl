@@ -1,6 +1,6 @@
 /** A Javascript API wrapper module for the Bifrost Protocol.
- * Currently supports version 4.1 of Bifrost's Loki-Layer API
- * Documentation for Loki-layer is available at https://Requests.docs.topl.co
+ * Currently supports version 4.1 of Bifrost's Brambl-Layer API
+ * Documentation for Brambl-layer is available at https://Requests.docs.topl.co
  *
  * @author James Ama (j.aman@topl.me)
  * @date 2020.0.29
@@ -24,7 +24,7 @@ const fetch = require('node-fetch')
  * @param {object} self - internal reference for accessing constructor data
  * @returnss {object} JSON response from the node
  */
-async function LokiRequest(routeInfo, params, self) {
+async function BramblRequest(routeInfo, params, self) {
   try {
     const route = routeInfo.route;
     const body = {
@@ -51,7 +51,7 @@ async function LokiRequest(routeInfo, params, self) {
 };
 
 /**
- * A class for sending requests to the Loki layer interface of the given chain provider
+ * A class for sending requests to the Brambl layer interface of the given chain provider
  * @param {string} [url="http://localhost:9085/"] Chain provider location
  * @param {string} [apiKey="topl_the_world!"] Access key for authorizing requests to the client API
  * @class Requests
@@ -88,7 +88,7 @@ class Requests {
       throw new Error("A list of publicKeys must be specified");
     const route = "wallet/";
     const method = "balances";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   //////listOpenKeyfiles////////////////
   /**
@@ -101,7 +101,7 @@ class Requests {
     const params = {};
     const route = "wallet/";
     const method = "listOpenKeyfiles";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   //////generateKeyfile////////////////
   /**
@@ -119,7 +119,7 @@ class Requests {
       throw new Error("A password must be provided to encrypt the keyfile");
     const route = "wallet/";
     const method = "generateKeyfile";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   //////lockKeyfile////////////////
   /**
@@ -140,7 +140,7 @@ class Requests {
       throw new Error("A password must be provided to encrypt the keyfile");
     const route = "wallet/";
     const method = "lockKeyfile";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   //////unlockKeyfile////////////////
   /**
@@ -161,7 +161,7 @@ class Requests {
       throw new Error("A password must be provided to encrypt the keyfile");
     const route = "wallet/";
     const method = "unlockKeyfile";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   //////signTransaction////////////////
   /**
@@ -182,7 +182,7 @@ class Requests {
       throw new Error("A tx object must be specified");
     const route = "wallet/";
     const method = "signTx";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   ///////////broadcastTx////////////////////
   /**
@@ -200,7 +200,7 @@ class Requests {
       throw new Error("A tx object must be specified");
     const route = "wallet/";
     const method = "broadcastTx";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////transferPolys////////////
   /**
@@ -227,7 +227,7 @@ class Requests {
       throw new Error("A fee must be specified");
     const route = "wallet/";
     const method = "transferPolys";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////transferArbits////////////
   /**
@@ -254,7 +254,7 @@ class Requests {
       throw new Error("A fee must be specified");
     const route = "wallet/";
     const method = "transferArbits";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////Asset Api Routes/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,7 +288,7 @@ class Requests {
       throw new Error("A fee must be specified");
     const route = "asset/";
     const method = "createAssets";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////createAssetsPrototype////////////
   /**
@@ -319,7 +319,7 @@ class Requests {
       throw new Error("A fee must be specified");
     const route = "asset/";
     const method = "createAssetsPrototype";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////transferAssets////////////
   /**
@@ -352,7 +352,7 @@ class Requests {
       throw new Error("A fee must be specified");
     const route = "asset/";
     const method = "transferAssets";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////transferAssetsPrototype////////////
   /**
@@ -387,7 +387,7 @@ class Requests {
       throw new Error("A fee must be specified");
     const route = "asset/";
     const method = "transferAssetsPrototype";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////transferTargetAssets////////////
   /**
@@ -415,7 +415,7 @@ class Requests {
       throw new Error("A fee must be specified");
     const route = "asset/";
     const method = "transferTargetAssets";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////transferTargetAssetsPrototype////////////
   /**
@@ -446,7 +446,7 @@ class Requests {
       throw new Error("A fee must be specified");
     const route = "asset/";
     const method = "transferTargetAssetsPrototype";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////NodeView Api Routes//////////////////////////////////////////////////////////////////////////////////////////////
@@ -467,7 +467,7 @@ class Requests {
       throw new Error("A transactionId must be specified");
     const route = "nodeView/";
     const method = "transactionById";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////getTransactionFromMempool////////////
   /**
@@ -485,7 +485,7 @@ class Requests {
       throw new Error("A transactionId must be specified");
     const route = "nodeView/";
     const method = "transactionFromMempool";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////getMempool////////////
   /**
@@ -498,7 +498,7 @@ class Requests {
     const params = {};
     const route = "nodeView/";
     const method = "mempool";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////////////getBlockById////////////
   /**
@@ -516,7 +516,7 @@ class Requests {
       throw new Error("A blockId must be specified");
     const route = "nodeView/";
     const method = "blockById";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////Debug Api Routes/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -532,7 +532,7 @@ class Requests {
     const params = {};
     const route = "debug/";
     const method = "info";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   ////////////Calculate block delay////////////
   /**
@@ -553,7 +553,7 @@ class Requests {
       throw new Error("A number of blocks must be specified");
     const route = "debug/";
     const method = "delay";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   //////////Blocks generated by node's keys////////////
   /**
@@ -566,7 +566,7 @@ class Requests {
     const params = {};
     const route = "debug/";
     const method = "myBlocks";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
   /////////Map block geneators to blocks////////////
   /**
@@ -579,7 +579,7 @@ class Requests {
     const params = {};
     const route = "debug/";
     const method = "generators";
-    return LokiRequest({ route, method, id }, params, this);
+    return BramblRequest({ route, method, id }, params, this);
   }
 }
 

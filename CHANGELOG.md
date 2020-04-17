@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * Moved testScripts beneath the tests/ directory
 ## 3.0.1 - 2020.04.09
 ### Added
-* Primary `Loki` class incorporating `KeyManager` and `Requests`
+* Primary `Brambl` class incorporating `KeyManager` and `Requests`
 * JSDoc and GitHub action to automatically build documentation
 * JSDoc config file
 ### Changed

@@ -25,15 +25,15 @@
  ]
  
  /**
-  * @class Creates an instance of Loki for interacting with the Topl protocol
+  * @class Creates an instance of Brambl for interacting with the Topl protocol
   * @requires KeyManager
   * @requires Requests
   * 
   * Each sub-module may be initialized in one of three ways
   * 1. Providing a separetly initialized Request and KeyManager instance. Each of these instances may be initialized using the 
-  *    static methods `Requests` or `KeyManager` available in the LokiJS class.
+  *    static methods `Requests` or `KeyManager` available in the BramblJS class.
   * 2. Providing custom configuration parameters needed to create new instances of each sub-module with the specified parameters
-  * 3. Providing minimal inputs (i.e. calling Loki with only a string constructor arguement). This will create new instances of
+  * 3. Providing minimal inputs (i.e. calling Brambl with only a string constructor arguement). This will create new instances of
   *    the sub-modules with default parameters. KeyManager will create a new keyfile and Requests will target a locally running
   *    instance of Bifrost. 
   * @param {object|string} [params={}]
@@ -46,7 +46,7 @@
   * @param {string} [params.Requests.url] The chain provider to send requests to
   * @param {string} [params.Requests.apikey] Api key for authorizing access to the chain provider
   */
- class Loki {
+ class Brambl {
      constructor(params = {}) {
          // default values for the constructor arguement
          const keyManagerVar = params.KeyManager || {};
@@ -86,7 +86,7 @@
       * 
       * @param {string} [url="http://localhost:9085/"] Chain provider location
       * @param {string} [apiKey="topl_the_world!"] Access key for authorizing requests to the client API
-      * @memberof Loki
+      * @memberof Brambl
       */
      static Requests(url, apiKey) {
          return new Requests(url, apiKey)
@@ -100,7 +100,7 @@
       * @param {string} params.password password for encrypting (decrypting) the keyfile
       * @param {string} [params.path] path to import keyfile
       * @param {object} [params.constants] default encryption options for storing keyfiles
-      * @memberof Loki
+      * @memberof Brambl
       */
      static KeyManager(params) {
          return new KeyManager(params)
@@ -113,7 +113,7 @@
   * @param {object} prototypeTx An unsigned transaction JSON object
   * @param {object|object[]} userKeys A keyManager object containing the user's key (may be an array)
  */
- Loki.prototype.addSigToTx = async function (prototypeTx, userKeys) {
+ Brambl.prototype.addSigToTx = async function (prototypeTx, userKeys) {
      // function for generating a signature in the correct format
      const genSig = (keys, txBytes) => {
          return Object.fromEntries( keys.map( key => [key.pk, base58.encode(key.sign(txBytes))]));
@@ -134,7 +134,7 @@
   *
   * @param {object} prototypeTx An unsigned transaction JSON object
   */
- Loki.prototype.signAndBroadcast = async function (prototypeTx) {
+ Brambl.prototype.signAndBroadcast = async function (prototypeTx) {
      const formattedTx = await this.addSigToTx(prototypeTx, this.keyManager)
      return this.requests.broadcastTx({ tx: formattedTx }).catch(e => { console.error(e); throw e })
  }
@@ -144,7 +144,7 @@
   * 
   * @param {string} method The chain resource method to create a transaction for
  */
- Loki.prototype.transaction = async function (method, params) {
+ Brambl.prototype.transaction = async function (method, params) {
      if (!validTxMethods.includes(method)) throw new Error('Invalid transaction method')
      return this.requests[method](params).then(res => this.signAndBroadcast(res.result))
  }
@@ -160,12 +160,12 @@
   * @param {object} [options] Optional parameters to control the polling behavior
   * @param {number} [options.timeout] The timeout (in seconds) before the polling operation is stopped
   * @param {number} [options.interval] The interval (in seconds) between attempts
-  * @param {number} [options.numFailedQueries] The maximum number of consecutive failures (to find the unconfirmed transaction) before ending the poll execution
+  * @param {number} [options.maxFailedQueries] The maximum number of consecutive failures (to find the unconfirmed transaction) before ending the poll execution
  */
- Loki.prototype.pollTx = async function(txId, options) {
-     const opts = options || { timeout: 60, interval: 3, numFailedQueries: 5 }
+ Brambl.prototype.pollTx = async function(txId, options) {
+     const opts = options || { timeout: 90, interval: 3, maxFailedQueries: 10 }
      return pollTx(this.requests, txId, opts)
  }
  
- module.exports = Loki
+ module.exports = Brambl
  

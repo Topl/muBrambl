@@ -1,1 +1,1 @@
-module.exports = require('./src/Loki')
+module.exports = require('./src/Brambl')

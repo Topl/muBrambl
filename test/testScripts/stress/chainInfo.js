@@ -1,7 +1,7 @@
 require('dotenv').config()
-const LokiJS = require('../../../index')
+const BramblJS = require('../../../index')
 
-const loki = new LokiJS({
+const brambl = new BramblJS({
     // Requests: {
     //     url: 'https://valhalla.torus.topl.co/',
     //     apiKey: process.env.VALHALLA_KEY
@@ -17,7 +17,7 @@ timeout = 60*1000; //ms
 var reqId = 0;
 const startTime = Date.now();
 const runner = id => {
-    return loki.requests.chainInfo(id.toString()).catch(e => {console.log(id); console.error(e)})
+    return brambl.requests.chainInfo(id.toString()).catch(e => {console.log(id); console.error(e)})
 }
 
 const intID = setInterval(() => runner(++reqId), interval)

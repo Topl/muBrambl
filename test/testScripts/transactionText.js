@@ -1,7 +1,7 @@
 require('dotenv').config()
-const LokiJS = require('../index')
+const BramblJS = require('../index')
 
-const loki = new LokiJS({
+const brambl = new BramblJS({
     // Requests: {
     //     url: 'https://valhalla.torus.topl.co:9585/',
     //     apiKey: process.env.VALHALLA_KEY
@@ -13,11 +13,11 @@ const loki = new LokiJS({
 })
 
 const createParams = {
-    issuer: loki.keyManager.pk,
+    issuer: brambl.keyManager.pk,
     assetCode: "test-" + Date.now(),
-    recipient: loki.keyManager.pk,
+    recipient: brambl.keyManager.pk,
     amount: 1,
     fee: 0
 };
 
-loki.transaction('createAssetsPrototype', createParams).then(console.log)
+brambl.transaction('createAssetsPrototype', createParams).then(console.log)
