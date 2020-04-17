@@ -1,4 +1,4 @@
-![GitHub pages](https://github.com/Topl/BramblJS/workflows/GitHub%20pages/badge.svg?branch=master)
+![GitHub pages](https://github.com/Topl/Brambl-JS/workflows/GitHub%20pages/badge.svg?branch=master)
 
 A NodeJS library to facilitate interaction with the Topl blockchain network. This server-side SDK is compliant with the Dion version of the Topl protocol as defined by the reference implementation, [Bifrost client](https://github.com/topl/bifrost).
 
