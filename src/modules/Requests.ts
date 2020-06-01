@@ -12,7 +12,7 @@
 
 // Dependencies
 import fetch from 'node-fetch'
-import {RoutInfo, Self, Params} from "../types/RequestsTypes"
+import {RoutInfo, Self, Params, BalancesParams, TxParams, TransferParams, TransferArbitParams, TransferAssetsParams, TransferTargetAssetsParams, TransferTargetAssetsPrototypeParams, getTransactionById, GetBlockById, CalcDelay} from "../types/RequestsTypes"
 /**
  * General builder function for formatting API request
  *
@@ -58,7 +58,7 @@ async function BramblRequest(routeInfo:RoutInfo, params:Object, self:Self) {
  */
 class Requests {
   url:string;
-  headers:Object;
+  headers:any;
   constructor(url = "http://localhost:9085/", apiKey = "topl_the_world!") {
     this.url = url;
     this.headers = {
@@ -85,11 +85,12 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async getBalancesByKey(params:Params, id = "1") {
+  async getBalancesByKey(params:BalancesParams, id = "1") {
     if (!params.publicKeys || !Array.isArray(params.publicKeys))
       throw new Error("A list of publicKeys must be specified");
     const route = "wallet/";
     const method = "balances";
+    
     return BramblRequest({ route, method, id }, params, this);
   }
   //////listOpenKeyfiles////////////////
@@ -114,7 +115,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async generateKeyfile(params, id = "1") {
+  async generateKeyfile(params:Params, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.password)
@@ -133,7 +134,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async lockKeyfile(params, id = "1") {
+  async lockKeyfile(params:Params, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.publicKey)
@@ -154,7 +155,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async unlockKeyfile(params, id = "1") {
+  async unlockKeyfile(params:Params, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.publicKey)
@@ -175,7 +176,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async signTransaction(params, id = "1") {
+  async signTransaction(params:TxParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.publicKey)
@@ -195,7 +196,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async broadcastTx(params, id = "1") {
+  async broadcastTx(params:TxParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.tx)
@@ -218,7 +219,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferPolys(params, id = "1") {
+  async transferPolys(params:TransferArbitParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.recipient)
@@ -245,7 +246,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferArbits(params, id = "1") {
+  async transferArbits(params:TransferArbitParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.recipient)
@@ -275,7 +276,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async createAssets(params, id = "1") {
+  async createAssets(params:TransferParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.issuer)
@@ -306,7 +307,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async createAssetsPrototype(params, id = "1") {
+  async createAssetsPrototype(params:TransferParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.issuer)
@@ -339,7 +340,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferAssets(params, id = "1") {
+  async transferAssets(params:TransferParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.issuer)
@@ -372,7 +373,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferAssetsPrototype(params, id = "1") {
+  async transferAssetsPrototype(params:TransferAssetsParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.issuer)
@@ -404,7 +405,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferTargetAssets(params, id = "1") {
+  async transferTargetAssets(params:TransferTargetAssetsParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.recipient)
@@ -433,7 +434,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferTargetAssetsPrototype(params, id = "1") {
+  async transferTargetAssetsPrototype(params:TransferTargetAssetsPrototypeParams, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.recipient)
@@ -462,7 +463,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async getTransactionById(params, id = "1") {
+  async getTransactionById(params:getTransactionById, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.transactionId)
@@ -480,7 +481,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async getTransactionFromMempool(params, id = "1") {
+  async getTransactionFromMempool(params:getTransactionById, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.transactionId)
@@ -511,7 +512,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async getBlockById(params, id = "1") {
+  async getBlockById(params:GetBlockById, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.blockId)
@@ -549,7 +550,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async calcDelay(params, id = "1") {
+  async calcDelay(params:CalcDelay, id = "1") {
 
     if (!params)
       throw new Error("A parameter object must be specified");

@@ -318,10 +318,10 @@ function generateKeystoreFilename(publicKey:string) {
 class KeyManager {
     // Private variables
     sk:any;
-    isLocked:any;
-    password:any;
-    keyStorage:any;
-    pk:any;
+    #isLocked:boolean;
+    #password:any;
+    #keyStorage:any;
+    pk:string;
     constants:any;
     //// Instance constructor //////////////////////////////////////////////////////////////////////////////////////////////
     constructor(params:ConstructorParams) {
@@ -331,9 +331,9 @@ class KeyManager {
         // Initialize a key manager object with a key storage object
         const initKeyStorage = (keyStorage:any, password:any) => {
             this.pk = keyStorage.publicKeyId;
-            this.isLocked = false
-            this.password = params;
-            this.keyStorage = keyStorage;
+            this.#isLocked = false
+            this.#password = params;
+            this.#keyStorage = keyStorage;
 
             if (this.pk) this.sk = recover(password, keyStorage, this.constants.scrypt)
 
@@ -402,9 +402,9 @@ class KeyManager {
      * @memberof KeyManager
      */
     getKeyStorage() {
-        if (this.isLocked) throw new Error('Key manager is currently locked. Please unlock and try again.')
+        if (this.#isLocked) throw new Error('Key manager is currently locked. Please unlock and try again.')
         if (!this.pk) throw new Error('A key must be initialized before using this key manager')
-        return this.keyStorage
+        return this.#keyStorage
     }
 
     /**
@@ -412,7 +412,7 @@ class KeyManager {
      * @memberof KeyManager
      */
     lockKey() {
-        this.isLocked = true;
+        this.#isLocked = true;
     }
 
     /**
@@ -421,9 +421,9 @@ class KeyManager {
      * @memberof KeyManager
      */
     unlockKey(password:string) {
-        if (!this.isLocked) throw new Error('The key is already unlocked')
-        if (password !== this.password) throw new Error('Invalid password')
-        this.isLocked = false;
+        if (!this.#isLocked) throw new Error('The key is already unlocked')
+        if (password !== this.#password) throw new Error('Invalid password')
+        this.#isLocked = false;
     }
 
     /**
@@ -433,7 +433,7 @@ class KeyManager {
      * @memberof KeyManager
      */
     sign(message:string) {
-        if (this.isLocked) throw new Error('The key is currently locked. Please unlock and try again.')
+        if (this.#isLocked) throw new Error('The key is currently locked. Please unlock and try again.')
 
         function curve25519sign(privateKey:any, message:string) {
             return curve25519.sign(str2buf(privateKey), str2buf(message, 'utf8'), crypto.randomBytes(64))

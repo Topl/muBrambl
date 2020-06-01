@@ -3,10 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hash = void 0;
 ("use strict");
 // Dependencies
-const base_58_1 = __importDefault(require("base-58"));
+const Base58 = require("base-58");
 const blake2_1 = __importDefault(require("blake2"));
 const fs_1 = __importDefault(require("fs"));
 // Based on JCS spec
@@ -33,7 +32,7 @@ function digestAndEncode(hash, encoding) {
         case "base64":
             return hash.read().toString(encoding);
         case "base58":
-            return base_58_1.default.encode(hash.read());
+            return Base58.encode(hash.read());
         default:
             return hash.read();
     }
@@ -85,4 +84,4 @@ class Hash {
     }
     ;
 }
-exports.hash = Hash;
+exports.default = Hash;

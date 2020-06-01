@@ -1,8 +1,9 @@
 ("use strict")
 // Dependencies
-import Base58 from "base-58"
+const Base58 = require("base-58")
 import blake from "blake2"
 import fs from "fs";
+import HashType from "../types/HashTypes";
 
 // Based on JCS spec
 // https://tools.ietf.org/html/draft-rundgren-json-canonicalization-scheme-17
@@ -23,7 +24,7 @@ function hashFunc() {
  * @param {string} [encoding] Desired output encoding. May be one of `hex`, `base64`, or `base58`. If none provided a `Buffer` is returned
  * @returns Blake2b-256 hash digest
  */
-function digestAndEncode(hash, encoding) {
+function digestAndEncode(hash:HashType, encoding:string) {
     hash.end()
     switch (encoding) {
         case "hex":
@@ -82,11 +83,11 @@ class Hash {
                 .createReadStream(filePath)
                 .on("error", reject)
                 .pipe(hashFunc())
-                .once("finish", function(this){
+                .once("finish", function(this: any){
                     resolve(digestAndEncode(this, encoding));
                 })
         );
     };
 }
 
-export const hash = Hash
+export default Hash

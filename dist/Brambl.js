@@ -13,15 +13,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 // Dependencies
 const base58 = require('base-58');
 // Primary sub-modules
-const Requests = require('./modules/Requests');
-const KeyManager = require('./modules/KeyManager');
+const Requests_1 = __importDefault(require("./modules/Requests"));
+const KeyManager_1 = __importDefault(require("./modules/KeyManager"));
 // Utilities
-const Hash = require('./utils/Hash');
+const Hash_1 = __importDefault(require("./utils/Hash"));
 // Libraries
-const pollTx = require('./lib/polling');
+const polling_1 = __importDefault(require("./lib/polling"));
 // Constants definitions
 const validTxMethods = [
     'createAssetsPrototype',
@@ -55,67 +58,6 @@ class Brambl {
         // default values for the constructor arguement
         const keyManagerVar = params.KeyManager || {};
         const requestsVar = params.Requests || {};
-        this.prototype = {};
-        /**
-         * Add a signature to a prototype transaction using the an unlocked key manager object
-         *
-         * @param {object} prototypeTx An unsigned transaction JSON object
-         * @param {object|object[]} userKeys A keyManager object containing the user's key (may be an array)
-        */
-        this.prototype.addSigToTx = function (prototypeTx, userKeys) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // function for generating a signature in the correct format
-                const genSig = (keys, txBytes) => {
-                    return Object.entries(keys.map(key => [key.pk, base58.encode(key.sign(txBytes))]));
-                };
-                // in case a single given is given not as an array
-                const keys = Array.isArray(userKeys) ? userKeys : [userKeys];
-                // add signatures of all given key files to the formatted transaction
-                return Object.assign(Object.assign({}, prototypeTx.formattedTx), { signatures: genSig(keys, base58.decode(prototypeTx.messageToSign)) });
-            });
-        };
-        /**
-         * Used to sign a prototype transaction and broadcast to a chain provider
-         *
-         * @param {object} prototypeTx An unsigned transaction JSON object
-         */
-        this.prototype.signAndBroadcast = function (prototypeTx) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const formattedTx = yield this.addSigToTx(prototypeTx, this.keyManager);
-                return this.requests.broadcastTx({ tx: formattedTx }).catch(e => { console.error(e); throw e; });
-            });
-        };
-        /**
-         * Create a new transaction, then sign and broadcast
-         *
-         * @param {string} method The chain resource method to create a transaction for
-        */
-        this.prototype.transaction = function (method, params) {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (!validTxMethods.includes(method))
-                    throw new Error('Invalid transaction method');
-                return this.requests[method](params).then(res => this.signAndBroadcast(res.result));
-            });
-        };
-        /**
-         * A function to initiate polling of the chain provider for a specified transaction.
-         * This function begins by querying 'getTransactionById' which looks for confirmed transactions only.
-         * If the transaction is not confirmed, the mempool is checked using 'getTransactionFromMemPool' to
-         * ensure that the transaction is pending. The parameter 'numFailedQueries' specifies the number of consecutive
-         * failures (when resorting to querying the mempool) before ending the polling operation prematurely.
-         *
-         * @param {string} txId The unique transaction ID to look for
-         * @param {object} [options] Optional parameters to control the polling behavior
-         * @param {number} [options.timeout] The timeout (in seconds) before the polling operation is stopped
-         * @param {number} [options.interval] The interval (in seconds) between attempts
-         * @param {number} [options.maxFailedQueries] The maximum number of consecutive failures (to find the unconfirmed transaction) before ending the poll execution
-        */
-        this.prototype.pollTx = function (txId, options) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const opts = options || { timeout: 90, interval: 3, maxFailedQueries: 10 };
-                return pollTx(this.requests, txId, opts);
-            });
-        };
         // if only a string is given in the constructor, assume it is the password.
         // Therefore, target a local chain provider and make a new key
         if (params.constructor === String)
@@ -125,10 +67,10 @@ class Brambl {
             this.requests = requestsVar.instance;
         }
         else if (requestsVar.url) {
-            this.requests = new Requests(requestsVar.url, requestsVar.apiKey);
+            this.requests = new Requests_1.default(requestsVar.url, requestsVar.apiKey);
         }
         else {
-            this.requests = new Requests();
+            this.requests = new Requests_1.default();
         }
         // Setup KeyManager object
         if (!keyManagerVar.password)
@@ -137,13 +79,13 @@ class Brambl {
             this.keyManager = keyManagerVar.instance;
         }
         else if (keyManagerVar.keyPath) {
-            this.keyManager = new KeyManager({ password: keyManagerVar.password, keyPath: keyManagerVar.keyPath, constants: keyManagerVar.constants });
+            this.keyManager = new KeyManager_1.default({ password: keyManagerVar.password, keyPath: keyManagerVar.keyPath, constants: keyManagerVar.constants });
         }
         else {
-            this.keyManager = new KeyManager({ password: keyManagerVar.password });
+            this.keyManager = new KeyManager_1.default(keyManagerVar.password);
         }
         // Import utilities
-        this.utils = { Hash };
+        this.utils = { Hash: Hash_1.default };
     }
     /**
      * Method for creating a separate Requests instance
@@ -154,7 +96,7 @@ class Brambl {
      * @memberof Brambl
      */
     static Requests(url, apiKey) {
-        return new Requests(url, apiKey);
+        return new Requests_1.default(url, apiKey);
     }
     /**
      * Method for creating a separate KeyManager instance
@@ -167,7 +109,71 @@ class Brambl {
      * @memberof Brambl
      */
     static KeyManager(params) {
-        return new KeyManager(params);
+        return new KeyManager_1.default(params);
     }
 }
+/**
+ * Add a signature to a prototype transaction using the an unlocked key manager object
+ *
+ * @param {object} prototypeTx An unsigned transaction JSON object
+ * @param {object|object[]} userKeys A keyManager object containing the user's key (may be an array)
+
+
+/**
+ * Used to sign a prototype transaction and broadcast to a chain provider
+ *
+ * @param {object} prototypeTx An unsigned transaction JSON object
+ */
+Brambl.prototype.addSigToTx = function (prototypeTx, userKeys) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // function for generating a signature in the correct format
+        const genSig = (keys, txBytes) => {
+            return Object.entries(keys.map((key) => [key.pk, base58.encode(key.sign(txBytes))]));
+        };
+        // in case a single given is given not as an array
+        const keys = Array.isArray(userKeys) ? userKeys : [userKeys];
+        // add signatures of all given key files to the formatted transaction
+        return Object.assign(Object.assign({}, prototypeTx.formattedTx), { signatures: genSig(keys, base58.decode(prototypeTx.messageToSign)) });
+    });
+};
+Brambl.prototype.signAndBroadcast = function (prototypeTx) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // console.log(prototypeTx)
+        const formattedTx = yield this.addSigToTx(prototypeTx, this.keyManager);
+        return this.requests.broadcastTx({ tx: formattedTx }).catch((e) => { console.error(e); throw e; });
+    });
+};
+/**
+ * Create a new transaction, then sign and broadcast
+ *
+ * @param {string} method The chain resource method to create a transaction for
+*/
+Brambl.prototype.transaction = function (method, params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // console.log("got far")
+        if (!validTxMethods.includes(method))
+            throw new Error('Invalid transaction method');
+        // console.log(this.requests[method](params)).then((res:{result:string}) => this.signAndBroadcast(res.result)
+        return this.requests[method](params).then((res) => this.signAndBroadcast(res.result));
+    });
+};
+/**
+* A function to initiate polling of the chain provider for a specified transaction.
+* This function begins by querying 'getTransactionById' which looks for confirmed transactions only.
+* If the transaction is not confirmed, the mempool is checked using 'getTransactionFromMemPool' to
+* ensure that the transaction is pending. The parameter 'numFailedQueries' specifies the number of consecutive
+* failures (when resorting to querying the mempool) before ending the polling operation prematurely.
+*
+* @param {string} txId The unique transaction ID to look for
+* @param {object} [options] Optional parameters to control the polling behavior
+* @param {number} [options.timeout] The timeout (in seconds) before the polling operation is stopped
+* @param {number} [options.interval] The interval (in seconds) between attempts
+* @param {number} [options.maxFailedQueries] The maximum number of consecutive failures (to find the unconfirmed transaction) before ending the poll execution
+*/
+Brambl.prototype.pollTx = function (txId, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const opts = options || { timeout: 90, interval: 3, maxFailedQueries: 10 };
+        return polling_1.default(this.requests, txId, opts);
+    });
+};
 module.exports = Brambl;

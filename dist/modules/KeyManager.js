@@ -7,9 +7,23 @@
  * Based on the keythereum library from Jack Peterson
  * https://github.com/Ethereumjs/keythereum
  */
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, privateMap, value) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to set private field on non-instance");
+    }
+    privateMap.set(receiver, value);
+    return value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, privateMap) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to get private field on non-instance");
+    }
+    return privateMap.get(receiver);
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _isLocked, _password, _keyStorage;
 ("use strict");
 // Dependencies
 const fs = require('fs');
@@ -278,15 +292,18 @@ function generateKeystoreFilename(publicKey) {
 class KeyManager {
     //// Instance constructor //////////////////////////////////////////////////////////////////////////////////////////////
     constructor(params) {
+        _isLocked.set(this, void 0);
+        _password.set(this, void 0);
+        _keyStorage.set(this, void 0);
         // enforce that a password must be provided\
         if (!params.password && params.constructor !== String)
             throw new Error('A password must be provided at initialization');
         // Initialize a key manager object with a key storage object
         const initKeyStorage = (keyStorage, password) => {
             this.pk = keyStorage.publicKeyId;
-            this.isLocked = false;
-            this.password = params;
-            this.keyStorage = keyStorage;
+            __classPrivateFieldSet(this, _isLocked, false);
+            __classPrivateFieldSet(this, _password, params);
+            __classPrivateFieldSet(this, _keyStorage, keyStorage);
             if (this.pk)
                 this.sk = recover(password, keyStorage, this.constants.scrypt);
         };
@@ -351,18 +368,18 @@ class KeyManager {
      * @memberof KeyManager
      */
     getKeyStorage() {
-        if (this.isLocked)
+        if (__classPrivateFieldGet(this, _isLocked))
             throw new Error('Key manager is currently locked. Please unlock and try again.');
         if (!this.pk)
             throw new Error('A key must be initialized before using this key manager');
-        return this.keyStorage;
+        return __classPrivateFieldGet(this, _keyStorage);
     }
     /**
      * Set the key manager to locked so that the private key may not be decrypted
      * @memberof KeyManager
      */
     lockKey() {
-        this.isLocked = true;
+        __classPrivateFieldSet(this, _isLocked, true);
     }
     /**
      * Unlock the key manager to be used in transactions
@@ -370,11 +387,11 @@ class KeyManager {
      * @memberof KeyManager
      */
     unlockKey(password) {
-        if (!this.isLocked)
+        if (!__classPrivateFieldGet(this, _isLocked))
             throw new Error('The key is already unlocked');
-        if (password !== this.password)
+        if (password !== __classPrivateFieldGet(this, _password))
             throw new Error('Invalid password');
-        this.isLocked = false;
+        __classPrivateFieldSet(this, _isLocked, false);
     }
     /**
      * Generate the signature of a message using the provided private key
@@ -383,7 +400,7 @@ class KeyManager {
      * @memberof KeyManager
      */
     sign(message) {
-        if (this.isLocked)
+        if (__classPrivateFieldGet(this, _isLocked))
             throw new Error('The key is currently locked. Please unlock and try again.');
         function curve25519sign(privateKey, message) {
             return curve25519.sign(str2buf(privateKey), str2buf(message, 'utf8'), crypto_1.default.randomBytes(64));
@@ -406,6 +423,7 @@ class KeyManager {
         return outpath;
     }
 }
+_isLocked = new WeakMap(), _password = new WeakMap(), _keyStorage = new WeakMap();
 ;
 module.exports = KeyManager;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
