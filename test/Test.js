@@ -9,7 +9,8 @@ console.log('\n' + "----------BramblJS prototype model tests------------" + '\n'
 //Using .then on promise to access json data
 
 BramblObj.getBalancesByKey({
-  publicKeys:['A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb']
+  publicKeys:['A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb'],
+  adas:"asda"
 })
 .then(function(response) {
   console.log('----------------------------------------------------------------');

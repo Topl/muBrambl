@@ -33,7 +33,7 @@ const node_fetch_1 = __importDefault(require("node-fetch"));
  * @param {object} params - method specific parameter object
  * @param {object} self - internal reference for accessing constructor data
  * @returnss {object} JSON response from the node
- */
+*/
 function BramblRequest(routeInfo, params, self) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -66,6 +66,37 @@ function BramblRequest(routeInfo, params, self) {
     });
 }
 ;
+/**
+ * A function to ensure the parameters object is not empty and has the correct keys.
+ * @param {any} params parameter object
+ * @param {Array} keysList List of Keys nessesary for the parameter object to include.
+ * @class Requests
+ */
+function checkParams(params, keysList) {
+    let desParams = Object.entries(params);
+    let structuredArr = [];
+    desParams.forEach(function (keyPair) {
+        if (keyPair[1] === undefined || keyPair === null) {
+            throw new Error("A " + keyPair[0] + " key must be specified cant use undefined or null");
+        }
+        structuredArr.push(keyPair[0]);
+    });
+    if (!params) {
+        throw new Error("A parameter object must be specified");
+    }
+    else {
+        if (JSON.stringify(keysList.sort()) !== JSON.stringify(structuredArr.sort())) {
+            var key = "";
+            keysList.forEach(function (keys) {
+                key += keys + ", ";
+            });
+            console.log(key);
+            throw new Error("Make Sure you filling only the correct keys, keys you must fill are " + key);
+        }
+        else {
+        }
+    }
+}
 /**
  * A class for sending requests to the Brambl layer interface of the given chain provider
  * @param {string} [url="http://localhost:9085/"] Chain provider location
@@ -101,8 +132,7 @@ class Requests {
      */
     getBalancesByKey(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params.publicKeys || !Array.isArray(params.publicKeys))
-                throw new Error("A list of publicKeys must be specified");
+            checkParams(params, ["publicKeys"]);
             const route = "wallet/";
             const method = "balances";
             return BramblRequest({ route, method, id }, params, this);
@@ -134,10 +164,7 @@ class Requests {
      */
     generateKeyfile(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.password)
-                throw new Error("A password must be provided to encrypt the keyfile");
+            checkParams(params, ["password"]);
             const route = "wallet/";
             const method = "generateKeyfile";
             return BramblRequest({ route, method, id }, params, this);
@@ -155,12 +182,7 @@ class Requests {
      */
     lockKeyfile(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.publicKey)
-                throw new Error("A publicKey field must be specified");
-            if (!params.password)
-                throw new Error("A password must be provided to encrypt the keyfile");
+            checkParams(params, ["publicKey", "password"]);
             const route = "wallet/";
             const method = "lockKeyfile";
             return BramblRequest({ route, method, id }, params, this);
@@ -178,12 +200,7 @@ class Requests {
      */
     unlockKeyfile(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.publicKey)
-                throw new Error("A publicKey field must be specified");
-            if (!params.password)
-                throw new Error("A password must be provided to encrypt the keyfile");
+            checkParams(params, ["publicKey", "password"]);
             const route = "wallet/";
             const method = "unlockKeyfile";
             return BramblRequest({ route, method, id }, params, this);
@@ -201,12 +218,7 @@ class Requests {
      */
     signTransaction(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.publicKey)
-                throw new Error("A publicKey field must be specified");
-            if (!params.tx)
-                throw new Error("A tx object must be specified");
+            checkParams(params, ["publicKey", "tx"]);
             const route = "wallet/";
             const method = "signTx";
             return BramblRequest({ route, method, id }, params, this);
@@ -223,10 +235,7 @@ class Requests {
      */
     broadcastTx(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.tx)
-                throw new Error("A tx object must be specified");
+            checkParams(params, ["tx"]);
             const route = "wallet/";
             const method = "broadcastTx";
             return BramblRequest({ route, method, id }, params, this);
@@ -248,12 +257,7 @@ class Requests {
      */
     transferPolys(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.recipient)
-                throw new Error("A recipient must be specified");
-            if (!params.amount)
-                throw new Error("An amount must be specified");
+            checkParams(params, ["amount", "recipient", "fee"]);
             if (!params.fee && params.fee !== 0)
                 throw new Error("A fee must be specified");
             const route = "wallet/";
@@ -277,12 +281,7 @@ class Requests {
      */
     transferArbits(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.recipient)
-                throw new Error("A recipient must be specified");
-            if (!params.amount)
-                throw new Error("An amount must be specified");
+            checkParams(params, ["amount", "recipient", "fee"]);
             if (!params.fee && params.fee !== 0)
                 throw new Error("A fee must be specified");
             const route = "wallet/";
@@ -309,18 +308,9 @@ class Requests {
      */
     createAssets(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.issuer)
-                throw new Error("An asset issuer must be specified");
-            if (!params.assetCode)
-                throw new Error("An assetCode must be specified");
-            if (!params.recipient)
-                throw new Error("A recipient must be specified");
-            if (!params.amount)
-                throw new Error("An amount must be specified");
+            checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"]);
             if (!params.fee && params.fee !== 0)
-                throw new Error("A fee must be specified");
+                throw new Error("A fee must be > 0");
             const route = "asset/";
             const method = "createAssets";
             return BramblRequest({ route, method, id }, params, this);
@@ -342,18 +332,9 @@ class Requests {
      */
     createAssetsPrototype(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.issuer)
-                throw new Error("An asset issuer must be specified");
-            if (!params.assetCode)
-                throw new Error("An assetCode must be specified");
-            if (!params.recipient)
-                throw new Error("A recipient must be specified");
-            if (!params.amount)
-                throw new Error("An amount must be specified");
+            checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"]);
             if (!params.fee && params.fee !== 0)
-                throw new Error("A fee must be specified");
+                throw new Error("A fee must be > 0");
             const route = "asset/";
             const method = "createAssetsPrototype";
             return BramblRequest({ route, method, id }, params, this);
@@ -377,16 +358,7 @@ class Requests {
      */
     transferAssets(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.issuer)
-                throw new Error("An asset issuer must be specified");
-            if (!params.assetCode)
-                throw new Error("An assetCode must be specified");
-            if (!params.recipient)
-                throw new Error("A recipient must be specified");
-            if (!params.amount)
-                throw new Error("An amount must be specified");
+            checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"]);
             if (!params.fee && params.fee !== 0)
                 throw new Error("A fee must be specified");
             const route = "asset/";
@@ -412,18 +384,7 @@ class Requests {
      */
     transferAssetsPrototype(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.issuer)
-                throw new Error("An asset issuer must be specified");
-            if (!params.assetCode)
-                throw new Error("An assetCode must be specified");
-            if (!params.recipient)
-                throw new Error("A recipient must be specified");
-            if (!params.sender)
-                throw new Error("A sender must be specified");
-            if (!params.amount)
-                throw new Error("An amount must be specified");
+            checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"]);
             if (!params.fee && params.fee !== 0)
                 throw new Error("A fee must be specified");
             const route = "asset/";
@@ -446,14 +407,7 @@ class Requests {
      */
     transferTargetAssets(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.recipient)
-                throw new Error("A recipient must be specified");
-            if (!params.assetId)
-                throw new Error("An assetId is required for this request");
-            if (!params.amount)
-                throw new Error("An amount must be specified");
+            checkParams(params, ["amount", "recipient", "fee", "assetId"]);
             if (!params.fee && params.fee !== 0)
                 throw new Error("A fee must be specified");
             const route = "asset/";
@@ -477,16 +431,7 @@ class Requests {
      */
     transferTargetAssetsPrototype(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.recipient)
-                throw new Error("A recipient must be specified");
-            if (!params.sender)
-                throw new Error("A sender must be specified");
-            if (!params.assetId)
-                throw new Error("An assetId is required for this request");
-            if (!params.amount)
-                throw new Error("An amount must be specified");
+            checkParams(params, ["amount", "recipient", "fee", "assetId", "sender"]);
             if (!params.fee && params.fee !== 0)
                 throw new Error("A fee must be specified");
             const route = "asset/";
@@ -508,10 +453,7 @@ class Requests {
      */
     getTransactionById(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.transactionId)
-                throw new Error("A transactionId must be specified");
+            checkParams(params, ["transactionId"]);
             const route = "nodeView/";
             const method = "transactionById";
             return BramblRequest({ route, method, id }, params, this);
@@ -528,10 +470,7 @@ class Requests {
      */
     getTransactionFromMempool(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.transactionId)
-                throw new Error("A transactionId must be specified");
+            checkParams(params, ["transactionId"]);
             const route = "nodeView/";
             const method = "transactionFromMempool";
             return BramblRequest({ route, method, id }, params, this);
@@ -563,10 +502,7 @@ class Requests {
      */
     getBlockById(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.blockId)
-                throw new Error("A blockId must be specified");
+            checkParams(params, ["blockId"]);
             const route = "nodeView/";
             const method = "blockById";
             return BramblRequest({ route, method, id }, params, this);
@@ -602,12 +538,7 @@ class Requests {
      */
     calcDelay(params, id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!params)
-                throw new Error("A parameter object must be specified");
-            if (!params.blockId)
-                throw new Error("A blockId must be specified");
-            if (!params.numBlocks)
-                throw new Error("A number of blocks must be specified");
+            checkParams(params, ["blockId", "numBlocks"]);
             const route = "debug/";
             const method = "delay";
             return BramblRequest({ route, method, id }, params, this);

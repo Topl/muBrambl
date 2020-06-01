@@ -23,7 +23,8 @@ import {RoutInfo, Self, Params, BalancesParams, TxParams, TransferParams, Transf
  * @param {object} params - method specific parameter object
  * @param {object} self - internal reference for accessing constructor data
  * @returnss {object} JSON response from the node
- */
+*/
+
 async function BramblRequest(routeInfo:RoutInfo, params:Object, self:Self) {
   try {
     const route = routeInfo.route;
@@ -49,7 +50,39 @@ async function BramblRequest(routeInfo:RoutInfo, params:Object, self:Self) {
     throw err
   }
 };
+/**
+ * A function to ensure the parameters object is not empty and has the correct keys.
+ * @param {any} params parameter object
+ * @param {Array} keysList List of Keys nessesary for the parameter object to include.
+ * @class Requests
+ */
+function checkParams(params:any, keysList:Array<any>) {
+  let desParams = Object.entries(params)
+  let structuredArr:Array<any> = []
+  desParams.forEach(function(keyPair){
+      if(keyPair[1]===undefined||keyPair===null){
+          throw new Error("A "+keyPair[0]+" key must be specified cant use undefined or null");
+      }
+      structuredArr.push(keyPair[0])
+  })
+  if(!params){
+       throw new Error("A parameter object must be specified");
 
+  }else{
+      
+      if(JSON.stringify(keysList.sort()) !== JSON.stringify(structuredArr.sort())){
+          var key = ""
+          keysList.forEach(function(keys){
+              key += keys+", "
+          })
+          console.log(key)
+          throw new Error("Make Sure you filling only the correct keys, keys you must fill are "+ key);
+      }else{
+          
+      }
+  }
+
+}
 /**
  * A class for sending requests to the Brambl layer interface of the given chain provider
  * @param {string} [url="http://localhost:9085/"] Chain provider location
@@ -86,8 +119,7 @@ class Requests {
    * @memberof Requests
    */
   async getBalancesByKey(params:BalancesParams, id = "1") {
-    if (!params.publicKeys || !Array.isArray(params.publicKeys))
-      throw new Error("A list of publicKeys must be specified");
+    checkParams(params, ["publicKeys"])
     const route = "wallet/";
     const method = "balances";
     
@@ -116,10 +148,8 @@ class Requests {
    * @memberof Requests
    */
   async generateKeyfile(params:Params, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.password)
-      throw new Error("A password must be provided to encrypt the keyfile");
+    checkParams(params, ["password"])
+
     const route = "wallet/";
     const method = "generateKeyfile";
     return BramblRequest({ route, method, id }, params, this);
@@ -135,12 +165,8 @@ class Requests {
    * @memberof Requests
    */
   async lockKeyfile(params:Params, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.publicKey)
-      throw new Error("A publicKey field must be specified");
-    if (!params.password)
-      throw new Error("A password must be provided to encrypt the keyfile");
+    checkParams(params, ["publicKey", "password"])
+
     const route = "wallet/";
     const method = "lockKeyfile";
     return BramblRequest({ route, method, id }, params, this);
@@ -156,12 +182,8 @@ class Requests {
    * @memberof Requests
    */
   async unlockKeyfile(params:Params, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.publicKey)
-      throw new Error("A publicKey field must be specified");
-    if (!params.password)
-      throw new Error("A password must be provided to encrypt the keyfile");
+    checkParams(params, ["publicKey", "password"])
+
     const route = "wallet/";
     const method = "unlockKeyfile";
     return BramblRequest({ route, method, id }, params, this);
@@ -177,12 +199,8 @@ class Requests {
    * @memberof Requests
    */
   async signTransaction(params:TxParams, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.publicKey)
-      throw new Error("A publicKey field must be specified");
-    if (!params.tx)
-      throw new Error("A tx object must be specified");
+    checkParams(params, ["publicKey", "tx"])
+
     const route = "wallet/";
     const method = "signTx";
     return BramblRequest({ route, method, id }, params, this);
@@ -197,10 +215,8 @@ class Requests {
    * @memberof Requests
    */
   async broadcastTx(params:{tx:string}, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.tx)
-      throw new Error("A tx object must be specified");
+    checkParams(params, ["tx"])
+
     const route = "wallet/";
     const method = "broadcastTx";
     return BramblRequest({ route, method, id }, params, this);
@@ -220,12 +236,8 @@ class Requests {
    * @memberof Requests
    */
   async transferPolys(params:TransferArbitParams, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.recipient)
-      throw new Error("A recipient must be specified");
-    if (!params.amount)
-      throw new Error("An amount must be specified");
+
+    checkParams(params, ["amount", "recipient", "fee"])
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
     const route = "wallet/";
@@ -247,12 +259,8 @@ class Requests {
    * @memberof Requests
    */
   async transferArbits(params:TransferArbitParams, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.recipient)
-      throw new Error("A recipient must be specified");
-    if (!params.amount)
-      throw new Error("An amount must be specified");
+    checkParams(params, ["amount", "recipient", "fee"])
+
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
     const route = "wallet/";
@@ -277,18 +285,10 @@ class Requests {
    * @memberof Requests
    */
   async createAssets(params:TransferParams, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.issuer)
-      throw new Error("An asset issuer must be specified");
-    if (!params.assetCode)
-      throw new Error("An assetCode must be specified");
-    if (!params.recipient)
-      throw new Error("A recipient must be specified");
-    if (!params.amount)
-      throw new Error("An amount must be specified");
+    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"])
+
     if (!params.fee && params.fee !== 0)
-      throw new Error("A fee must be specified");
+      throw new Error("A fee must be > 0");
     const route = "asset/";
     const method = "createAssets";
     return BramblRequest({ route, method, id }, params, this);
@@ -308,18 +308,10 @@ class Requests {
    * @memberof Requests
    */
   async createAssetsPrototype(params:TransferParams, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.issuer)
-      throw new Error("An asset issuer must be specified");
-    if (!params.assetCode)
-      throw new Error("An assetCode must be specified");
-    if (!params.recipient)
-      throw new Error("A recipient must be specified");
-    if (!params.amount)
-      throw new Error("An amount must be specified");
+    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"])
+
     if (!params.fee && params.fee !== 0)
-      throw new Error("A fee must be specified");
+      throw new Error("A fee must be > 0");
     const route = "asset/";
     const method = "createAssetsPrototype";
     return BramblRequest({ route, method, id }, params, this);
@@ -341,16 +333,8 @@ class Requests {
    * @memberof Requests
    */
   async transferAssets(params:TransferParams, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.issuer)
-      throw new Error("An asset issuer must be specified");
-    if (!params.assetCode)
-      throw new Error("An assetCode must be specified");
-    if (!params.recipient)
-      throw new Error("A recipient must be specified");
-    if (!params.amount)
-      throw new Error("An amount must be specified");
+    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"])
+
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
     const route = "asset/";
@@ -374,18 +358,8 @@ class Requests {
    * @memberof Requests
    */
   async transferAssetsPrototype(params:TransferAssetsParams, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.issuer)
-      throw new Error("An asset issuer must be specified");
-    if (!params.assetCode)
-      throw new Error("An assetCode must be specified");
-    if (!params.recipient)
-      throw new Error("A recipient must be specified");
-    if (!params.sender)
-      throw new Error("A sender must be specified");
-    if (!params.amount)
-      throw new Error("An amount must be specified");
+    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"])
+
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
     const route = "asset/";
@@ -406,14 +380,8 @@ class Requests {
    * @memberof Requests
    */
   async transferTargetAssets(params:TransferTargetAssetsParams, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.recipient)
-      throw new Error("A recipient must be specified");
-    if (!params.assetId)
-      throw new Error("An assetId is required for this request");
-    if (!params.amount)
-      throw new Error("An amount must be specified");
+    checkParams(params, ["amount", "recipient", "fee", "assetId"])
+
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
     const route = "asset/";
@@ -435,16 +403,8 @@ class Requests {
    * @memberof Requests
    */
   async transferTargetAssetsPrototype(params:TransferTargetAssetsPrototypeParams, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.recipient)
-      throw new Error("A recipient must be specified");
-    if (!params.sender)
-      throw new Error("A sender must be specified");
-    if (!params.assetId)
-      throw new Error("An assetId is required for this request");
-    if (!params.amount)
-      throw new Error("An amount must be specified");
+    checkParams(params, ["amount", "recipient", "fee", "assetId", "sender"])
+
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
     const route = "asset/";
@@ -464,10 +424,8 @@ class Requests {
    * @memberof Requests
    */
   async getTransactionById(params:getTransactionById, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.transactionId)
-      throw new Error("A transactionId must be specified");
+    checkParams(params, ["transactionId"])
+
     const route = "nodeView/";
     const method = "transactionById";
     return BramblRequest({ route, method, id }, params, this);
@@ -482,10 +440,8 @@ class Requests {
    * @memberof Requests
    */
   async getTransactionFromMempool(params:getTransactionById, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.transactionId)
-      throw new Error("A transactionId must be specified");
+    checkParams(params, ["transactionId"])
+
     const route = "nodeView/";
     const method = "transactionFromMempool";
     return BramblRequest({ route, method, id }, params, this);
@@ -513,10 +469,8 @@ class Requests {
    * @memberof Requests
    */
   async getBlockById(params:GetBlockById, id = "1") {
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.blockId)
-      throw new Error("A blockId must be specified");
+    checkParams(params, ["blockId"])
+
     const route = "nodeView/";
     const method = "blockById";
     return BramblRequest({ route, method, id }, params, this);
@@ -551,13 +505,8 @@ class Requests {
    * @memberof Requests
    */
   async calcDelay(params:CalcDelay, id = "1") {
+    checkParams(params, ["blockId", "numBlocks"])
 
-    if (!params)
-      throw new Error("A parameter object must be specified");
-    if (!params.blockId)
-      throw new Error("A blockId must be specified");
-    if (!params.numBlocks)
-      throw new Error("A number of blocks must be specified");
     const route = "debug/";
     const method = "delay";
     return BramblRequest({ route, method, id }, params, this);

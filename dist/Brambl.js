@@ -53,12 +53,12 @@ const validTxMethods = [
  * @param {string} [params.Requests.url] The chain provider to send requests to
  * @param {string} [params.Requests.apikey] Api key for authorizing access to the chain provider
  */
-const emptyObj = {};
+const emptyKeyMan = {};
 class Brambl {
     constructor(params) {
         // default values for the constructor arguement
-        const keyManagerVar = params.KeyManager || emptyObj;
-        const requestsVar = params.Requests || emptyObj;
+        const keyManagerVar = params.KeyManager || emptyKeyMan;
+        const requestsVar = params.Requests || emptyKeyMan;
         // if only a string is given in the constructor, assume it is the password.
         // Therefore, target a local chain provider and make a new key
         if (params.constructor === String)
@@ -151,7 +151,8 @@ Brambl.prototype.signAndBroadcast = function (prototypeTx) {
 */
 Brambl.prototype.transaction = function (method, params) {
     return __awaiter(this, void 0, void 0, function* () {
-        // console.log("got far")
+        // console.log("got far")\\
+        console.log(this.requests);
         if (!validTxMethods.includes(method))
             throw new Error('Invalid transaction method');
         // console.log(this.requests[method](params)).then((res:{result:string}) => this.signAndBroadcast(res.result)
