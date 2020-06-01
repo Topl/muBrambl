@@ -53,11 +53,12 @@ const validTxMethods = [
  * @param {string} [params.Requests.url] The chain provider to send requests to
  * @param {string} [params.Requests.apikey] Api key for authorizing access to the chain provider
  */
+const emptyObj = {};
 class Brambl {
     constructor(params) {
         // default values for the constructor arguement
-        const keyManagerVar = params.KeyManager || {};
-        const requestsVar = params.Requests || {};
+        const keyManagerVar = params.KeyManager || emptyObj;
+        const requestsVar = params.Requests || emptyObj;
         // if only a string is given in the constructor, assume it is the password.
         // Therefore, target a local chain provider and make a new key
         if (params.constructor === String)

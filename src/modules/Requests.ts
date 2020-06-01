@@ -196,7 +196,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async broadcastTx(params:TxParams, id = "1") {
+  async broadcastTx(params:{tx:string}, id = "1") {
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.tx)

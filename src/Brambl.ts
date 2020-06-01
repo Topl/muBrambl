@@ -49,6 +49,7 @@ import { ConstructorParams } from './types/KeyManagerTypes'
   * @param {string} [params.Requests.apikey] Api key for authorizing access to the chain provider
   */
 
+  const emptyKeyMan:any = {}
  class Brambl {
      requests:any;
      keyManager:KeyManager;
@@ -59,8 +60,8 @@ import { ConstructorParams } from './types/KeyManagerTypes'
      pollTx:Function
      constructor(params:Params) {
          // default values for the constructor arguement
-         const keyManagerVar = params.KeyManager || {};
-         const requestsVar = params.Requests || {};
+         const keyManagerVar = params.KeyManager || emptyKeyMan;
+         const requestsVar = params.Requests || emptyKeyMan;
          // if only a string is given in the constructor, assume it is the password.
          // Therefore, target a local chain provider and make a new key
          if (params.constructor === String) keyManagerVar.password = params
@@ -155,8 +156,9 @@ Brambl.prototype.signAndBroadcast = async function (prototypeTx:Object) {
          * 
          * @param {string} method The chain resource method to create a transaction for
         */
-Brambl.prototype.transaction = async function (method:any, params:any) {    
-    // console.log("got far")
+Brambl.prototype.transaction = async function (method:string, params:any) {    
+    // console.log("got far")\\
+    console.log(this.requests)
     if (!validTxMethods.includes(method)) throw new Error('Invalid transaction method')
     // console.log(this.requests[method](params)).then((res:{result:string}) => this.signAndBroadcast(res.result)
     return this.requests[method](params).then((res:{result:any}) => this.signAndBroadcast(res.result))
