@@ -1,1 +1,1 @@
-module.exports = require('./src/Brambl')
+module.exports = require('./dist/Brambl.js')

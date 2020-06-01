@@ -46,12 +46,77 @@
   * @param {string} [params.Requests.url] The chain provider to send requests to
   * @param {string} [params.Requests.apikey] Api key for authorizing access to the chain provider
   */
+
  class Brambl {
-     constructor(params = {}) {
+     requests;
+     keyManager;
+     utils;
+     prototype;
+     constructor(params) {
          // default values for the constructor arguement
          const keyManagerVar = params.KeyManager || {};
          const requestsVar = params.Requests || {};
- 
+         this.prototype = {}
+         /**  
+          * Add a signature to a prototype transaction using the an unlocked key manager object
+          * 
+          * @param {object} prototypeTx An unsigned transaction JSON object
+          * @param {object|object[]} userKeys A keyManager object containing the user's key (may be an array)
+         */
+        this.prototype.addSigToTx = async function (prototypeTx, userKeys) {
+            // function for generating a signature in the correct format
+            const genSig = (keys, txBytes) => {
+                return Object.entries( keys.map( key => [key.pk, base58.encode(key.sign(txBytes))]));
+            }       
+
+            // in case a single given is given not as an array
+            const keys = Array.isArray(userKeys) ? userKeys : [userKeys]        
+
+            // add signatures of all given key files to the formatted transaction
+            return { 
+                ...prototypeTx.formattedTx, 
+                signatures: genSig(keys, base58.decode(prototypeTx.messageToSign))
+            }
+        }       
+
+        /**
+         * Used to sign a prototype transaction and broadcast to a chain provider
+         *
+         * @param {object} prototypeTx An unsigned transaction JSON object
+         */
+        this.prototype.signAndBroadcast = async function (prototypeTx) {
+            const formattedTx = await this.addSigToTx(prototypeTx, this.keyManager)
+            return this.requests.broadcastTx({ tx: formattedTx }).catch(e => { console.error(e); throw e })
+        }       
+
+        /** 
+         * Create a new transaction, then sign and broadcast
+         * 
+         * @param {string} method The chain resource method to create a transaction for
+        */
+        this.prototype.transaction = async function (method, params) {
+            if (!validTxMethods.includes(method)) throw new Error('Invalid transaction method')
+            return this.requests[method](params).then(res => this.signAndBroadcast(res.result))
+        }       
+
+        /** 
+         * A function to initiate polling of the chain provider for a specified transaction.
+         * This function begins by querying 'getTransactionById' which looks for confirmed transactions only.
+         * If the transaction is not confirmed, the mempool is checked using 'getTransactionFromMemPool' to
+         * ensure that the transaction is pending. The parameter 'numFailedQueries' specifies the number of consecutive
+         * failures (when resorting to querying the mempool) before ending the polling operation prematurely.
+         * 
+         * @param {string} txId The unique transaction ID to look for
+         * @param {object} [options] Optional parameters to control the polling behavior
+         * @param {number} [options.timeout] The timeout (in seconds) before the polling operation is stopped
+         * @param {number} [options.interval] The interval (in seconds) between attempts
+         * @param {number} [options.maxFailedQueries] The maximum number of consecutive failures (to find the unconfirmed transaction) before ending the poll execution
+        */
+        this.prototype.pollTx = async function(txId, options) {
+            const opts = options || { timeout: 90, interval: 3, maxFailedQueries: 10 }
+            return pollTx(this.requests, txId, opts)
+        }       
+
          // if only a string is given in the constructor, assume it is the password.
          // Therefore, target a local chain provider and make a new key
          if (params.constructor === String) keyManagerVar.password = params
@@ -107,65 +172,6 @@
      }
  }
  
- /**  
-  * Add a signature to a prototype transaction using the an unlocked key manager object
-  * 
-  * @param {object} prototypeTx An unsigned transaction JSON object
-  * @param {object|object[]} userKeys A keyManager object containing the user's key (may be an array)
- */
- Brambl.prototype.addSigToTx = async function (prototypeTx, userKeys) {
-     // function for generating a signature in the correct format
-     const genSig = (keys, txBytes) => {
-         return Object.fromEntries( keys.map( key => [key.pk, base58.encode(key.sign(txBytes))]));
-     }
- 
-     // in case a single given is given not as an array
-     const keys = Array.isArray(userKeys) ? userKeys : [userKeys]
- 
-     // add signatures of all given key files to the formatted transaction
-     return { 
-         ...prototypeTx.formattedTx, 
-         signatures: genSig(keys, base58.decode(prototypeTx.messageToSign))
-     }
- }
- 
- /**
-  * Used to sign a prototype transaction and broadcast to a chain provider
-  *
-  * @param {object} prototypeTx An unsigned transaction JSON object
-  */
- Brambl.prototype.signAndBroadcast = async function (prototypeTx) {
-     const formattedTx = await this.addSigToTx(prototypeTx, this.keyManager)
-     return this.requests.broadcastTx({ tx: formattedTx }).catch(e => { console.error(e); throw e })
- }
- 
- /** 
-  * Create a new transaction, then sign and broadcast
-  * 
-  * @param {string} method The chain resource method to create a transaction for
- */
- Brambl.prototype.transaction = async function (method, params) {
-     if (!validTxMethods.includes(method)) throw new Error('Invalid transaction method')
-     return this.requests[method](params).then(res => this.signAndBroadcast(res.result))
- }
- 
- /** 
-  * A function to initiate polling of the chain provider for a specified transaction.
-  * This function begins by querying 'getTransactionById' which looks for confirmed transactions only.
-  * If the transaction is not confirmed, the mempool is checked using 'getTransactionFromMemPool' to
-  * ensure that the transaction is pending. The parameter 'numFailedQueries' specifies the number of consecutive
-  * failures (when resorting to querying the mempool) before ending the polling operation prematurely.
-  * 
-  * @param {string} txId The unique transaction ID to look for
-  * @param {object} [options] Optional parameters to control the polling behavior
-  * @param {number} [options.timeout] The timeout (in seconds) before the polling operation is stopped
-  * @param {number} [options.interval] The interval (in seconds) between attempts
-  * @param {number} [options.maxFailedQueries] The maximum number of consecutive failures (to find the unconfirmed transaction) before ending the poll execution
- */
- Brambl.prototype.pollTx = async function(txId, options) {
-     const opts = options || { timeout: 90, interval: 3, maxFailedQueries: 10 }
-     return pollTx(this.requests, txId, opts)
- }
- 
- module.exports = Brambl
+
+export = Brambl
  

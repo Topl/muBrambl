@@ -11,8 +11,8 @@
 ("use strict");
 
 // Dependencies
-const fetch = require('node-fetch')
-
+import fetch from 'node-fetch'
+import {RoutInfo, Self, Params} from "../types/RequestsTypes"
 /**
  * General builder function for formatting API request
  *
@@ -24,7 +24,7 @@ const fetch = require('node-fetch')
  * @param {object} self - internal reference for accessing constructor data
  * @returnss {object} JSON response from the node
  */
-async function BramblRequest(routeInfo, params, self) {
+async function BramblRequest(routeInfo:RoutInfo, params:Object, self:Self) {
   try {
     const route = routeInfo.route;
     const body = {
@@ -57,6 +57,8 @@ async function BramblRequest(routeInfo, params, self) {
  * @class Requests
  */
 class Requests {
+  url:string;
+  headers:Object;
   constructor(url = "http://localhost:9085/", apiKey = "topl_the_world!") {
     this.url = url;
     this.headers = {
@@ -65,10 +67,10 @@ class Requests {
     };
   }
   //Allows setting a different url than the default from which to create and accept RPC connections
-  setUrl(url) {
+  setUrl(url:string) {
     this.url = url;
   }
-  setApiKey(apiKey) {
+  setApiKey(apiKey:string) {
     this.headers["x-api-key"] = apiKey;
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +85,7 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async getBalancesByKey(params, id = "1") {
+  async getBalancesByKey(params:Params, id = "1") {
     if (!params.publicKeys || !Array.isArray(params.publicKeys))
       throw new Error("A list of publicKeys must be specified");
     const route = "wallet/";
@@ -528,10 +530,13 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
+
   async chainInfo(id = "1") {
-    const params = {};
+    var params = {};
     const route = "debug/";
     const method = "info";
+
+    
     return BramblRequest({ route, method, id }, params, this);
   }
   ////////////Calculate block delay////////////
@@ -544,7 +549,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async calcDelay(id = "1") {
+  async calcDelay(params, id = "1") {
+
     if (!params)
       throw new Error("A parameter object must be specified");
     if (!params.blockId)
@@ -585,6 +591,6 @@ class Requests {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module.exports = Requests;
+export = Requests;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

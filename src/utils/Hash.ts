@@ -1,12 +1,12 @@
 ("use strict")
 // Dependencies
-const Base58 = require("base-58");
-const blake = require("blake2");
-const fs = require("fs");
+import Base58 from "base-58"
+import blake from "blake2"
+import fs from "fs";
 
 // Based on JCS spec
 // https://tools.ietf.org/html/draft-rundgren-json-canonicalization-scheme-17
-JSON.canonify = require("canonicalize");
+let JSONCanonify = require("canonicalize");
 
 /**
  * standard FastCryptographicHash in Bifrost
@@ -50,8 +50,8 @@ class Hash {
      * @param {string} encoding output encoding
      * @returns Blake2b-256 hash digest
      */
-    static any(message, encoding) {
-        const msg = Buffer.from(JSON.canonify(message))
+    static any(message:any, encoding:string) {
+        const msg = Buffer.from(JSONCanonify(message))
         const hash = hashFunc().update(msg)
         return digestAndEncode(hash, encoding)
     }
@@ -63,7 +63,7 @@ class Hash {
      * @param {string} encoding output encoding
      * @returns Blake2b-256 hash digest
      */
-    static string(message, encoding) {
+    static string(message:string, encoding:string) {
         const msg = Buffer.from(message)
         const hash = hashFunc().update(msg)
         return digestAndEncode(hash, encoding)
@@ -76,17 +76,17 @@ class Hash {
      * @param {string} encoding output encoding
      * @returns Blake2b-256 hash digest
      */
-    static file(filePath, encoding) {
+    static file(filePath:string, encoding:string) {
         return new Promise((resolve, reject) =>
             fs
                 .createReadStream(filePath)
                 .on("error", reject)
                 .pipe(hashFunc())
-                .once("finish", function () {
+                .once("finish", function(this){
                     resolve(digestAndEncode(this, encoding));
                 })
         );
     };
 }
 
-module.exports = Hash
+export const hash = Hash
