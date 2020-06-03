@@ -1,18 +1,25 @@
-const brambl = require('../index')
 require('dotenv').config()
+const BramblJS = require('../../index')
 
-const bramblLayer = new brambl.Requests("https://valhalla.torus.topl.co", process.env.VALHALLA_KEY)
-const keyMan = new brambl.KeyManager; keyMan.importFromFile('./keystore/itGuy.json' , 'genesis')
-const signAndBroadcast = (tx) => brambl.utils.transactions.signAndBroadcast(bramblLayer, keyMan, tx)
-
+const brambl = new BramblJS({
+    Requests: {
+        url: 'https://valhalla.torus.topl.co/',
+        apiKey: process.env.VALHALLA_KEY
+    },
+    KeyManager: {
+        password: 'genesis_billyBob',
+        //keyPath: './keystore/itGuy.json'
+    }
+})
+console.log(brambl.keyManager)
 const createParams = {
-    issuer: keyMan.pk,
+    issuer: brambl.keyManager.pk,
     assetCode: "test-" + Date.now(),
-    recipient: keyMan.pk,
+    recipient: brambl.keyManager.pk,
     amount: 1,
     fee: 0
 };
 
-bramblLayer.createAssetsPrototype(createParams)
-    .then(res => signAndBroadcast(res.result))
+brambl.requests.createAssetsPrototype(createParams)
+    .then(res => brambl.signAndBroadcast(res.result))
     .then(res => console.log(res))

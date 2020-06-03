@@ -1,7 +1,7 @@
 const KeyMan = require('../../dist/modules/KeyManager'); 
 const b58 = require('base-58')
 
-gjal = new KeyMan({as:"as"}); 
+gjal = new KeyMan("password"); 
  
 h = gjal.getKeyStorage()
 console.log(h)

@@ -25,3 +25,7 @@ export interface Options{
     timeout:number
     maxFailedQueries:number
 }
+export interface Key{
+    pk:string
+    sign:Function
+}

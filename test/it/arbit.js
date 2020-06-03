@@ -1,9 +1,12 @@
 const assert = require("assert");
-const BramblJS = require("./../../src/Requests");
+const BramblJS = require("../../dist/modules/Requests.js");
 
 describe("Arbit", () => {
   before(() => {
-    brambljs = new BramblJS();
+    brambljs = new BramblJS({
+      url: 'https://valhalla.torus.topl.co/',
+      apiKey: process.env.VALHALLA_KEY
+  });
   });
 
   it("should transfer arbits", done => {

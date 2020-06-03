@@ -23,7 +23,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _isLocked, _password, _keyStorage;
+var _sk, _isLocked, _password, _keyStorage;
 ("use strict");
 // Dependencies
 const fs = require('fs');
@@ -136,10 +136,10 @@ function create(params, cb) {
         return blake2_1.default.createHash("blake2b", { digestLength: 32 }).update(Buffer).digest();
     }
     function curve25519KeyGen(randomBytes) {
-        const { public: pk, private: sk } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
+        const { public: pk, private: sk1 } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
         return {
             publicKey: Buffer.from(pk),
-            privateKey: Buffer.from(sk),
+            privateKey: Buffer.from(sk1),
             iv: bifrostBlake2b(crypto_1.default.randomBytes(keyBytes + ivBytes + keyBytes)).slice(0, ivBytes),
             salt: bifrostBlake2b(crypto_1.default.randomBytes(keyBytes + ivBytes))
         };
@@ -292,6 +292,8 @@ function generateKeystoreFilename(publicKey) {
 class KeyManager {
     //// Instance constructor //////////////////////////////////////////////////////////////////////////////////////////////
     constructor(params) {
+        // Private variables
+        _sk.set(this, void 0);
         _isLocked.set(this, void 0);
         _password.set(this, void 0);
         _keyStorage.set(this, void 0);
@@ -305,7 +307,7 @@ class KeyManager {
             __classPrivateFieldSet(this, _password, params);
             __classPrivateFieldSet(this, _keyStorage, keyStorage);
             if (this.pk)
-                this.sk = recover(password, keyStorage, this.constants.scrypt);
+                __classPrivateFieldSet(this, _sk, recover(password, keyStorage, this.constants.scrypt));
         };
         const generateKey = (password) => {
             // this will create a new curve25519 key pair and dump to an encrypted format
@@ -319,7 +321,7 @@ class KeyManager {
         };
         // initialize vatiables
         this.constants = params.constants || defaultOptions;
-        initKeyStorage({ publicKeyId: '', crypto: {} }, '');
+        initKeyStorage({ publicKeyId: '', crypto: {} }, Buffer.from(""));
         // load in keyfile if a path was given, or default to generating a new key
         if (params.keyPath) {
             try {
@@ -405,7 +407,7 @@ class KeyManager {
         function curve25519sign(privateKey, message) {
             return curve25519.sign(str2buf(privateKey), str2buf(message, 'utf8'), crypto_1.default.randomBytes(64));
         }
-        return curve25519sign(this.sk, message);
+        return curve25519sign(__classPrivateFieldGet(this, _sk), message);
     }
     /**
      * Export formatted JSON to keystore file.
@@ -423,7 +425,7 @@ class KeyManager {
         return outpath;
     }
 }
-_isLocked = new WeakMap(), _password = new WeakMap(), _keyStorage = new WeakMap();
+_sk = new WeakMap(), _isLocked = new WeakMap(), _password = new WeakMap(), _keyStorage = new WeakMap();
 ;
 module.exports = KeyManager;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

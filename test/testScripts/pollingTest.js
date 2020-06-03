@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('./node_modules/dotenv').config()
 const BramblJS = require('../../index')
 
 const brambl = new BramblJS({

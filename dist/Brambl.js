@@ -56,6 +56,7 @@ const validTxMethods = [
 const emptyKeyMan = {};
 class Brambl {
     constructor(params) {
+        this.keyMan = KeyManager_1.default;
         // default values for the constructor arguement
         const keyManagerVar = params.KeyManager || emptyKeyMan;
         const requestsVar = params.Requests || emptyKeyMan;
@@ -129,7 +130,7 @@ Brambl.prototype.addSigToTx = function (prototypeTx, userKeys) {
     return __awaiter(this, void 0, void 0, function* () {
         // function for generating a signature in the correct format
         const genSig = (keys, txBytes) => {
-            return Object.entries(keys.map((key) => [key.pk, base58.encode(key.sign(txBytes))]));
+            return Object.fromEntries(keys.map((key) => [key.pk, base58.encode(key.sign(txBytes))]));
         };
         // in case a single given is given not as an array
         const keys = Array.isArray(userKeys) ? userKeys : [userKeys];
@@ -139,7 +140,6 @@ Brambl.prototype.addSigToTx = function (prototypeTx, userKeys) {
 };
 Brambl.prototype.signAndBroadcast = function (prototypeTx) {
     return __awaiter(this, void 0, void 0, function* () {
-        // console.log(prototypeTx)
         const formattedTx = yield this.addSigToTx(prototypeTx, this.keyManager);
         return this.requests.broadcastTx({ tx: formattedTx }).catch((e) => { console.error(e); throw e; });
     });
@@ -151,11 +151,8 @@ Brambl.prototype.signAndBroadcast = function (prototypeTx) {
 */
 Brambl.prototype.transaction = function (method, params) {
     return __awaiter(this, void 0, void 0, function* () {
-        // console.log("got far")\\
-        console.log(this.requests);
         if (!validTxMethods.includes(method))
             throw new Error('Invalid transaction method');
-        // console.log(this.requests[method](params)).then((res:{result:string}) => this.signAndBroadcast(res.result)
         return this.requests[method](params).then((res) => this.signAndBroadcast(res.result));
     });
 };

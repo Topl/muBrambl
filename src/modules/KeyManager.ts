@@ -135,10 +135,11 @@ function create(params:paramsCreate, cb?:Function) {
     }
 
     function curve25519KeyGen(randomBytes:Buffer) {
-        const { public: pk, private: sk } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
+
+        const { public: pk, private: sk1 } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
         return {
             publicKey: Buffer.from(pk),
-            privateKey: Buffer.from(sk),
+            privateKey: Buffer.from(sk1),
             iv: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes + keyBytes)).slice(0, ivBytes),
             salt: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes))
         };
@@ -317,7 +318,7 @@ function generateKeystoreFilename(publicKey:string) {
  */
 class KeyManager {
     // Private variables
-    sk:any;
+    #sk:any;
     #isLocked:boolean;
     #password:any;
     #keyStorage:any;
@@ -329,13 +330,13 @@ class KeyManager {
         if (!params.password && params.constructor !== String) throw new Error('A password must be provided at initialization')
 
         // Initialize a key manager object with a key storage object
-        const initKeyStorage = (keyStorage:any, password:any) => {
+        const initKeyStorage = (keyStorage:any, password:Buffer) => {
             this.pk = keyStorage.publicKeyId;
             this.#isLocked = false
             this.#password = params;
             this.#keyStorage = keyStorage;
 
-            if (this.pk) this.sk = recover(password, keyStorage, this.constants.scrypt)
+            if (this.pk) this.#sk = recover(password, keyStorage, this.constants.scrypt)
 
         };
 
@@ -346,7 +347,7 @@ class KeyManager {
 
         }
         // Imports key data object from keystore JSON file.
-        const importFromFile = (filepath:any, password:Buffer) => {
+        const importFromFile = (filepath:string, password:Buffer) => {
             const keyStorage = JSON.parse(fs.readFileSync(filepath));
             // todo - check that the imported object conforms to our definition of a keyfile
             initKeyStorage(keyStorage, password)
@@ -354,8 +355,8 @@ class KeyManager {
 
         // initialize vatiables
         this.constants = params.constants || defaultOptions
-        initKeyStorage({ publicKeyId: '', crypto: {} }, '')
-
+        initKeyStorage({ publicKeyId: '', crypto: {} },  Buffer.from(""))
+ 
         // load in keyfile if a path was given, or default to generating a new key
         if (params.keyPath) {
             try { importFromFile(params.keyPath, params.password) } catch (err) { throw new Error('Error importing keyfile') }
@@ -439,7 +440,7 @@ class KeyManager {
             return curve25519.sign(str2buf(privateKey), str2buf(message, 'utf8'), crypto.randomBytes(64))
         }
 
-        return curve25519sign(this.sk, message);
+        return curve25519sign(this.#sk, message);
     }
 
     /**
@@ -449,7 +450,7 @@ class KeyManager {
      * @return {string} JSON filename 
      * @memberof KeyManager
      */
-    exportToFile(_keyPath:any) {
+    exportToFile(_keyPath:string) {
         const keyPath = _keyPath || "keyfiles";
 
         let outfile = generateKeystoreFilename(this.pk);

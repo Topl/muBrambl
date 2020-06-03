@@ -1,5 +1,5 @@
 'use strict';
-require('dotenv').config()
+require('./node_modules/dotenv').config()
 
 const BramblJS = require('../dist/modules/Requests.js');
 
@@ -10,7 +10,6 @@ console.log('\n' + "----------BramblJS prototype model tests------------" + '\n'
 
 BramblObj.getBalancesByKey({
   publicKeys:['A9vRt6hw7w4c7b4qEkQHYptpqBGpKM5MGoXyrkGCbrfb'],
-  adas:"asda"
 })
 .then(function(response) {
   console.log('----------------------------------------------------------------');
@@ -18,22 +17,22 @@ BramblObj.getBalancesByKey({
   console.log(response);
   });
 
-// BramblObj.unlockKeyfile({
-//   publicKey:'6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 
-//   password:'genesis'
-// })
-// .then(function(response) {
-//   console.log('----------------------------------------------------------------');
-//   console.log("unlockKeyfile result:");
-//   console.log(response);
-// });
+BramblObj.unlockKeyfile({
+  publicKey:'6sYyiTguyQ455w2dGEaNbrwkAWAEYV1Zk6FtZMknWDKQ', 
+  password:'genesis'
+})
+.then(function(response) {
+  console.log('----------------------------------------------------------------');
+  console.log("unlockKeyfile result:");
+  console.log(response);
+});
 
-// BramblObj.chainInfo()
-// .then(function(response) {
-//   console.log('----------------------------------------------------------------');
-//   console.log("chainInfo result:");
-//   console.log(response);
-// });
+BramblObj.chainInfo()
+.then(function(response) {
+  console.log('----------------------------------------------------------------');
+  console.log("chainInfo result:");
+  console.log(response);
+});
 
 // BramblObj.myBlocks()
 // .then(function(response) {
@@ -42,12 +41,12 @@ BramblObj.getBalancesByKey({
 //   console.log(response);
 // });
 
-// BramblObj.blockGenerators()
-// .then(function(response) {
-//   console.log('----------------------------------------------------------------');
-//   console.log("blockGenerators result:");
-//   console.log(response);
-// });
+BramblObj.blockGenerators()
+.then(function(response) {
+  console.log('----------------------------------------------------------------');
+  console.log("blockGenerators result:");
+  console.log(response);
+});
 
 BramblObj.calcDelay({blockId: '6LPtWEm5CRzcjcqJKym9ByKPRYWvBYy7P3DHeE4K7F2r', numBlocks:10})
 .then(function(response) {

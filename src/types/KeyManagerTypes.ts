@@ -3,16 +3,16 @@ export interface paramsCreate{
     ivBytes: number;
 }
 export interface KdfParams{
-    n:any;
-    r:any;
-    p:any;
-    dkLen:any;
+    n:number;
+    r:number;
+    p:number;
+    dkLen:number;
 }
 export interface ConstructorParams{
     password:any;
     constants:any;
     constructor:any;
-    keyPath:any;
+    keyPath:string;
 }
 export interface KeyObject{
     publicKey:string;
@@ -20,16 +20,16 @@ export interface KeyObject{
 
 }
 export interface Options{
-    kdfParams:any
+    kdfParams:KdfParams
     scrypt:any
-    cipher:any
+    cipher:string
 }
 interface CipherParams{
     iv: any;
 }
 interface Crypto{
-    kdfSalt:any;
-    kdsfSalt:any;
+    kdfSalt:string;
+    kdsfSalt:string;
     cipherText:string;
     mac:Uint8Array;
     cipher:Buffer

@@ -90,7 +90,7 @@ function checkParams(params, keysList) {
             keysList.forEach(function (keys) {
                 key += keys + ", ";
             });
-            console.log(key);
+            // console.log(key)
             throw new Error("Make Sure you filling only the correct keys, keys you must fill are " + key);
         }
         else {

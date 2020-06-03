@@ -12,7 +12,7 @@
 
 // Dependencies
 import fetch from 'node-fetch'
-import {RoutInfo, Self, Params, BalancesParams, TxParams, TransferParams, TransferArbitParams, TransferAssetsParams, TransferTargetAssetsParams, TransferTargetAssetsPrototypeParams, getTransactionById, GetBlockById, CalcDelay} from "../types/RequestsTypes"
+import {RoutInfo, Self, Params, BalancesParams, TxParams, TransferParams, TransferArbitParams, TransferAssetsParams, TransferTargetAssetsParams, TransferTargetAssetsPrototypeParams, getTransactionById, GetBlockById, CalcDelay, txParams2} from "../types/RequestsTypes"
 /**
  * General builder function for formatting API request
  *
@@ -43,6 +43,8 @@ async function BramblRequest(routeInfo:RoutInfo, params:Object, self:Self) {
       body: JSON.stringify(body)
     };
     const response = await (await fetch(self.url + route, payload)).json();
+
+
     if (response.error) { throw response }
     else { return response }
 
@@ -75,7 +77,7 @@ function checkParams(params:any, keysList:Array<any>) {
           keysList.forEach(function(keys){
               key += keys+", "
           })
-          console.log(key)
+          // console.log(key)
           throw new Error("Make Sure you filling only the correct keys, keys you must fill are "+ key);
       }else{
           
@@ -214,7 +216,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async broadcastTx(params:{tx:string}, id = "1") {
+
+  async broadcastTx(params:txParams2, id = "1") {
     checkParams(params, ["tx"])
 
     const route = "wallet/";

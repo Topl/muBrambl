@@ -8,7 +8,7 @@ export interface Self{
     url:string;
 }
 export interface BalancesParams{
-    publicKeys:any;
+    publicKeys:Array<any>;
     password:string;
 }
 export interface Params{
@@ -26,6 +26,9 @@ export interface TransferArbitParams{
     fee:number
 
 }
+export  interface txParams2 {
+    tx:any
+  }
 export interface TransferParams{
     recipient:string
     amount:number

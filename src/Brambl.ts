@@ -16,7 +16,7 @@
  
  // Libraries
  import pollTx  from './lib/polling'
-import { Params, PrototypeTx, Options } from './types/brambleTypes'
+import { Params, PrototypeTx, Options, Key } from './types/brambleTypes'
 import { ConstructorParams } from './types/KeyManagerTypes'
  
  // Constants definitions
@@ -53,20 +53,20 @@ import { ConstructorParams } from './types/KeyManagerTypes'
  class Brambl {
      requests:any;
      keyManager:KeyManager;
-     utils:any;
+     keyMan:Function;
+     utils:Hash;
      addSigToTx:Function
      signAndBroadcast:Function
      transaction:Function
      pollTx:Function
      constructor(params:Params) {
+         this.keyMan = KeyManager
          // default values for the constructor arguement
          const keyManagerVar = params.KeyManager || emptyKeyMan;
          const requestsVar = params.Requests || emptyKeyMan;
          // if only a string is given in the constructor, assume it is the password.
          // Therefore, target a local chain provider and make a new key
          if (params.constructor === String) keyManagerVar.password = params
- 
- 
          // Setup reqeusts object
          if (requestsVar.instance) {
              this.requests = requestsVar.instance
@@ -131,9 +131,9 @@ import { ConstructorParams } from './types/KeyManagerTypes'
 
 Brambl.prototype.addSigToTx = async function (prototypeTx:PrototypeTx, userKeys:Object) {
     // function for generating a signature in the correct format
-    const genSig = (keys:any, txBytes:any) => {
+    const genSig = (keys:Array<any>, txBytes:any) => {
 
-        return Object.entries( keys.map( (key: { pk: any; sign: (arg0: any) => any; }) => [key.pk, base58.encode(key.sign(txBytes))]));
+        return Object.fromEntries( keys.map( (key:Key) => [key.pk, base58.encode(key.sign(txBytes))]));
     }       
 
     // in case a single given is given not as an array
@@ -145,9 +145,9 @@ Brambl.prototype.addSigToTx = async function (prototypeTx:PrototypeTx, userKeys:
         signatures: genSig(keys, base58.decode(prototypeTx.messageToSign))
     }
 }  
-Brambl.prototype.signAndBroadcast = async function (prototypeTx:Object) {
-    // console.log(prototypeTx)
+Brambl.prototype.signAndBroadcast = async function (prototypeTx:JSON) {
     const formattedTx = await this.addSigToTx(prototypeTx, this.keyManager)
+
     return this.requests.broadcastTx({ tx: formattedTx }).catch((e:string) => { console.error(e); throw e })
 }       
 
@@ -157,10 +157,9 @@ Brambl.prototype.signAndBroadcast = async function (prototypeTx:Object) {
          * @param {string} method The chain resource method to create a transaction for
         */
 Brambl.prototype.transaction = async function (method:string, params:any) {    
-    // console.log("got far")\\
-    console.log(this.requests)
+
     if (!validTxMethods.includes(method)) throw new Error('Invalid transaction method')
-    // console.log(this.requests[method](params)).then((res:{result:string}) => this.signAndBroadcast(res.result)
+
     return this.requests[method](params).then((res:{result:any}) => this.signAndBroadcast(res.result))
 }      
     /** 
