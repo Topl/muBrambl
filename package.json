@@ -4,8 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "mochaTest": "mocha test/it",
-    "test": "node test/Test.js "
+    "test": "mocha"
   },
   "author": "topl",
   "license": "MPL-2.0",
@@ -25,6 +24,6 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "dotenv": "^8.2.0",
-    "mocha": "^7.1.1"
+    "mocha": "^7.2.0"
   }
 }
