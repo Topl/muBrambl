@@ -15,19 +15,19 @@
 //     }
 // })
 
-
-// describe("Requests Module", () => {
-//     it("Transaction Test", done =>{
-//         const createParams = {
-//             issuer: brambljs.keyManager.pk,
-//             assetCode: "test-" + Date.now(),
-//             recipient: brambljs.keyManager.pk,
-//             amount: 1,
-//             fee: 0
-//         };
-//         brambljs.transaction("createAssetPrototype", createParams)
-//         .then(response=>{
-//             console.log(response)
-//         })
-//     })
+// const createParams = {
+//     issuer: brambljs.keyManager.pk,
+//     assetCode: "test-" + Date.now(),
+//     recipient: brambljs.keyManager.pk,
+//     amount: 1,
+//     fee: 0
+// };
+// brambljs.transaction("createAssetsPrototype", createParams)
+// .then(response=>{
+//     console.log(response)
 // })
+// // describe("Transaction Module", () => {
+// //     it("Transaction Test", done =>{
+
+// //     })
+// // })

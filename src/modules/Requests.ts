@@ -43,6 +43,7 @@ async function BramblRequest(routeInfo:RoutInfo, params:Object, self:Self) {
       body: JSON.stringify(body)
     };
 
+
     const response =  await(await fetch(self.url + route, payload)).json();
 
     if (response.error) { throw response }
