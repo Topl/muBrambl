@@ -70,7 +70,6 @@ function BramblRequest(routeInfo, params, self) {
  * A function to ensure the parameters object is not empty and has the correct keys.
  * @param {any} params parameter object
  * @param {Array} keysList List of Keys nessesary for the parameter object to include.
- * @class Requests
  */
 function checkParams(params, keysList) {
     let desParams = Object.entries(params);

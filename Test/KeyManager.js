@@ -54,20 +54,6 @@ describe("KeyManager", () => {
             done()
         }
     })
-    it("Verify the Public Key", function(done){
-        h = brambljs.keyManager.getKeyStorage()
-        sig = brambljs.keyManager.sign('this is a msg', Buffer.from)
-        ver = brambljs.keyMan.verify(h.publicKeyId, 'this is a msg', sig)
-
-        if(ver){
-
-            assert.equal(typeof ver, "boolean");
-            done()
-        }else{
-            assert.equal(typeof ver, "boolean");
-            done()
-        }
-    })
     it("Import from keystore", function(done){
         let outKey = ''
         try {
@@ -88,8 +74,9 @@ describe("KeyManager", () => {
                     keyPath: outKey
                 }
             })
+            assert.equal(typeof gjam.keyManager.getKeyStorage().publicKeyId, "string")
 
-        done()
+            done()
         } catch(err) {
             console.log(err)
         }
