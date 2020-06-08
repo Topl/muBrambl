@@ -111,6 +111,9 @@ brambl.transaction('createAssetsPrototype', createParams)
     .then(res => { console.log('\nConfirmed transaction'); console.log(res) })
     .catch(console.log)
 ```
+## Testing
+To test run "npm test" from the root directory. 
+This will run a mocha test that will ensure that the encryption and KeyManager code is functioning properly.
 
 # License
 BramblJS is licensed under the [Mozilla Public License version 2.0 (MPL 2.0)](https://www.mozilla.org/en-US/MPL/2.0). A copy of this license may be found [here](../LICENSE.md)
