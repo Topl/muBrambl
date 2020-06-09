@@ -61,6 +61,10 @@ const keyManager = BramblJS.KeyManager('PASSWORD')
 ```
 where `'PASSWORD'` is the user provided encryption password for the keyfile.
 
+# Testing
+To test run "npm test" from the root directory. 
+This will run a mocha test that will ensure that the encryption and KeyManager code is functioning properly.
+
 # Examples
 Below are examples for using the BramblJS library with a private testnet running on your localhost. Please consult the [Bifrost documentation](https://github.com/topl/bifrost) for further instructions on deploying a local private testnet.
 
@@ -111,9 +115,6 @@ brambl.transaction('createAssetsPrototype', createParams)
     .then(res => { console.log('\nConfirmed transaction'); console.log(res) })
     .catch(console.log)
 ```
-## Testing
-To test run "npm test" from the root directory. 
-This will run a mocha test that will ensure that the encryption and KeyManager code is functioning properly.
 
 # License
 BramblJS is licensed under the [Mozilla Public License version 2.0 (MPL 2.0)](https://www.mozilla.org/en-US/MPL/2.0). A copy of this license may be found [here](../LICENSE.md)
