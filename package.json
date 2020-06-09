@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha Test/"
   },
   "author": "topl",
   "license": "MPL-2.0",
