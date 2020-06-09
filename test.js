@@ -20,7 +20,8 @@ console.log("------KeyManager Object-------")
 console.log(KeyManager)
 console.log(brambl.keyManager)
 
-// Transaction Test
+// // console.log("first We will test a whole bunch of in the request object functions. As long as you see no errors your all good")
+// // Transaction Test
 // const createParams = {
 //     issuer: brambl.keyManager.pk,
 //     assetCode: "test-" + Date.now(),
@@ -43,13 +44,13 @@ console.log(brambl.keyManager)
 //   console.log(response);
 // });
 
-// Chain Info
-Requests.chainInfo()
-.then(function(response){
-    console.log('----------------------------------------------------------------');
-    console.log("Chain Info result:");
-    console.log(response);
-})
+// // Chain Info
+// Requests.chainInfo()
+// .then(function(response){
+//     console.log('----------------------------------------------------------------');
+//     console.log("Chain Info result:");
+//     console.log(response);
+// })
 
 // // getBalancesByKey Test
 // Requests.getBalancesByKey({publicKeys:["J6j878auHyYTo46zMQekovCT9bGZKPE72cJv8CPHXVGR"]})
@@ -67,26 +68,26 @@ Requests.chainInfo()
 //     console.log(response);
 // })
 
-// Generate Key File
-// Commented out to avoid generating an excessive amounts of key files
-// Requests.generateKeyfile({password:"password"})
-// .then(function(response){
-//     console.log('----------------------------------------------------------------');
-//     console.log("Generate Key Files result:");
-//     console.log(response);
-// })
+// // Generate Key File
+// // Commented out to avoid generating an excessive amounts of key files
+Requests.generateKeyfile({password:"password"})
+.then(function(response){
+    console.log('----------------------------------------------------------------');
+    console.log("Generate Key Files result:");
+    console.log(response);
+})
 
 // lock Key File
-// // Commented to avoid relocking
-// Requests.lockKeyfile({password:"password",publicKey: '6xywd24gtBMVACMz9KqRiAYWCxbVWyZ7CJEyPP1P9CSS' })
+// Commented to avoid relocking
+// Requests.lockKeyfile({password:"password",publicKey: 'EXwz9RG6gF5tPtZtxRPbadRqgQTmTeAk7vSZhwad3SUT' })
 // .then(function(response){
 //     console.log('----------------------------------------------------------------');
 //     console.log("Lock Key File result:");
 //     console.log(response);
 // })
 
-// // unlockKeyfile
-// // commented to avoid unlocking already unlocked keys
+// unlockKeyfile
+// commented to avoid unlocking already unlocked keys
 // Requests.unlockKeyfile({password:"password",publicKey: '5cJ599eLTrdyVdwSStubyyvYdV8L2GRB8DfgwZNz8Ejp' })
 // .then(function(response){
 //     console.log('----------------------------------------------------------------');
@@ -134,29 +135,29 @@ Requests.chainInfo()
 //     console.log(err)
 // }
 
-// let outKey = ''
-// try {
-//     outKey = brambl.keyManager.exportToFile('keystore/')
-//     console.log(outKey)
-// } catch(err) {
-//     console.log(err)
-// }
+let outKey = ''
+try {
+    outKey = brambl.keyManager.exportToFile('keystore/')
+    console.log(outKey)
+} catch(err) {
+    console.log(err)
+}
 
-// /////////////////////////
-// try {
-//     const gjam = new BramblJS({
-//         Requests: {
-//             url: 'https://valhalla.torus.topl.co/',
-//             apiKey: process.env.VALHALLA_KEY
-//         },
-//         KeyManager: {
-//             password: 'genesis',
-//             keyPath: outKey
-//         }
-//     })
-// console.log("-----------------------------")
-// console.log("From Storage File")
-//     console.log(gjam.keyManager.getKeyStorage())
-// } catch(err) {
-//     console.log(err)
-// }
+/////////////////////////
+try {
+    const gjam = new BramblJS({
+        Requests: {
+            url: 'https://valhalla.torus.topl.co/',
+            apiKey: process.env.VALHALLA_KEY
+        },
+        KeyManager: {
+            password: 'genesis',
+            keyPath: outKey
+        }
+    })
+console.log("-----------------------------")
+console.log("From Storage File")
+    console.log(gjam.keyManager.getKeyStorage())
+} catch(err) {
+    console.log(err)
+}

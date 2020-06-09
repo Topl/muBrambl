@@ -42,8 +42,9 @@ async function BramblRequest(routeInfo:RoutInfo, params:Object, self:Self) {
       headers: self.headers,
       body: JSON.stringify(body)
     };
-    const response = await (await fetch(self.url + route, payload)).json();
 
+
+    const response =  await(await fetch(self.url + route, payload)).json();
 
     if (response.error) { throw response }
     else { return response }
@@ -56,7 +57,6 @@ async function BramblRequest(routeInfo:RoutInfo, params:Object, self:Self) {
  * A function to ensure the parameters object is not empty and has the correct keys.
  * @param {any} params parameter object
  * @param {Array} keysList List of Keys nessesary for the parameter object to include.
- * @class Requests
  */
 function checkParams(params:any, keysList:Array<any>) {
   let desParams = Object.entries(params)
@@ -494,7 +494,7 @@ class Requests {
     const route = "debug/";
     const method = "info";
 
-    
+
     return BramblRequest({ route, method, id }, params, this);
   }
   ////////////Calculate block delay////////////
