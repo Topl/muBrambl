@@ -1,18 +1,33 @@
 /** A Javascript API wrapper module for the Bifrost Protocol.
  * Currently supports version 4.1 of Bifrost's Brambl-Layer API
  * Documentation for Brambl-layer is available at https://Requests.docs.topl.co
- *
+ *s
  * @author James Ama (j.aman@topl.me)
  * @date 2020.0.29
- * 
+ *
  * Based on the original work of Yamir Tainwala - 2019
  */
 
 ("use strict");
 
 // Dependencies
-import fetch from 'node-fetch'
-import {RoutInfo, Self, Params, BalancesParams, TxParams, TransferParams, TransferArbitParams, TransferAssetsParams, TransferTargetAssetsParams, TransferTargetAssetsPrototypeParams, getTransactionById, GetBlockById, CalcDelay, txParams2} from "../types/RequestsTypes"
+import fetch from "node-fetch";
+import {
+  RoutInfo,
+  Self,
+  Params,
+  BalancesParams,
+  TxParams,
+  TransferParams,
+  TransferArbitParams,
+  TransferAssetsParams,
+  TransferTargetAssetsParams,
+  TransferTargetAssetsPrototypeParams,
+  getTransactionById,
+  GetBlockById,
+  CalcDelay,
+  txParams2,
+} from "../../types/interfaces/RequestsTypes";
 /**
  * General builder function for formatting API request
  *
@@ -23,67 +38,69 @@ import {RoutInfo, Self, Params, BalancesParams, TxParams, TransferParams, Transf
  * @param {object} params - method specific parameter object
  * @param {object} self - internal reference for accessing constructor data
  * @returnss {object} JSON response from the node
-*/
+ */
 
-async function BramblRequest(routeInfo:RoutInfo, params:Object, self:Self) {
+async function BramblRequest(routeInfo: RoutInfo, params: any, self: Self) {
   try {
     const route = routeInfo.route;
     const body = {
       jsonrpc: "2.0",
       id: routeInfo.id || "1",
       method: routeInfo.method,
-      params: [
-        { ...params }
-      ]
+      params: [{ ...params }],
     };
     const payload = {
       url: self.url + route,
       method: "POST",
       headers: self.headers,
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     };
 
+    const response = await (await fetch(self.url + route, payload)).json();
 
-    const response =  await(await fetch(self.url + route, payload)).json();
-
-    if (response.error) { throw response }
-    else { return response }
-
+    if (response.error) {
+      throw response;
+    } else {
+      return response;
+    }
   } catch (err) {
-    throw err
+    throw err;
   }
-};
+}
 /**
  * A function to ensure the parameters object is not empty and has the correct keys.
  * @param {any} params parameter object
  * @param {Array} keysList List of Keys nessesary for the parameter object to include.
  */
-function checkParams(params:any, keysList:Array<any>) {
-  let desParams = Object.entries(params)
-  let structuredArr:Array<any> = []
-  desParams.forEach(function(keyPair){
-      if(keyPair[1]===undefined||keyPair===null){
-          throw new Error("A "+keyPair[0]+" key must be specified cant use undefined or null");
-      }
-      structuredArr.push(keyPair[0])
-  })
-  if(!params){
-       throw new Error("A parameter object must be specified");
-
-  }else{
-      
-      if(JSON.stringify(keysList.sort()) !== JSON.stringify(structuredArr.sort())){
-          var key = ""
-          keysList.forEach(function(keys){
-              key += keys+", "
-          })
-          // console.log(key)
-          throw new Error("Make Sure you filling only the correct keys, keys you must fill are "+ key);
-      }else{
-          
-      }
+function checkParams(params: any, keysList: Array<any>) {
+  const desParams = Object.entries(params);
+  const structuredArr: Array<any> = [];
+  desParams.forEach(function (keyPair) {
+    if (keyPair[1] === undefined || keyPair === null) {
+      throw new Error(
+        "A " + keyPair[0] + " key must be specified cant use undefined or null"
+      );
+    }
+    structuredArr.push(keyPair[0]);
+  });
+  if (!params) {
+    throw new Error("A parameter object must be specified");
+  } else {
+    if (
+      JSON.stringify(keysList.sort()) !== JSON.stringify(structuredArr.sort())
+    ) {
+      let key = "";
+      keysList.forEach(function (keys) {
+        key += keys + ", ";
+      });
+      // console.log(key)
+      throw new Error(
+        "Make Sure you filling only the correct keys, keys you must fill are " +
+          key
+      );
+    } else {
+    }
   }
-
 }
 /**
  * A class for sending requests to the Brambl layer interface of the given chain provider
@@ -92,20 +109,20 @@ function checkParams(params:any, keysList:Array<any>) {
  * @class Requests
  */
 class Requests {
-  url:string;
-  headers:any;
+  url: string;
+  headers: any;
   constructor(url = "http://localhost:9085/", apiKey = "topl_the_world!") {
     this.url = url;
     this.headers = {
       "Content-Type": "application/json",
-      "x-api-key": apiKey
+      "x-api-key": apiKey,
     };
   }
   //Allows setting a different url than the default from which to create and accept RPC connections
-  setUrl(url:string) {
+  setUrl(url: string) {
     this.url = url;
   }
-  setApiKey(apiKey:string) {
+  setApiKey(apiKey: string) {
     this.headers["x-api-key"] = apiKey;
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,11 +137,11 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async getBalancesByKey(params:BalancesParams, id = "1") {
-    checkParams(params, ["publicKeys"])
+  async getBalancesByKey(params: BalancesParams, id = "1") {
+    checkParams(params, ["publicKeys"]);
     const route = "wallet/";
     const method = "balances";
-    
+
     return BramblRequest({ route, method, id }, params, this);
   }
   //////listOpenKeyfiles////////////////
@@ -149,8 +166,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async generateKeyfile(params:Params, id = "1") {
-    checkParams(params, ["password"])
+  async generateKeyfile(params: Params, id = "1") {
+    checkParams(params, ["password"]);
 
     const route = "wallet/";
     const method = "generateKeyfile";
@@ -166,8 +183,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async lockKeyfile(params:Params, id = "1") {
-    checkParams(params, ["publicKey", "password"])
+  async lockKeyfile(params: Params, id = "1") {
+    checkParams(params, ["publicKey", "password"]);
 
     const route = "wallet/";
     const method = "lockKeyfile";
@@ -183,8 +200,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async unlockKeyfile(params:Params, id = "1") {
-    checkParams(params, ["publicKey", "password"])
+  async unlockKeyfile(params: Params, id = "1") {
+    checkParams(params, ["publicKey", "password"]);
 
     const route = "wallet/";
     const method = "unlockKeyfile";
@@ -200,8 +217,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async signTransaction(params:TxParams, id = "1") {
-    checkParams(params, ["publicKey", "tx"])
+  async signTransaction(params: TxParams, id = "1") {
+    checkParams(params, ["publicKey", "tx"]);
 
     const route = "wallet/";
     const method = "signTx";
@@ -217,8 +234,8 @@ class Requests {
    * @memberof Requests
    */
 
-  async broadcastTx(params:txParams2, id = "1") {
-    checkParams(params, ["tx"])
+  async broadcastTx(params: txParams2, id = "1") {
+    checkParams(params, ["tx"]);
 
     const route = "wallet/";
     const method = "broadcastTx";
@@ -238,9 +255,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferPolys(params:TransferArbitParams, id = "1") {
-
-    checkParams(params, ["amount", "recipient", "fee"])
+  async transferPolys(params: TransferArbitParams, id = "1") {
+    checkParams(params, ["amount", "recipient", "fee"]);
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
     const route = "wallet/";
@@ -261,8 +277,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferArbits(params:TransferArbitParams, id = "1") {
-    checkParams(params, ["amount", "recipient", "fee"])
+  async transferArbits(params: TransferArbitParams, id = "1") {
+    checkParams(params, ["amount", "recipient", "fee"]);
 
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
@@ -287,11 +303,10 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async createAssets(params:TransferParams, id = "1") {
-    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"])
+  async createAssets(params: TransferParams, id = "1") {
+    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"]);
 
-    if (!params.fee && params.fee !== 0)
-      throw new Error("A fee must be > 0");
+    if (!params.fee && params.fee !== 0) throw new Error("A fee must be > 0");
     const route = "asset/";
     const method = "createAssets";
     return BramblRequest({ route, method, id }, params, this);
@@ -310,11 +325,10 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async createAssetsPrototype(params:TransferParams, id = "1") {
-    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"])
+  async createAssetsPrototype(params: TransferParams, id = "1") {
+    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"]);
 
-    if (!params.fee && params.fee !== 0)
-      throw new Error("A fee must be > 0");
+    if (!params.fee && params.fee !== 0) throw new Error("A fee must be > 0");
     const route = "asset/";
     const method = "createAssetsPrototype";
     return BramblRequest({ route, method, id }, params, this);
@@ -335,8 +349,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferAssets(params:TransferParams, id = "1") {
-    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"])
+  async transferAssets(params: TransferParams, id = "1") {
+    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"]);
 
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
@@ -360,8 +374,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferAssetsPrototype(params:TransferAssetsParams, id = "1") {
-    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"])
+  async transferAssetsPrototype(params: TransferAssetsParams, id = "1") {
+    checkParams(params, ["amount", "recipient", "fee", "assetCode", "issuer"]);
 
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
@@ -382,8 +396,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferTargetAssets(params:TransferTargetAssetsParams, id = "1") {
-    checkParams(params, ["amount", "recipient", "fee", "assetId"])
+  async transferTargetAssets(params: TransferTargetAssetsParams, id = "1") {
+    checkParams(params, ["amount", "recipient", "fee", "assetId"]);
 
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
@@ -405,8 +419,11 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async transferTargetAssetsPrototype(params:TransferTargetAssetsPrototypeParams, id = "1") {
-    checkParams(params, ["amount", "recipient", "fee", "assetId", "sender"])
+  async transferTargetAssetsPrototype(
+    params: TransferTargetAssetsPrototypeParams,
+    id = "1"
+  ) {
+    checkParams(params, ["amount", "recipient", "fee", "assetId", "sender"]);
 
     if (!params.fee && params.fee !== 0)
       throw new Error("A fee must be specified");
@@ -426,8 +443,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async getTransactionById(params:getTransactionById, id = "1") {
-    checkParams(params, ["transactionId"])
+  async getTransactionById(params: getTransactionById, id = "1") {
+    checkParams(params, ["transactionId"]);
 
     const route = "nodeView/";
     const method = "transactionById";
@@ -442,8 +459,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async getTransactionFromMempool(params:getTransactionById, id = "1") {
-    checkParams(params, ["transactionId"])
+  async getTransactionFromMempool(params: getTransactionById, id = "1") {
+    checkParams(params, ["transactionId"]);
 
     const route = "nodeView/";
     const method = "transactionFromMempool";
@@ -471,8 +488,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async getBlockById(params:GetBlockById, id = "1") {
-    checkParams(params, ["blockId"])
+  async getBlockById(params: GetBlockById, id = "1") {
+    checkParams(params, ["blockId"]);
 
     const route = "nodeView/";
     const method = "blockById";
@@ -490,10 +507,9 @@ class Requests {
    */
 
   async chainInfo(id = "1") {
-    var params = {};
+    const params = {};
     const route = "debug/";
     const method = "info";
-
 
     return BramblRequest({ route, method, id }, params, this);
   }
@@ -507,8 +523,8 @@ class Requests {
    * @returns {object} json-rpc response from the chain
    * @memberof Requests
    */
-  async calcDelay(params:CalcDelay, id = "1") {
-    checkParams(params, ["blockId", "numBlocks"])
+  async calcDelay(params: CalcDelay, id = "1") {
+    checkParams(params, ["blockId", "numBlocks"]);
 
     const route = "debug/";
     const method = "delay";

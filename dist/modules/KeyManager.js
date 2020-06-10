@@ -7,6 +7,25 @@
  * Based on the keythereum library from Jack Peterson
  * https://github.com/Ethereumjs/keythereum
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, privateMap, value) {
     if (!privateMap.has(receiver)) {
         throw new TypeError("attempted to set private field on non-instance");
@@ -26,14 +45,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _sk, _isLocked, _password, _keyStorage;
 ("use strict");
 // Dependencies
-const fs = require('fs');
+const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const blake2_1 = __importDefault(require("blake2"));
 const crypto_1 = __importDefault(require("crypto"));
-const Base58 = require('base-58');
+const base_58_1 = __importDefault(require("base-58"));
 const keccak_1 = __importDefault(require("keccak"));
-const curve25519 = require("curve25519-js");
-// Default options for key generation as of 2020.01.25  
+const curve25519 = __importStar(require("curve25519-js"));
+// Default options for key generation as of 2020.01.25
 const defaultOptions = {
     // Symmetric cipher for private key encryption
     //--- anything from crypto.getCiphers() is eligible
@@ -47,12 +66,14 @@ const defaultOptions = {
         dkLen: 32,
         n: Math.pow(2, 18),
         r: 8,
-        p: 1 // parallelization
-    }
+        p: 1,
+    },
 };
 //// Generic key methods //////////////////////////////////////////////////////////////////////////////////////////////
 // function for checking the type input as a callback
-function isFunction(f) { return typeof f === "function"; }
+function isFunction(f) {
+    return typeof f === "function";
+}
 /**
  * Convert a string to a Buffer.  If encoding is not specified, hex-encoding
  * will be used if the input is valid hex.  If the input is valid base64 but
@@ -64,7 +85,7 @@ function isFunction(f) { return typeof f === "function"; }
 function str2buf(str, enc) {
     if (!str || str.constructor !== String)
         return str;
-    return enc ? Buffer.from(str, enc) : Buffer.from(Base58.decode(str));
+    return enc ? Buffer.from(str, enc) : Buffer.from(base_58_1.default.decode(str));
 }
 /**
  * Check if the selected cipher is available.
@@ -72,7 +93,9 @@ function str2buf(str, enc) {
  * @return {boolean} If available true, otherwise false.
  */
 function isCipherAvailable(cipher) {
-    return crypto_1.default.getCiphers().some(function (name) { return name === cipher; });
+    return crypto_1.default.getCiphers().some(function (name) {
+        return name === cipher;
+    });
 }
 /**
  * Symmetric private key encryption using secret (derived) key.
@@ -114,11 +137,8 @@ function decrypt(ciphertext, key, iv, algo) {
  * @return {string} Base58-encoded MAC.
  */
 function getMAC(derivedKey, ciphertext) {
-    const keccak256 = (msg) => keccak_1.default('keccak256').update(msg).digest();
-    return keccak256(Buffer.concat([
-        str2buf(derivedKey).slice(16, 32),
-        str2buf(ciphertext)
-    ]));
+    const keccak256 = (msg) => keccak_1.default("keccak256").update(msg).digest();
+    return keccak256(Buffer.concat([str2buf(derivedKey).slice(16, 32), str2buf(ciphertext)]));
 }
 /**
  * Generate random numbers for private key, initialization vector,
@@ -133,7 +153,10 @@ function create(params, cb) {
     const keyBytes = params.keyBytes;
     const ivBytes = params.ivBytes;
     function bifrostBlake2b(Buffer) {
-        return blake2_1.default.createHash("blake2b", { digestLength: 32 }).update(Buffer).digest();
+        return blake2_1.default
+            .createHash("blake2b", { digestLength: 32 })
+            .update(Buffer)
+            .digest();
     }
     function curve25519KeyGen(randomBytes) {
         const { public: pk, private: sk1 } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
@@ -141,7 +164,7 @@ function create(params, cb) {
             publicKey: Buffer.from(pk),
             privateKey: Buffer.from(sk1),
             iv: bifrostBlake2b(crypto_1.default.randomBytes(keyBytes + ivBytes + keyBytes)).slice(0, ivBytes),
-            salt: bifrostBlake2b(crypto_1.default.randomBytes(keyBytes + ivBytes))
+            salt: bifrostBlake2b(crypto_1.default.randomBytes(keyBytes + ivBytes)),
         };
     }
     // synchronous key generation if callback not provided
@@ -198,14 +221,14 @@ function marshal(derivedKey, keyObject, salt, iv, algo) {
     // encrypt using last 16 bytes of derived key (this matches Bifrost)
     const ciphertext = encrypt(keyObject.privateKey, derivedKey, iv, algo);
     const keyStorage = {
-        publicKeyId: Base58.encode(keyObject.publicKey),
+        publicKeyId: base_58_1.default.encode(keyObject.publicKey),
         crypto: {
             cipher: algo,
-            cipherText: Base58.encode(ciphertext),
-            cipherParams: { iv: Base58.encode(iv) },
-            mac: Base58.encode(getMAC(derivedKey, ciphertext)),
+            cipherText: base_58_1.default.encode(ciphertext),
+            cipherParams: { iv: base_58_1.default.encode(iv) },
+            mac: base_58_1.default.encode(getMAC(derivedKey, ciphertext)),
             kdf: "scrypt",
-            kdsfSalt: Base58.encode(salt),
+            kdsfSalt: base_58_1.default.encode(salt),
         },
     };
     return keyStorage;
@@ -219,7 +242,7 @@ function marshal(derivedKey, keyObject, salt, iv, algo) {
  * @return {Object} keyStorage for use with exportToFile
  */
 // =============================================================
-// object for keyObject is going to be a pain 
+// object for keyObject is going to be a pain
 function dump(password, keyObject, options, cb) {
     const kdfParams = options.kdfParams || options.scrypt;
     const iv = str2buf(keyObject.iv);
@@ -274,9 +297,9 @@ function recover(password, keyStorage, kdfParams, cb) {
  * @return {string} Keystore filename.
  */
 function generateKeystoreFilename(publicKey) {
-    if (typeof publicKey !== 'string')
-        throw new Error('PublicKey must be given as a string for the filename');
-    let filename = new Date().toISOString() + "-" + publicKey + ".json";
+    if (typeof publicKey !== "string")
+        throw new Error("PublicKey must be given as a string for the filename");
+    const filename = new Date().toISOString() + "-" + publicKey + ".json";
     return filename.split(":").join("-");
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,7 +322,7 @@ class KeyManager {
         _keyStorage.set(this, void 0);
         // enforce that a password must be provided\
         if (!params.password && params.constructor !== String)
-            throw new Error('A password must be provided at initialization');
+            throw new Error("A password must be provided at initialization");
         // Initialize a key manager object with a key storage object
         const initKeyStorage = (keyStorage, password) => {
             this.pk = keyStorage.publicKeyId;
@@ -315,20 +338,20 @@ class KeyManager {
         };
         // Imports key data object from keystore JSON file.
         const importFromFile = (filepath, password) => {
-            const keyStorage = JSON.parse(fs.readFileSync(filepath));
+            const keyStorage = JSON.parse(String(fs_1.default.readFileSync(filepath)));
             // todo - check that the imported object conforms to our definition of a keyfile
             initKeyStorage(keyStorage, password);
         };
         // initialize vatiables
         this.constants = params.constants || defaultOptions;
-        initKeyStorage({ publicKeyId: '', crypto: {} }, Buffer.from(""));
+        initKeyStorage({ publicKeyId: "", crypto: {} }, Buffer.from(""));
         // load in keyfile if a path was given, or default to generating a new key
         if (params.keyPath) {
             try {
                 importFromFile(params.keyPath, params.password);
             }
             catch (err) {
-                throw new Error('Error importing keyfile');
+                throw new Error("Error importing keyfile");
             }
         }
         else {
@@ -352,7 +375,7 @@ class KeyManager {
      */
     static verify(publicKey, message, signature, cb) {
         const pk = str2buf(publicKey);
-        const msg = str2buf(message, 'utf8');
+        const msg = str2buf(message, "utf8");
         const sig = str2buf(signature);
         // synchronous key generation if callback not provided
         if (!isFunction(cb)) {
@@ -363,7 +386,6 @@ class KeyManager {
             cb(curve25519.verify(pk, msg, sig));
         }
     }
-    ;
     ////////////////// Public methods ////////////////////////////////////////////////////////////////////////
     /**
      * Getter function to retrieve key storage in the Bifrost compatible format
@@ -371,9 +393,9 @@ class KeyManager {
      */
     getKeyStorage() {
         if (__classPrivateFieldGet(this, _isLocked))
-            throw new Error('Key manager is currently locked. Please unlock and try again.');
+            throw new Error("Key manager is currently locked. Please unlock and try again.");
         if (!this.pk)
-            throw new Error('A key must be initialized before using this key manager');
+            throw new Error("A key must be initialized before using this key manager");
         return __classPrivateFieldGet(this, _keyStorage);
     }
     /**
@@ -390,9 +412,9 @@ class KeyManager {
      */
     unlockKey(password) {
         if (!__classPrivateFieldGet(this, _isLocked))
-            throw new Error('The key is already unlocked');
+            throw new Error("The key is already unlocked");
         if (password !== __classPrivateFieldGet(this, _password))
-            throw new Error('Invalid password');
+            throw new Error("Invalid password");
         __classPrivateFieldSet(this, _isLocked, false);
     }
     /**
@@ -403,9 +425,9 @@ class KeyManager {
      */
     sign(message) {
         if (__classPrivateFieldGet(this, _isLocked))
-            throw new Error('The key is currently locked. Please unlock and try again.');
+            throw new Error("The key is currently locked. Please unlock and try again.");
         function curve25519sign(privateKey, message) {
-            return curve25519.sign(str2buf(privateKey), str2buf(message, 'utf8'), crypto_1.default.randomBytes(64));
+            return curve25519.sign(str2buf(privateKey), str2buf(message, "utf8"), crypto_1.default.randomBytes(64));
         }
         return curve25519sign(__classPrivateFieldGet(this, _sk), message);
     }
@@ -418,14 +440,13 @@ class KeyManager {
      */
     exportToFile(_keyPath) {
         const keyPath = _keyPath || "keyfiles";
-        let outfile = generateKeystoreFilename(this.pk);
-        let json = JSON.stringify(this.getKeyStorage());
-        let outpath = path_1.default.join(keyPath, outfile);
-        fs.writeFileSync(outpath, json);
+        const outfile = generateKeystoreFilename(this.pk);
+        const json = JSON.stringify(this.getKeyStorage());
+        const outpath = path_1.default.join(keyPath, outfile);
+        fs_1.default.writeFileSync(outpath, json);
         return outpath;
     }
 }
 _sk = new WeakMap(), _isLocked = new WeakMap(), _password = new WeakMap(), _keyStorage = new WeakMap();
-;
 module.exports = KeyManager;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

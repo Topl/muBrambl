@@ -2,7 +2,7 @@
 /** A Javascript API wrapper module for the Bifrost Protocol.
  * Currently supports version 4.1 of Bifrost's Brambl-Layer API
  * Documentation for Brambl-layer is available at https://Requests.docs.topl.co
- *
+ *s
  * @author James Ama (j.aman@topl.me)
  * @date 2020.0.29
  *
@@ -33,7 +33,7 @@ const node_fetch_1 = __importDefault(require("node-fetch"));
  * @param {object} params - method specific parameter object
  * @param {object} self - internal reference for accessing constructor data
  * @returnss {object} JSON response from the node
-*/
+ */
 function BramblRequest(routeInfo, params, self) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -42,15 +42,13 @@ function BramblRequest(routeInfo, params, self) {
                 jsonrpc: "2.0",
                 id: routeInfo.id || "1",
                 method: routeInfo.method,
-                params: [
-                    Object.assign({}, params)
-                ]
+                params: [Object.assign({}, params)],
             };
             const payload = {
                 url: self.url + route,
                 method: "POST",
                 headers: self.headers,
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
             };
             const response = yield (yield node_fetch_1.default(self.url + route, payload)).json();
             if (response.error) {
@@ -65,15 +63,14 @@ function BramblRequest(routeInfo, params, self) {
         }
     });
 }
-;
 /**
  * A function to ensure the parameters object is not empty and has the correct keys.
  * @param {any} params parameter object
  * @param {Array} keysList List of Keys nessesary for the parameter object to include.
  */
 function checkParams(params, keysList) {
-    let desParams = Object.entries(params);
-    let structuredArr = [];
+    const desParams = Object.entries(params);
+    const structuredArr = [];
     desParams.forEach(function (keyPair) {
         if (keyPair[1] === undefined || keyPair === null) {
             throw new Error("A " + keyPair[0] + " key must be specified cant use undefined or null");
@@ -85,12 +82,13 @@ function checkParams(params, keysList) {
     }
     else {
         if (JSON.stringify(keysList.sort()) !== JSON.stringify(structuredArr.sort())) {
-            var key = "";
+            let key = "";
             keysList.forEach(function (keys) {
                 key += keys + ", ";
             });
             // console.log(key)
-            throw new Error("Make Sure you filling only the correct keys, keys you must fill are " + key);
+            throw new Error("Make Sure you filling only the correct keys, keys you must fill are " +
+                key);
         }
         else {
         }
@@ -107,7 +105,7 @@ class Requests {
         this.url = url;
         this.headers = {
             "Content-Type": "application/json",
-            "x-api-key": apiKey
+            "x-api-key": apiKey,
         };
     }
     //Allows setting a different url than the default from which to create and accept RPC connections
@@ -519,7 +517,7 @@ class Requests {
      */
     chainInfo(id = "1") {
         return __awaiter(this, void 0, void 0, function* () {
-            var params = {};
+            const params = {};
             const route = "debug/";
             const method = "info";
             return BramblRequest({ route, method, id }, params, this);

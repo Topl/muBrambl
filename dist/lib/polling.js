@@ -8,10 +8,12 @@ const polling = (requests, txId, options) => {
         //Setting timeout thread to clear interval thread after timeout duration
         const timeoutID = setTimeout(function () {
             clearInterval(intervalID);
-            reject(new Error("Request timed out, transaction was not included in a block before expiration \n" + failureResponse));
+            reject(new Error("Request timed out, transaction was not included in a block before expiration \n" +
+                failureResponse));
         }, timeout * 1000);
         const intervalID = setInterval(function () {
-            requests.getTransactionById({ transactionId: txId })
+            requests
+                .getTransactionById({ transactionId: txId })
                 .then(
             // on fulfilled promise (when the transaction has been included in a block)
             function (response) {
@@ -28,12 +30,15 @@ const polling = (requests, txId, options) => {
             }, 
             // on rejected promise, see if ithe transaction can be found in the mempool
             function (response) {
-                failureResponse = response.error ? response.error.message : 'Uncaught exception';
-                requests.getTransactionFromMempool({ transactionId: txId })
+                failureResponse = response.error
+                    ? response.error.message
+                    : "Uncaught exception";
+                requests
+                    .getTransactionFromMempool({ transactionId: txId })
                     .then(
                 // on finding the tx in the mempool
                 function () {
-                    //console.debug('Transaction Pending')  
+                    //console.debug('Transaction Pending')
                     numFailedQueries = 0; // reset pending counter
                 }, 
                 // on rejected promise, increment the counter and reject if too many attepmts
@@ -45,8 +50,10 @@ const polling = (requests, txId, options) => {
                         clearTimeout(timeoutID);
                         throw new Error("Unable to find the transaction in the mempool");
                     }
-                }).catch((err) => reject(err));
-            }).catch((err) => reject(err));
+                })
+                    .catch((err) => reject(err));
+            })
+                .catch((err) => reject(err));
         }, interval * 1000);
     });
 };
