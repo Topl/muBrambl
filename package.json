@@ -11,11 +11,6 @@
     "license": "MPL-2.0",
     "description": "",
     "dependencies": {
-        "@types/blake2": "^4.0.0",
-        "@types/keccak": "^3.0.1",
-        "@types/node-fetch": "^2.5.7",
-        "@typescript-eslint/eslint-plugin": "^3.2.0",
-        "@typescript-eslint/parser": "^3.2.0",
         "assert": "^2.0.0",
         "base-58": "0.0.1",
         "blake2": "^4.0.0",
@@ -24,10 +19,15 @@
         "eslint": "^7.2.0",
         "keccak": "^3.0.0",
         "node-fetch": "^2.6.0",
-        "prettier": "^2.0.5",
         "typescript": "^3.9.5"
     },
     "devDependencies": {
+        "prettier": "^2.0.5",
+        "@types/blake2": "^4.0.0",
+        "@types/keccak": "^3.0.1",
+        "@types/node-fetch": "^2.5.7",
+        "@typescript-eslint/eslint-plugin": "^3.2.0",
+        "@typescript-eslint/parser": "^3.2.0",
         "chai": "^4.2.0",
         "dotenv": "^8.2.0",
         "eslint-config-prettier": "^6.11.0",
