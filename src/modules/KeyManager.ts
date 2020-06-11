@@ -18,6 +18,7 @@ import Base58 from "base-58";
 import keccakHash from "keccak";
 import * as curve25519 from "curve25519-js";
 import * as KeyManTypes from "../../types/interfaces/KeyManagerTypes";
+import { Key } from "../../types/interfaces/brambleTypes";
 
 // Default options for key generation as of 2020.01.25
 const defaultOptions = {
@@ -43,7 +44,7 @@ const defaultOptions = {
 //// Generic key methods //////////////////////////////////////////////////////////////////////////////////////////////
 
 // function for checking the type input as a callback
-function isFunction(f: Function): boolean {
+function isFunction(f: /*(any:any)=> any*/Function): boolean {
   return typeof f === "function";
 }
 
@@ -91,24 +92,9 @@ function encrypt(
   algo: string
 ): Buffer {
   if (!isCipherAvailable(algo)) throw new Error(algo + " is not available");
-  if (Buffer.isBuffer(key)) {
-    var keyBuff: any = key;
-  } else if (typeof key == "string") {
-    var keyBuff: any = str2buf(key);
-  } else {
-    throw new Error(key + " must be either a string or a buffer");
-  }
 
-  if (Buffer.isBuffer(plaintext)) {
-    var text: any = plaintext;
-  } else if (typeof plaintext == "string") {
-    var text: any = str2buf(plaintext);
-  } else {
-    throw new Error(plaintext + " must be either a string or a buffer");
-  }
-
-  const cipher = crypto.createCipheriv(algo, keyBuff, iv);
-  const ciphertext = cipher.update(text);
+  const cipher = crypto.createCipheriv(algo, str2buf(key), iv);
+  const ciphertext = cipher.update(str2buf(plaintext));
   return Buffer.concat([ciphertext, cipher.final()]);
 }
 
@@ -142,7 +128,10 @@ function decrypt(
  * @param {Buffer|string} ciphertext Text encrypted with secret key.
  * @return {string} Base58-encoded MAC.
  */
-function getMAC(derivedKey: string | Buffer, ciphertext: Buffer | string) {
+function getMAC(
+  derivedKey: string | Buffer,
+  ciphertext: Buffer | string
+): Buffer {
   const keccak256 = (msg: any) => keccakHash("keccak256").update(msg).digest();
   return keccak256(
     Buffer.concat([str2buf(derivedKey).slice(16, 32), str2buf(ciphertext)])
@@ -159,7 +148,10 @@ function getMAC(derivedKey: string | Buffer, ciphertext: Buffer | string) {
  * @return {Object} Keys, IV and salt.
  */
 
-function create(params: KeyManTypes.paramsCreate, cb?: Function) {
+function create(
+  params: KeyManTypes.paramsCreate,
+  cb?: (arg: KeyManTypes.KeyGen) => any
+): KeyManTypes.KeyGen | undefined {
   const keyBytes = params.keyBytes;
   const ivBytes = params.ivBytes;
 
@@ -214,8 +206,8 @@ function deriveKey(
   password: string,
   salt: Buffer | string,
   kdfParams: KeyManTypes.KdfParams,
-  cb?: Function
-) {
+  cb?: (cryptoBuffer: Buffer) => any
+): Buffer | undefined {
   if (typeof password === "undefined" || password === null || !salt) {
     throw new Error("Must provide password and salt to derive a key");
   }
@@ -273,7 +265,7 @@ function deriveKey2(
   password: string,
   salt: Buffer | string,
   kdfParams: KeyManTypes.KdfParams
-) {
+): Buffer {
   if (typeof password === "undefined" || password === null || !salt) {
     throw new Error("Must provide password and salt to derive a key");
   }
@@ -311,7 +303,7 @@ function marshal(
   salt: Buffer,
   iv: Buffer,
   algo: string
-) {
+): KeyManTypes.DeriveKey {
   // encrypt using last 16 bytes of derived key (this matches Bifrost)
   const ciphertext = encrypt(keyObject.privateKey, derivedKey, iv, algo);
 
@@ -345,8 +337,8 @@ function dump(
   password: string,
   keyObject: any,
   options: KeyManTypes.Options,
-  cb?: Function
-) {
+  cb?: (marshal: KeyManTypes.DeriveKey) => KeyManTypes.DeriveKey
+): KeyManTypes.DeriveKey | undefined {
   const kdfParams = options.kdfParams || options.scrypt;
   const salt = keyObject.salt;
   const privateKey = keyObject.privateKey;
@@ -399,8 +391,8 @@ function recover(
   password: string,
   keyStorage: KeyManTypes.KeyStorage,
   kdfParams: KeyManTypes.KdfParams,
-  cb?: Function
-) {
+  cb?: (decryptedBuffer: Buffer) => any
+): Buffer | undefined {
   // verify that message authentication codes match, then decrypt
   function verifyAndDecrypt(
     derivedKey: Buffer | string,
@@ -456,7 +448,7 @@ function recover(
  * @param {String} publicKey Topl address.
  * @return {string} Keystore filename.
  */
-function generateKeystoreFilename(publicKey: string) {
+function generateKeystoreFilename(publicKey: string): string {
   if (typeof publicKey !== "string")
     throw new Error("PublicKey must be given as a string for the filename");
   const filename = new Date().toISOString() + "-" + publicKey + ".json";
@@ -552,8 +544,8 @@ class KeyManager {
     publicKey: Buffer | string,
     message: string,
     signature: Buffer | string,
-    cb?: Function
-  ) {
+    cb?: (curve: boolean) => any
+  ): boolean | undefined {
     const pk = str2buf(publicKey);
     const msg = str2buf(message, "utf8");
     const sig = signature;
