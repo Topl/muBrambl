@@ -1,4 +1,4 @@
 export default interface HashType {
-  end: () => any;
-  read: () => any;
+    end: () => any;
+    read: () => any;
 }

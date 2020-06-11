@@ -1,1 +1,1 @@
-declare module "curve25519-js";
+declare module 'curve25519-js';
