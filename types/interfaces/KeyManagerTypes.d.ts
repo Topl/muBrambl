@@ -15,8 +15,8 @@ export interface ConstructorParams {
   keyPath: string;
 }
 export interface KeyObject {
-  publicKey: string;
-  privateKey: string;
+  publicKey: string | Buffer;
+  privateKey: string | Buffer;
 }
 export interface Options {
   kdfParams: KdfParams;
@@ -30,8 +30,8 @@ interface Crypto {
   kdfSalt: string;
   kdsfSalt: string;
   cipherText: string;
-  mac: Uint8Array;
-  cipher: Buffer;
+  mac: string;
+  cipher: string;
   cipherParams: CipherParams;
 }
 export interface KeyStorage {
