@@ -1,4 +1,4 @@
-import { pollingRequests, pollingOptions } from '../../types/interfaces/pollingTypes';
+import { pollingRequests, pollingOptions } from '../../types/pollingTypes';
 
 const polling = (requests: pollingRequests, txId: string, options: pollingOptions) => {
     const { timeout, interval, maxFailedQueries } = options;

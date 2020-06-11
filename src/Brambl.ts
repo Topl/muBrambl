@@ -16,8 +16,8 @@ import Hash from './utils/Hash';
 
 // Libraries
 import pollTx from './lib/polling';
-import { Params, PrototypeTx, Options, Key } from '../types/interfaces/brambleTypes';
-import { ConstructorParams } from '../types/interfaces/KeyManagerTypes';
+import { Params, PrototypeTx, Options, Key } from '../types/brambleTypes';
+import { ConstructorParams } from '../types/KeyManagerTypes';
 
 // Constants definitions
 const validTxMethods = ['createAssetsPrototype', 'transferAssetsPrototype', 'transferTargetAssetsPrototype'];

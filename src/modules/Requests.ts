@@ -10,7 +10,7 @@
 
 // Dependencies
 import fetch, { HeadersInit } from 'node-fetch';
-import * as ReqTypes from '../../types/interfaces/RequestsTypes';
+import * as ReqTypes from '../../types/RequestsTypes';
 
 /**
  * General builder function for formatting API request
