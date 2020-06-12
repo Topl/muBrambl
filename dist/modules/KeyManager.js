@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 /**
  * Create, import, and export Topl Bifrost keys.
  * Also allows for signing of transactions
@@ -7,72 +7,51 @@
  * Based on the keythereum library from Jack Peterson
  * https://github.com/Ethereumjs/keythereum
  */
-var __createBinding =
-    (this && this.__createBinding) ||
-    (Object.create
-        ? function (o, m, k, k2) {
-              if (k2 === undefined) k2 = k;
-              Object.defineProperty(o, k2, {
-                  enumerable: true,
-                  get: function () {
-                      return m[k];
-                  },
-              });
-          }
-        : function (o, m, k, k2) {
-              if (k2 === undefined) k2 = k;
-              o[k2] = m[k];
-          });
-var __setModuleDefault =
-    (this && this.__setModuleDefault) ||
-    (Object.create
-        ? function (o, v) {
-              Object.defineProperty(o, 'default', { enumerable: true, value: v });
-          }
-        : function (o, v) {
-              o['default'] = v;
-          });
-var __importStar =
-    (this && this.__importStar) ||
-    function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-var __classPrivateFieldSet =
-    (this && this.__classPrivateFieldSet) ||
-    function (receiver, privateMap, value) {
-        if (!privateMap.has(receiver)) {
-            throw new TypeError('attempted to set private field on non-instance');
-        }
-        privateMap.set(receiver, value);
-        return value;
-    };
-var __classPrivateFieldGet =
-    (this && this.__classPrivateFieldGet) ||
-    function (receiver, privateMap) {
-        if (!privateMap.has(receiver)) {
-            throw new TypeError('attempted to get private field on non-instance');
-        }
-        return privateMap.get(receiver);
-    };
-var __importDefault =
-    (this && this.__importDefault) ||
-    function (mod) {
-        return mod && mod.__esModule ? mod : { default: mod };
-    };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, privateMap, value) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to set private field on non-instance");
+    }
+    privateMap.set(receiver, value);
+    return value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, privateMap) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to get private field on non-instance");
+    }
+    return privateMap.get(receiver);
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var _sk, _isLocked, _password, _keyStorage;
 ('use strict');
 // Dependencies
-const fs_1 = __importDefault(require('fs'));
-const path_1 = __importDefault(require('path'));
-const blake2_1 = __importDefault(require('blake2'));
-const crypto_1 = __importDefault(require('crypto'));
-const base_58_1 = __importDefault(require('base-58'));
-const keccak_1 = __importDefault(require('keccak'));
-const curve25519 = __importStar(require('curve25519-js'));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const blake2_1 = __importDefault(require("blake2"));
+const crypto_1 = __importDefault(require("crypto"));
+const base_58_1 = __importDefault(require("base-58"));
+const keccak_1 = __importDefault(require("keccak"));
+const curve25519 = __importStar(require("curve25519-js"));
 // Default options for key generation as of 2020.01.25
 const defaultOptions = {
     // Symmetric cipher for private key encryption
@@ -128,7 +107,8 @@ function isCipherAvailable(cipher) {
  * @return {Buffer} Encrypted data.
  */
 function encrypt(plaintext, key, iv, algo) {
-    if (!isCipherAvailable(algo)) throw new Error(algo + ' is not available');
+    if (!isCipherAvailable(algo))
+        throw new Error(algo + ' is not available');
     const cipher = crypto_1.default.createCipheriv(algo, str2buf(key), iv);
     const ciphertext = cipher.update(str2buf(plaintext));
     return Buffer.concat([ciphertext, cipher.final()]);
@@ -142,7 +122,8 @@ function encrypt(plaintext, key, iv, algo) {
  * @return {Buffer} Decrypted data.
  */
 function decrypt(ciphertext, key, iv, algo) {
-    if (!isCipherAvailable(algo)) throw new Error(algo + ' is not available');
+    if (!isCipherAvailable(algo))
+        throw new Error(algo + ' is not available');
     const decipher = crypto_1.default.createDecipheriv(algo, str2buf(key), iv);
     const plaintext = decipher.update(str2buf(ciphertext));
     return Buffer.concat([plaintext, decipher.final()]);
@@ -190,10 +171,12 @@ function create(params, cb) {
             crypto_1.default.randomBytes(keyBytes + ivBytes + keyBytes, function (randomBytes) {
                 cb(curve25519KeyGen(randomBytes));
             });
-        } else {
+        }
+        else {
             return curve25519KeyGen(crypto_1.default.randomBytes(keyBytes + ivBytes + keyBytes));
         }
-    } else {
+    }
+    else {
         return curve25519KeyGen(crypto_1.default.randomBytes(keyBytes + ivBytes + keyBytes));
     }
 }
@@ -234,15 +217,14 @@ function deriveKey(password, salt, kdfParams, cb) {
                 p,
                 maxmem,
             });
-        } else {
-            cb(
-                crypto_1.default.scryptSync(str2buf(password, 'utf8'), str2buf(salt), dkLen, {
-                    N,
-                    r,
-                    p,
-                    maxmem,
-                }),
-            );
+        }
+        else {
+            cb(crypto_1.default.scryptSync(str2buf(password, 'utf8'), str2buf(salt), dkLen, {
+                N,
+                r,
+                p,
+                maxmem,
+            }));
         }
     }
 }
@@ -313,17 +295,13 @@ function dump(password, keyObject, options, cb) {
             return marshal(key, { privateKey, publicKey }, salt, iv, options.cipher);
         }
         // asynchronous if callback provided
-        deriveKey(
-            password,
-            salt,
-            kdfParams,
-            function (derivedKey) {
-                if (cb !== undefined) {
-                    cb(marshal(derivedKey, { privateKey, publicKey }, salt, iv, options.cipher));
-                }
-            }.bind(this),
-        );
-    } else {
+        deriveKey(password, salt, kdfParams, function (derivedKey) {
+            if (cb !== undefined) {
+                cb(marshal(derivedKey, { privateKey, publicKey }, salt, iv, options.cipher));
+            }
+        }.bind(this));
+    }
+    else {
         return marshal(key, { privateKey, publicKey }, salt, iv, options.cipher);
     }
 }
@@ -341,7 +319,8 @@ function recover(password, keyStorage, kdfParams, cb) {
         if (!getMAC(derivedKey, ciphertext).equals(mac)) {
             throw new Error('message authentication code mismatch');
         }
-        if (!isCipherAvailable(algo)) throw new Error(algo + ' is not available');
+        if (!isCipherAvailable(algo))
+            throw new Error(algo + ' is not available');
         return decrypt(ciphertext, derivedKey, str2buf(iv), algo);
     }
     const iv = str2buf(keyStorage.crypto.cipherParams.iv);
@@ -353,14 +332,16 @@ function recover(password, keyStorage, kdfParams, cb) {
     if (cb) {
         if (!isFunction(cb)) {
             return verifyAndDecrypt(deriveKey2(password, salt, kdfParams), iv, ciphertext, mac, algo);
-        } else {
+        }
+        else {
             deriveKey(password, salt, kdfParams, (derivedKey) => {
                 if (cb !== undefined) {
                     cb(verifyAndDecrypt(derivedKey, iv, ciphertext, mac, algo));
                 }
             });
         }
-    } else {
+    }
+    else {
         return verifyAndDecrypt(deriveKey2(password, salt, kdfParams), iv, ciphertext, mac, algo);
     }
 }
@@ -370,7 +351,8 @@ function recover(password, keyStorage, kdfParams, cb) {
  * @return {string} Keystore filename.
  */
 function generateKeystoreFilename(publicKey) {
-    if (typeof publicKey !== 'string') throw new Error('PublicKey must be given as a string for the filename');
+    if (typeof publicKey !== 'string')
+        throw new Error('PublicKey must be given as a string for the filename');
     const filename = new Date().toISOString() + '-' + publicKey + '.json';
     return filename.split(':').join('-');
 }
@@ -421,10 +403,12 @@ class KeyManager {
         if (params.keyPath) {
             try {
                 importFromFile(params.keyPath, params.password);
-            } catch (err) {
+            }
+            catch (err) {
                 throw new Error('Error importing keyfile');
             }
-        } else {
+        }
+        else {
             // Will check if only a string was given and assume it is the password
             if (params.constructor === String) {
                 generateKey(params);
@@ -452,7 +436,8 @@ class KeyManager {
             if (cb !== undefined) {
                 cb(curve25519.verify(pk, msg, sig));
             }
-        } else {
+        }
+        else {
             return curve25519.verify(pk, msg, sig);
         }
         // asynchronous
@@ -465,7 +450,8 @@ class KeyManager {
     getKeyStorage() {
         if (__classPrivateFieldGet(this, _isLocked))
             throw new Error('Key manager is currently locked. Please unlock and try again.');
-        if (!this.pk) throw new Error('A key must be initialized before using this key manager');
+        if (!this.pk)
+            throw new Error('A key must be initialized before using this key manager');
         return __classPrivateFieldGet(this, _keyStorage);
     }
     /**
@@ -481,8 +467,10 @@ class KeyManager {
      * @memberof KeyManager
      */
     unlockKey(password) {
-        if (!__classPrivateFieldGet(this, _isLocked)) throw new Error('The key is already unlocked');
-        if (password !== __classPrivateFieldGet(this, _password)) throw new Error('Invalid password');
+        if (!__classPrivateFieldGet(this, _isLocked))
+            throw new Error('The key is already unlocked');
+        if (password !== __classPrivateFieldGet(this, _password))
+            throw new Error('Invalid password');
         __classPrivateFieldSet(this, _isLocked, false);
     }
     /**
@@ -516,6 +504,6 @@ class KeyManager {
         return outpath;
     }
 }
-(_sk = new WeakMap()), (_isLocked = new WeakMap()), (_password = new WeakMap()), (_keyStorage = new WeakMap());
+_sk = new WeakMap(), _isLocked = new WeakMap(), _password = new WeakMap(), _keyStorage = new WeakMap();
 module.exports = KeyManager;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
