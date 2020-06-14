@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "test": "mocha",
+        "build": "webpack --config webpack.config.js",
         "lint": "eslint '*/**/*.{js, ts,tsx}' --quiet --fix"
     },
     "author": "topl",
@@ -14,24 +15,29 @@
         "assert": "^2.0.0",
         "base-58": "0.0.1",
         "blake2": "^4.0.0",
+        "blake2b": "^2.1.3",
         "canonicalize": "^1.0.1",
+        "cross-fetch": "^3.0.4",
+        "crypto-browserify": "^3.12.0",
         "curve25519-js": "0.0.4",
-        "eslint": "^7.2.0",
         "keccak": "^3.0.0",
-        "node-fetch": "^2.6.0",
-        "typescript": "^3.9.5"
+        "scrypt-js": "^3.0.1"
     },
     "devDependencies": {
-        "prettier": "^2.0.5",
+        "typescript": "^3.9.5",
+        "ts-loader": "^7.0.5",
+        "eslint": "^7.2.0",
         "@types/blake2": "^4.0.0",
         "@types/keccak": "^3.0.1",
-        "@types/node-fetch": "^2.5.7",
         "@typescript-eslint/eslint-plugin": "^3.2.0",
         "@typescript-eslint/parser": "^3.2.0",
         "chai": "^4.2.0",
         "dotenv": "^8.2.0",
         "eslint-config-prettier": "^6.11.0",
         "eslint-plugin-prettier": "^3.1.3",
-        "mocha": "^7.2.0"
+        "mocha": "^7.2.0",
+        "prettier": "^2.0.5",
+        "webpack": "^4.43.0",
+        "webpack-cli": "^3.3.11"
     }
 }
