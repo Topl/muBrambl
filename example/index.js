@@ -1,4 +1,4 @@
-const brambl = new BramblJS({
+const brambljs = new BramblJS({
     Requests: {
         url: 'https://valhalla.torus.topl.co/',
         apiKey: 'Ku6v7NUyFFFkhqN5',
@@ -8,5 +8,14 @@ const brambl = new BramblJS({
         //keyPath: './keystore/itGuy.json'
     },
 });
-// var h = brambl.keyManager.getKeyStorage();
-// console.log(h);
+
+const createParams = {
+    issuer: brambljs.keyManager.pk,
+    assetCode: 'test-' + Date.now(),
+    recipient: brambljs.keyManager.pk,
+    amount: 1,
+    fee: 1,
+};
+brambljs.transaction('createAssetsPrototype', createParams).then((response) => {
+    console.log(response);
+});

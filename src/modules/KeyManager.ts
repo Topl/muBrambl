@@ -11,14 +11,12 @@
 
 // Dependencies
 
-import path from 'path';
-
 import blake2 from 'blake2b';
 import crypto from 'crypto';
 import Base58 from 'base-58';
 import keccakHash from 'keccak';
 import * as curve25519 from 'curve25519-js';
-import * as KeyManTypes from '../../types/KeyManagerTypes';
+import * as KeyManTypes from './KeyManager.d';
 import scrypt from 'scrypt-js';
 
 // Default options for key generation as of 2020.01.25

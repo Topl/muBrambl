@@ -11,7 +11,7 @@
 // Dependencies
 // import { HeadersInit } from 'node-fetch';
 import fetch from 'cross-fetch';
-import * as ReqTypes from '../../types/RequestsTypes';
+import * as ReqTypes from './Requests.d';
 
 // const bindFetch = typeof fetch == 'function' && typeof window != 'undefined' ? fetch.bind(window)
 /**
@@ -96,7 +96,7 @@ class Requests {
         this.headers = {
             'Content-Type': 'application/json',
             'x-api-key': apiKey,
-            'Access-Control-Allow-Origin': '*',
+            // 'Access-Control-Allow-Origin': '*',
         };
     }
 

@@ -15,8 +15,8 @@ import KeyManager from './modules/KeyManager';
 
 // Libraries
 import pollTx from './lib/polling';
-import { Params, PrototypeTx, Options, Key } from '../types/brambleTypes';
-import { ConstructorParams } from '../types/KeyManagerTypes';
+import { Params, PrototypeTx, Options, Key } from './Bramble.d';
+import { ConstructorParams } from './modules/KeyManager.d';
 
 // Constants definitions
 const validTxMethods = ['createAssetsPrototype', 'transferAssetsPrototype', 'transferTargetAssetsPrototype'];
