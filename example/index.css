@@ -1,0 +1,12 @@
+div.six.wide.column {
+    background-color: aliceblue;
+}
+
+button.ui.button {
+    display: block;
+    margin: 20px auto;
+}
+
+button.ui.mini {
+    padding: 3px
+}
