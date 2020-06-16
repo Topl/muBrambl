@@ -12,7 +12,7 @@ export interface ConstructorParams {
     password: any;
     constants: any;
     constructor: any;
-    keyPath: string;
+    keyStore: Object;
 }
 export interface KeyObject {
     publicKey: string | Buffer;

@@ -1,18 +1,18 @@
-// require('dotenv').config()
-// const BramblJS = require('../index')
-// const assert = require("assert")
+require('dotenv').config();
+const BramblJS = require('../index');
+const assert = require('assert');
 
-// const brambljs = new BramblJS({
-//     Requests: {
-//         url: 'https://valhalla.torus.topl.co/',
-//         apiKey: process.env.VALHALLA_KEY
-//     },
-//     KeyManager: {
-//         password: 'password',
-//         // keyPath: 'keyfile.json'
-//     }
-// })
-
+const brambljs = new BramblJS({
+    Requests: {
+        url: 'https://valhalla.torus.topl.co/',
+        apiKey: process.env.VALHALLA_KEY,
+    },
+    KeyManager: {
+        password: 'password',
+        // keyPath: 'keyfile.json'
+    },
+});
+brambljs.requests.generateKeyfile({ password: 'password' }).then(console.log);
 // describe("Requests Module", () => {
 
 //     it("should return a newly generated keyfile", done => {

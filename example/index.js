@@ -5,17 +5,32 @@ const brambljs = new BramblJS({
     },
     KeyManager: {
         password: 'password',
-        //keyPath: './keystore/itGuy.json'
+        keyStore: {
+            publicKeyId: 'Cc93BCQn31pAtpTMR4BDBPPEFLVKACbcJVNpTH9SJKfM',
+            crypto: {
+                cipher: 'aes-256-ctr',
+                cipherText: 'CP5EKt792bPgijmZ129nnVsi3LwL1rN98aNmexATTGx2',
+                cipherParams: { iv: 'QetaiStk9HwfkJAf6zmuQb' },
+                mac: '71DqsZdGTaS7kNPWDEFUg4XScDxVULzEFkHxhdMYeo8Q',
+                kdf: 'scrypt',
+                kdsfSalt: 'FoxVcL6TJnU8RMW8W8vacdhjS5RdvcqvmzvjtsunVQeN',
+            },
+        },
     },
 });
-
-const createParams = {
-    issuer: brambljs.keyManager.pk,
-    assetCode: 'test-' + Date.now(),
-    recipient: brambljs.keyManager.pk,
-    amount: 1,
-    fee: 1,
-};
-brambljs.transaction('createAssetsPrototype', createParams).then((response) => {
-    console.log(response);
+function copyToClipboard() {
+    var $temp = $('<input>');
+    $('body').append($temp);
+    $temp.val(brambljs.keyManager.pk).select();
+    document.execCommand('copy');
+    $temp.remove();
+}
+let miniButton = $('button.mini');
+miniButton.html("<i class='copy icon'></i>" + brambljs.keyManager.pk.substr(0, 5) + '...');
+miniButton.popup({
+    content: 'Copy text to clipboard',
+    on: 'hover',
+});
+miniButton.click(function () {
+    copyToClipboard();
 });

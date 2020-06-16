@@ -1,5 +1,5 @@
 interface KeyManager {
-    keyPath: string;
+    keyStore: any;
     password: any;
     constants: string;
     instance: any;

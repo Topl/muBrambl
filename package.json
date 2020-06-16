@@ -12,6 +12,7 @@
     "license": "MPL-2.0",
     "description": "",
     "dependencies": {
+        "@types/scrypt-async": "^1.3.1",
         "assert": "^2.0.0",
         "base-58": "0.0.1",
         "blake2": "^4.0.0",
@@ -21,6 +22,7 @@
         "crypto-browserify": "^3.12.0",
         "curve25519-js": "0.0.4",
         "keccak": "^3.0.0",
+        "scrypt-async": "^2.0.1",
         "scrypt-js": "^3.0.1"
     },
     "devDependencies": {
