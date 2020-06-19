@@ -8,7 +8,7 @@ To install from npm run `npm install --save mubrambl` in your project directory<
 
 To install from source:
 
--   Git clone using `git clone https://github.com/topl/BramblJS`
+-   Git clone using `git clone https://github.com/topl/muBrambl`
 -   Run `npm run install` within the cloned repo to install all dependencies
 
 # Usage
@@ -16,7 +16,7 @@ To install from source:
 To create a minimal instance of BramblJS in your application, include the following commands:<br/>
 
 ```
-const BramblJS = require('brambljs');
+const Brambl = require('mubrambl');
 const brambl = new BramblJS('PASSWORD')
 ```
 
@@ -28,7 +28,7 @@ BramblJS provides the following modules:
 -   `Requests` - sub-module for sending json-rpc requests to a specified chain provider.
 -   `KeyManager` - sub-module that provides functions for creating, importing, and exporting Bifrost compatible keyfiles.
 
-A brief overview of each module is given below but for a detailed descriptions of all available methods, please visit https://brambljs.docs.topl.co
+A brief overview of each module is given below
 
 ## Brambl
 
@@ -48,7 +48,7 @@ The `Requests` module is compliant with Bifrost's JSON-RPC interface documented 
 A new JSON-RPC interface class may be instantiated by <br/>
 
 ```
-const requests = BramblJS.Requests()
+const requests = Brambl.Requests()
 ```
 
 By default requests will be sent to `http://localhost:9085`. This is the standard address and API port that Bifrost listens on when launched locally. All of the methods available in this module are asynchronous and will return `Promises` that must be handled using `async/await` structures or `.then()`. For example:
@@ -68,7 +68,7 @@ The `KeyManager` module is compliant with Bifrost's Gjallarhorn Key Manager serv
 A new `KeyManager` may be created directly using<br/>
 
 ```
-const keyManager = BramblJS.KeyManager('PASSWORD')
+const keyManager = Brambl.KeyManager('PASSWORD')
 ```
 
 where `'PASSWORD'` is the user provided encryption password for the keyfile.
@@ -85,7 +85,7 @@ Below are examples for using the BramblJS library with a private testnet running
 ### Retrieving the timestamp of the latest block
 
 ```
-BramblJS.Requests().chainInfo().then(x => {
+Brambl.Requests().chainInfo().then(x => {
     const timestamp = new Date(x.result.bestBlock.timestamp)
     const blockHeight = x.result.height
     console.log('Block #' + blockHeight + ' forged at ' + timestamp)
@@ -95,13 +95,13 @@ BramblJS.Requests().chainInfo().then(x => {
 ### Importing a keyfile to a KeyManager instance
 
 ```
-const keyManager = BramblJS.KeyManager({ keyPath: '/path/to/file', password: 'encryption_password' })
+const keyManager = Brambl.KeyManager({ keyPath: '/path/to/file', password: 'encryption_password' })
 ```
 
 ### Issuing a `createAsset` transaction
 
 ```
-const brambl = new BramblJS('test')
+const brambl = new Brambl('test')
 
 const createParams = {
     issuer: brambl.keyManager.pk,
@@ -117,7 +117,7 @@ brambl.transaction('createAssetsPrototype', createParams).then(console.log)
 ### Creating and polling a `createAsset` transaction
 
 ```
-const brambl = new BramblJS('test')
+const brambl = new Brambl('test')
 
 const createParams = {
     issuer: brambl.keyManager.pk,
@@ -136,4 +136,4 @@ brambl.transaction('createAssetsPrototype', createParams)
 
 # License
 
-BramblJS is licensed under the [Mozilla Public License version 2.0 (MPL 2.0)](https://www.mozilla.org/en-US/MPL/2.0). A copy of this license may be found [here](../LICENSE.md)
+Brambl is licensed under the [Mozilla Public License version 2.0 (MPL 2.0)](https://www.mozilla.org/en-US/MPL/2.0). A copy of this license may be found [here](../LICENSE.md)
