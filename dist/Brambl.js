@@ -1,23 +1,29 @@
+"use strict";
 /**
  * @author James Aman (j.aman@topl.me)
  * @version 3.0.0
  * @date 2020.4.03
  **/
-
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 // Dependencies
-import base58 from 'base-58';
-
+const base_58_1 = __importDefault(require("base-58"));
 // Primary sub-modules
-import Requests from './modules/Requests';
-import KeyManager from './modules/KeyManager';
-
+const Requests_1 = __importDefault(require("./modules/Requests"));
+const KeyManager_1 = __importDefault(require("./modules/KeyManager"));
 // Utilities
-
 // Libraries
-import pollTx from './lib/polling';
-import { Params, PrototypeTx, Options, Key } from './Bramble.d';
-import { ConstructorParams } from './modules/KeyManager.d';
-
+const polling_1 = __importDefault(require("./lib/polling"));
 // Constants definitions
 const validTxMethods = [
     'createAssetsPrototype',
@@ -26,7 +32,6 @@ const validTxMethods = [
     'transferArbitsPrototype',
     'transferPolysPrototype',
 ];
-
 /**
  * @class Creates an instance of Brambl for interacting with the Topl protocol
  * @requires KeyManager
@@ -49,51 +54,45 @@ const validTxMethods = [
  * @param {string} [params.Requests.url] The chain provider to send requests to
  * @param {string} [params.Requests.apikey] Api key for authorizing access to the chain provider
  */
-
-const emptyKeyMan: any = {};
+const emptyKeyMan = {};
 class Brambl {
-    requests: any;
-    keyManager: KeyManager;
-    keyMan: any;
-
-    addSigToTx: (prototypeTx: PrototypeTx, userKeys: KeyManager) => any;
-    signAndBroadcast: (prototypeTx: PrototypeTx) => any;
-    transaction: (method: string, params: any) => any;
-    pollTx: (txId: string, options: Options) => any;
-    constructor(params: Params) {
-        this.keyMan = KeyManager;
+    constructor(params) {
+        this.keyMan = KeyManager_1.default;
         // default values for the constructor arguement
         const keyManagerVar = params.KeyManager || emptyKeyMan;
         const requestsVar = params.Requests || emptyKeyMan;
         // if only a string is given in the constructor, assume it is the password.
         // Therefore, target a local chain provider and make a new key
-        if (params.constructor === String) keyManagerVar.password = params;
+        if (params.constructor === String)
+            keyManagerVar.password = params;
         // Setup reqeusts object
         if (requestsVar.instance) {
             this.requests = requestsVar.instance;
-        } else if (requestsVar.url) {
-            this.requests = new Requests(requestsVar.url, requestsVar.apiKey);
-        } else {
-            this.requests = new Requests();
         }
-
+        else if (requestsVar.url) {
+            this.requests = new Requests_1.default(requestsVar.url, requestsVar.apiKey);
+        }
+        else {
+            this.requests = new Requests_1.default();
+        }
         // Setup KeyManager object
-        if (!keyManagerVar.password) throw new Error('An encryption password is required to open a keyfile');
+        if (!keyManagerVar.password)
+            throw new Error('An encryption password is required to open a keyfile');
         if (keyManagerVar.instance) {
             this.keyManager = keyManagerVar.instance;
-        } else if (keyManagerVar.keyStore) {
-            this.keyManager = new KeyManager({
+        }
+        else if (keyManagerVar.keyStore) {
+            this.keyManager = new KeyManager_1.default({
                 password: keyManagerVar.password,
                 keyStore: keyManagerVar.keyStore,
                 constants: keyManagerVar.constants,
             });
-        } else {
-            this.keyManager = new KeyManager(keyManagerVar.password);
         }
-
+        else {
+            this.keyManager = new KeyManager_1.default(keyManagerVar.password);
+        }
         // Import utilities
     }
-
     /**
      * Method for creating a separate Requests instance
      * @static
@@ -102,10 +101,9 @@ class Brambl {
      * @param {string} [apiKey="topl_the_world!"] Access key for authorizing requests to the client API
      * @memberof Brambl
      */
-    static Requests(url: string, apiKey: string) {
-        return new Requests(url, apiKey);
+    static Requests(url, apiKey) {
+        return new Requests_1.default(url, apiKey);
     }
-
     /**
      * Method for creating a separate KeyManager instance
      * @static
@@ -116,13 +114,13 @@ class Brambl {
      * @param {object} [params.constants] default encryption options for storing keyfiles
      * @memberof Brambl
      */
-    static KeyManager(params: ConstructorParams) {
-        return new KeyManager(params);
+    static KeyManager(params) {
+        return new KeyManager_1.default(params);
     }
 }
-/**  
+/**
  * Add a signature to a prototype transaction using the an unlocked key manager object
- * 
+ *
  * @param {object} prototypeTx An unsigned transaction JSON object
  * @param {object|object[]} userKeys A keyManager object containing the user's key (may be an array)
 
@@ -132,40 +130,38 @@ class Brambl {
  *
  * @param {object} prototypeTx An unsigned transaction JSON object
  */
-
-Brambl.prototype.addSigToTx = async function (prototypeTx: PrototypeTx, userKeys: KeyManager) {
-    // function for generating a signature in the correct format
-    const genSig = (keys: Array<any>, txBytes: any) => {
-        return Object.fromEntries(keys.map((key: Key) => [key.pk, base58.encode(key.sign(txBytes))]));
-    };
-
-    // in case a single given is given not as an array
-    const keys = Array.isArray(userKeys) ? userKeys : [userKeys];
-
-    // add signatures of all given key files to the formatted transaction
-    return {
-        ...prototypeTx.formattedTx,
-        signatures: genSig(keys, base58.decode(prototypeTx.messageToSign)),
-    };
-};
-Brambl.prototype.signAndBroadcast = async function (prototypeTx: PrototypeTx) {
-    const formattedTx = await this.addSigToTx(prototypeTx, this.keyManager);
-
-    return this.requests.broadcastTx({ tx: formattedTx }).catch((e: string) => {
-        console.error(e);
-        throw e;
+Brambl.prototype.addSigToTx = function (prototypeTx, userKeys) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // function for generating a signature in the correct format
+        const genSig = (keys, txBytes) => {
+            return Object.fromEntries(keys.map((key) => [key.pk, base_58_1.default.encode(key.sign(txBytes))]));
+        };
+        // in case a single given is given not as an array
+        const keys = Array.isArray(userKeys) ? userKeys : [userKeys];
+        // add signatures of all given key files to the formatted transaction
+        return Object.assign(Object.assign({}, prototypeTx.formattedTx), { signatures: genSig(keys, base_58_1.default.decode(prototypeTx.messageToSign)) });
     });
 };
-
+Brambl.prototype.signAndBroadcast = function (prototypeTx) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const formattedTx = yield this.addSigToTx(prototypeTx, this.keyManager);
+        return this.requests.broadcastTx({ tx: formattedTx }).catch((e) => {
+            console.error(e);
+            throw e;
+        });
+    });
+};
 /**
  * Create a new transaction, then sign and broadcast
  *
  * @param {string} method The chain resource method to create a transaction for
  */
-Brambl.prototype.transaction = async function (method: string, params: any) {
-    if (!validTxMethods.includes(method)) throw new Error('Invalid transaction method');
-
-    return this.requests[method](params).then((res: { result: any }) => this.signAndBroadcast(res.result));
+Brambl.prototype.transaction = function (method, params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!validTxMethods.includes(method))
+            throw new Error('Invalid transaction method');
+        return this.requests[method](params).then((res) => this.signAndBroadcast(res.result));
+    });
 };
 /**
  * A function to initiate polling of the chain provider for a specified transaction.
@@ -180,8 +176,10 @@ Brambl.prototype.transaction = async function (method: string, params: any) {
  * @param {number} [options.interval] The interval (in seconds) between attempts
  * @param {number} [options.maxFailedQueries] The maximum number of consecutive failures (to find the unconfirmed transaction) before ending the poll execution
  */
-Brambl.prototype.pollTx = async function (txId: string, options: Options) {
-    const opts = options || { timeout: 90, interval: 3, maxFailedQueries: 10 };
-    return pollTx(this.requests, txId, opts);
+Brambl.prototype.pollTx = function (txId, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const opts = options || { timeout: 90, interval: 3, maxFailedQueries: 10 };
+        return polling_1.default(this.requests, txId, opts);
+    });
 };
-export = Brambl;
+module.exports = Brambl;
