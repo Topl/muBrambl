@@ -102,6 +102,7 @@ function decrypt(ciphertext: string | Buffer, key: string | Buffer, iv: Buffer, 
 
     const decipher = crypto.createDecipheriv(algo, str2buf(key), iv);
     const plaintext = decipher.update(str2buf(ciphertext));
+
     return Buffer.concat([plaintext, decipher.final()]);
 }
 
@@ -351,6 +352,7 @@ function recover(
 
         return decrypt(ciphertext, derivedKey, str2buf(iv), algo);
     }
+
     const iv = str2buf(keyStorage.crypto.cipherParams.iv);
 
     const salt = str2buf(keyStorage.crypto.kdsfSalt);

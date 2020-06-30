@@ -133,11 +133,19 @@ class Brambl {
 Brambl.prototype.addSigToTx = function (prototypeTx, userKeys) {
     return __awaiter(this, void 0, void 0, function* () {
         // function for generating a signature in the correct format
+        // console.log(prototypeTx);
+        // prototypeTx.messageToSign = '8qg1r5cmNWdHZtjbNyxP2e2k96AdeVeAdQUfryxG8e4U';
         const genSig = (keys, txBytes) => {
+            console.log(txBytes);
             return Object.fromEntries(keys.map((key) => [key.pk, base_58_1.default.encode(key.sign(txBytes))]));
         };
         // in case a single given is given not as an array
         const keys = Array.isArray(userKeys) ? userKeys : [userKeys];
+        console.log('keys');
+        console.log(keys);
+        console.log(prototypeTx.messageToSign);
+        console.log(prototypeTx);
+        console.log(base_58_1.default.decode(prototypeTx.messageToSign));
         // add signatures of all given key files to the formatted transaction
         return Object.assign(Object.assign({}, prototypeTx.formattedTx), { signatures: genSig(keys, base_58_1.default.decode(prototypeTx.messageToSign)) });
     });
@@ -145,6 +153,7 @@ Brambl.prototype.addSigToTx = function (prototypeTx, userKeys) {
 Brambl.prototype.signAndBroadcast = function (prototypeTx) {
     return __awaiter(this, void 0, void 0, function* () {
         const formattedTx = yield this.addSigToTx(prototypeTx, this.keyManager);
+        console.log(formattedTx);
         return this.requests.broadcastTx({ tx: formattedTx }).catch((e) => {
             console.error(e);
             throw e;
@@ -160,6 +169,9 @@ Brambl.prototype.transaction = function (method, params) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!validTxMethods.includes(method))
             throw new Error('Invalid transaction method');
+        if (method === 'transferArbitsPrototype' || method == 'transferPolysPrototype') {
+            return this.requests[method](params);
+        }
         return this.requests[method](params).then((res) => this.signAndBroadcast(res.result));
     });
 };

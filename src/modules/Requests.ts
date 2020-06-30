@@ -52,8 +52,7 @@ async function BramblRequest(
             headers: headers,
             body: JSON.stringify(body),
         };
-        console.log(body);
-        console.log(await (await fetch(payload.url, payload)).json());
+
         // we have to await here because we don't have to evaluate whether the node returned an error
         const response = await (await fetch(payload.url, payload)).json();
         if (response.error) throw response.error;

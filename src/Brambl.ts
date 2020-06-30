@@ -135,12 +135,19 @@ class Brambl {
 
 Brambl.prototype.addSigToTx = async function (prototypeTx: PrototypeTx, userKeys: KeyManager) {
     // function for generating a signature in the correct format
+    // console.log(prototypeTx);
+    // prototypeTx.messageToSign = '8qg1r5cmNWdHZtjbNyxP2e2k96AdeVeAdQUfryxG8e4U';
     const genSig = (keys: Array<any>, txBytes: any) => {
+        console.log(txBytes);
         return Object.fromEntries(keys.map((key: Key) => [key.pk, base58.encode(key.sign(txBytes))]));
     };
-
     // in case a single given is given not as an array
     const keys = Array.isArray(userKeys) ? userKeys : [userKeys];
+    console.log('keys');
+    console.log(keys);
+    console.log(prototypeTx.messageToSign);
+    console.log(prototypeTx);
+    console.log(base58.decode(prototypeTx.messageToSign));
 
     // add signatures of all given key files to the formatted transaction
     return {
@@ -150,7 +157,7 @@ Brambl.prototype.addSigToTx = async function (prototypeTx: PrototypeTx, userKeys
 };
 Brambl.prototype.signAndBroadcast = async function (prototypeTx: PrototypeTx) {
     const formattedTx = await this.addSigToTx(prototypeTx, this.keyManager);
-
+    console.log(formattedTx);
     return this.requests.broadcastTx({ tx: formattedTx }).catch((e: string) => {
         console.error(e);
         throw e;
@@ -164,7 +171,9 @@ Brambl.prototype.signAndBroadcast = async function (prototypeTx: PrototypeTx) {
  */
 Brambl.prototype.transaction = async function (method: string, params: any) {
     if (!validTxMethods.includes(method)) throw new Error('Invalid transaction method');
-
+    if (method === 'transferArbitsPrototype' || method == 'transferPolysPrototype') {
+        return this.requests[method](params);
+    }
     return this.requests[method](params).then((res: { result: any }) => this.signAndBroadcast(res.result));
 };
 /**

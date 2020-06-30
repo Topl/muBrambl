@@ -56,8 +56,6 @@ function BramblRequest(routeInfo, params, fields, self) {
                 headers: headers,
                 body: JSON.stringify(body),
             };
-            console.log(body);
-            console.log(yield (yield cross_fetch_1.default(payload.url, payload)).json());
             // we have to await here because we don't have to evaluate whether the node returned an error
             const response = yield (yield cross_fetch_1.default(payload.url, payload)).json();
             if (response.error)
