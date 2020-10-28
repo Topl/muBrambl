@@ -18,7 +18,7 @@ import keccakHash from 'keccak';
 import * as curve25519 from 'curve25519-js';
 import * as KeyManTypes from './KeyManager.d';
 import scrypt from 'scrypt-async';
-
+import * as bip39 from 'bip39';
 // Default options for key generation as of 2020.01.25
 const defaultOptions = {
     // Symmetric cipher for private key encryption
@@ -43,7 +43,7 @@ const defaultOptions = {
 //// Generic key methods //////////////////////////////////////////////////////////////////////////////////////////////
 
 // function for checking the type input as a callback
-function isFunction(f: /*(any:any)=> any*/ Function): boolean {
+function isFunction(f: (any: any) => any): boolean {
     return typeof f === 'function';
 }
 
@@ -59,6 +59,7 @@ function str2buf(str: string | Buffer, enc?: 'utf8' | 'hex' | 'base64'): Buffer 
     if (Buffer.isBuffer(str)) {
         return str;
     }
+    console.log(str);
     return enc ? Buffer.from(str, enc) : Buffer.from(Base58.decode(str));
 }
 
@@ -129,20 +130,17 @@ function getMAC(derivedKey: string | Buffer, ciphertext: Buffer | string): Buffe
  * @param {function=} cb Callback function (optional).
  * @return {Object} Keys, IV and salt.
  */
-
-function create(
-    params: KeyManTypes.paramsCreate,
-    cb?: (arg: KeyManTypes.KeyGen) => any,
-): KeyManTypes.KeyGen | undefined {
+function bifrostBlake2b(buffer: Buffer): Buffer {
+    return Buffer.from(blake2(32).update(buffer).digest());
+}
+function create(params: KeyManTypes.paramsCreate, cb?: (arg: KeyManTypes.KeyGen) => any): KeyManTypes.KeyGen {
     const keyBytes = params.keyBytes;
     const ivBytes = params.ivBytes;
 
-    function bifrostBlake2b(buffer: Buffer) {
-        return Buffer.from(blake2(32).update(buffer).digest());
-    }
-
     function curve25519KeyGen(randomBytes: Buffer): KeyManTypes.KeyGen {
         const { public: pk, private: sk1 } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
+        console.log(sk1);
+        console.log(pk);
         return {
             publicKey: Buffer.from(pk),
             privateKey: Buffer.from(sk1),
@@ -160,9 +158,8 @@ function create(
         } else {
             return curve25519KeyGen(crypto.randomBytes(keyBytes + ivBytes + keyBytes));
         }
-    } else {
-        return curve25519KeyGen(crypto.randomBytes(keyBytes + ivBytes + keyBytes));
     }
+    return curve25519KeyGen(crypto.randomBytes(keyBytes + ivBytes + keyBytes));
 }
 
 /**
@@ -285,7 +282,7 @@ function marshal(
 function dump(
     this: any,
     password: string,
-    keyObject: any,
+    keyObject: { publicKey: string | Buffer; privateKey: string | Buffer; iv: Buffer; salt: Buffer },
     options: KeyManTypes.Options,
     cb?: (marshal: KeyManTypes.DeriveKey) => KeyManTypes.DeriveKey,
 ): KeyManTypes.DeriveKey | undefined {
@@ -377,18 +374,6 @@ function recover(
     }
 }
 
-/**
- * Generate filename for a keystore file.
- * @param {String} publicKey Topl address.
- * @return {string} Keystore filename.
- */
-function generateKeystoreFilename(publicKey: string): string {
-    if (typeof publicKey !== 'string') throw new Error('PublicKey must be given as a string for the filename');
-    const filename = new Date().toISOString() + '-' + publicKey + '.json';
-
-    return filename.split(':').join('-');
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///// Key Manager Class //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -407,6 +392,7 @@ class KeyManager {
     #keyStorage: any;
     pk: string;
     constants: any;
+    mnemonic: any;
     //// Instance constructor //////////////////////////////////////////////////////////////////////////////////////////////
     constructor(params: KeyManTypes.ConstructorParams) {
         // enforce that a password must be provided\
@@ -415,6 +401,7 @@ class KeyManager {
 
         // Initialize a key manager object with a key storage object
         const initKeyStorage = (keyStorage: any, password: string | Buffer) => {
+            console.log(keyStorage);
             this.pk = keyStorage.publicKeyId;
             this.#isLocked = false;
             this.#password = password;
@@ -423,12 +410,14 @@ class KeyManager {
                 this.#sk = recover(String(password), keyStorage, this.constants.scrypt);
             }
         };
+
         const generateKey = (password: any) => {
+            // console.log(dump(password, create(this.constants), this.constants));
             initKeyStorage(dump(password, create(this.constants), this.constants), password);
         };
 
         // Imports key data object from keystore JSON file.
-        const importKeystore = (keyStore: Object, password: Buffer | string) => {
+        const importKeystore = (keyStore: Record<string, unknown>, password: Buffer | string) => {
             const keyStorage = keyStore;
 
             // todo - check that the imported object conforms to our definition of a keyfile
@@ -448,6 +437,41 @@ class KeyManager {
             } catch (err) {
                 throw new Error('Error importing keyfile');
             }
+        } else if (params.mnemonic) {
+            try {
+                let pair: { public: string | Buffer; private: string | Buffer };
+
+                bip39.mnemonicToSeed(params.mnemonic).then((seed) => {
+                    pair = curve25519.generateKeyPair(bifrostBlake2b(seed));
+
+                    console.log(pair.public);
+                    console.log(pair.private);
+
+                    initKeyStorage(
+                        dump(
+                            params.password,
+                            {
+                                publicKey: Buffer.from(pair.public),
+                                privateKey: Buffer.from(pair.private),
+                                iv: bifrostBlake2b(
+                                    crypto.randomBytes(
+                                        this.constants.keyBytes + this.constants.ivBytes + this.constants.keyBytes,
+                                    ),
+                                ).slice(0, this.constants.ivBytes),
+                                salt: bifrostBlake2b(
+                                    crypto.randomBytes(this.constants.keyBytes + this.constants.ivBytes),
+                                ),
+                            },
+                            this.constants,
+                        ),
+                        params.password,
+                    );
+                });
+            } catch (err) {
+                throw new Error('Invalid Mnemonic');
+            }
+
+            console.log(params.mnemonic);
         } else {
             // Will check if only a string was given and assume it is the password
             if (params.constructor === String) {
@@ -526,7 +550,7 @@ class KeyManager {
      * @return {Buffer=} signature
      * @memberof KeyManager
      */
-    sign(message: string) {
+    sign(message: string): Buffer | undefined {
         if (this.#isLocked) {
             throw new Error('The key is currently locked. Please unlock and try again.');
         }

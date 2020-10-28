@@ -9,10 +9,7 @@ export interface KdfParams {
     dkLen: number;
 }
 export interface ConstructorParams {
-    password: any;
-    constants: any;
-    constructor: any;
-    keyStore: Object;
+    [key: string]: any;
 }
 export interface KeyObject {
     publicKey: string | Buffer;
