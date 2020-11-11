@@ -59,7 +59,6 @@ function str2buf(str: string | Buffer, enc?: 'utf8' | 'hex' | 'base64'): Buffer 
     if (Buffer.isBuffer(str)) {
         return str;
     }
-    console.log(str);
     return enc ? Buffer.from(str, enc) : Buffer.from(Base58.decode(str));
 }
 
@@ -139,8 +138,6 @@ function create(params: KeyManTypes.paramsCreate, cb?: (arg: KeyManTypes.KeyGen)
 
     function curve25519KeyGen(randomBytes: Buffer): KeyManTypes.KeyGen {
         const { public: pk, private: sk1 } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
-        console.log(sk1);
-        console.log(pk);
         return {
             publicKey: Buffer.from(pk),
             privateKey: Buffer.from(sk1),
@@ -401,7 +398,6 @@ class KeyManager {
 
         // Initialize a key manager object with a key storage object
         const initKeyStorage = (keyStorage: any, password: string | Buffer) => {
-            console.log(keyStorage);
             this.pk = keyStorage.publicKeyId;
             this.#isLocked = false;
             this.#password = password;
@@ -412,7 +408,6 @@ class KeyManager {
         };
 
         const generateKey = (password: any) => {
-            // console.log(dump(password, create(this.constants), this.constants));
             initKeyStorage(dump(password, create(this.constants), this.constants), password);
         };
 
@@ -444,9 +439,6 @@ class KeyManager {
                 bip39.mnemonicToSeed(params.mnemonic).then((seed) => {
                     pair = curve25519.generateKeyPair(bifrostBlake2b(seed));
 
-                    console.log(pair.public);
-                    console.log(pair.private);
-
                     initKeyStorage(
                         dump(
                             params.password,
@@ -470,8 +462,6 @@ class KeyManager {
             } catch (err) {
                 throw new Error('Invalid Mnemonic');
             }
-
-            console.log(params.mnemonic);
         } else {
             // Will check if only a string was given and assume it is the password
             if (params.constructor === String) {
