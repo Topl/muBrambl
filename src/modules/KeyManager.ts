@@ -158,6 +158,34 @@ function create(params: KeyManTypes.paramsCreate, cb?: (arg: KeyManTypes.KeyGen)
     }
     return curve25519KeyGen(crypto.randomBytes(keyBytes + ivBytes + keyBytes));
 }
+function create2(
+    params: KeyManTypes.paramsCreate,
+    randomBytes: any,
+    cb?: (arg: KeyManTypes.KeyGen) => any,
+): KeyManTypes.KeyGen {
+    const keyBytes = params.keyBytes;
+    const ivBytes = params.ivBytes;
+
+    function curve25519KeyGen(randomBytes: Buffer): KeyManTypes.KeyGen {
+        const { public: pk, private: sk1 } = curve25519.generateKeyPair(bifrostBlake2b(randomBytes));
+        return {
+            publicKey: Buffer.from(pk),
+            privateKey: Buffer.from(sk1),
+            iv: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes + keyBytes)).slice(0, ivBytes),
+            salt: bifrostBlake2b(crypto.randomBytes(keyBytes + ivBytes)),
+        };
+    }
+    // synchronous key generation if callback not provided
+
+    if (cb) {
+        if (isFunction(cb)) {
+            cb(curve25519KeyGen(randomBytes));
+        } else {
+            return curve25519KeyGen(randomBytes);
+        }
+    }
+    return curve25519KeyGen(randomBytes);
+}
 
 /**
  * Derive secret key from password with key derivation function.
@@ -217,7 +245,6 @@ function deriveKey2(password: string, salt: Buffer | string, kdfParams: KeyManTy
     }
 
     // convert strings to Buffers
-
     // get scrypt parameters
     const dkLen = kdfParams.dkLen;
     const N = kdfParams.n;
@@ -387,9 +414,10 @@ class KeyManager {
     #isLocked: boolean;
     #password: string | KeyManTypes.ConstructorParams | Buffer;
     #keyStorage: any;
+    #seed: any;
     pk: string;
     constants: any;
-    mnemonic: any;
+    mnemonic: string;
     //// Instance constructor //////////////////////////////////////////////////////////////////////////////////////////////
     constructor(params: KeyManTypes.ConstructorParams) {
         // enforce that a password must be provided\
@@ -403,12 +431,17 @@ class KeyManager {
             this.#password = password;
             this.#keyStorage = keyStorage;
             if (this.pk) {
+                // this.#sk = recover(String(password), keyStorage, this.constants.scrypt);
                 this.#sk = recover(String(password), keyStorage, this.constants.scrypt);
             }
         };
 
         const generateKey = (password: any) => {
-            initKeyStorage(dump(password, create(this.constants), this.constants), password);
+            initKeyStorage(
+                dump(password, create2(this.constants, str2buf(this.#seed, 'hex')), this.constants),
+                password,
+            );
+            // initKeyStorage(dump(password, create(this.constants), this.constants), password);
         };
 
         // Imports key data object from keystore JSON file.
@@ -421,6 +454,7 @@ class KeyManager {
         };
 
         // initialize vatiables
+
         this.constants = params.constants || defaultOptions;
         initKeyStorage({ publicKeyId: '', crypto: {} }, Buffer.from(''));
 
@@ -433,42 +467,21 @@ class KeyManager {
                 throw new Error('Error importing keyfile');
             }
         } else if (params.mnemonic) {
-            try {
-                let pair: { public: string | Buffer; private: string | Buffer };
-
-                bip39.mnemonicToSeed(params.mnemonic).then((seed) => {
-                    pair = curve25519.generateKeyPair(bifrostBlake2b(seed));
-
-                    initKeyStorage(
-                        dump(
-                            params.password,
-                            {
-                                publicKey: Buffer.from(pair.public),
-                                privateKey: Buffer.from(pair.private),
-                                iv: bifrostBlake2b(
-                                    crypto.randomBytes(
-                                        this.constants.keyBytes + this.constants.ivBytes + this.constants.keyBytes,
-                                    ),
-                                ).slice(0, this.constants.ivBytes),
-                                salt: bifrostBlake2b(
-                                    crypto.randomBytes(this.constants.keyBytes + this.constants.ivBytes),
-                                ),
-                            },
-                            this.constants,
-                        ),
-                        params.password,
-                    );
-                });
-            } catch (err) {
-                throw new Error('Invalid Mnemonic');
-            }
+            const seed = bip39.mnemonicToEntropy(params.mnemonic);
+            this.#seed = seed;
+            generateKey(params.password);
         } else {
             // Will check if only a string was given and assume it is the password
+            const keyBytes = this.constants.keyBytes;
+            const ivBytes = this.constants.ivBytes;
+            this.#seed = crypto.randomBytes(256 / 8);
+
+            this.mnemonic = bip39.entropyToMnemonic(this.#seed);
             if (params.constructor === String) {
                 generateKey(params);
+            } else {
+                generateKey(params.password);
             }
-
-            generateKey(params);
         }
     }
 
