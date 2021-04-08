@@ -81,6 +81,11 @@ class Brambl {
                 keyStore: keyManagerVar.keyStore,
                 constants: keyManagerVar.constants,
             });
+        } else if (keyManagerVar.mnemonic) {
+            this.keyManager = new KeyManager({
+                mnemonic: keyManagerVar.mnemonic,
+                password: keyManagerVar.password,
+            });
         } else {
             this.keyManager = new KeyManager(keyManagerVar.password);
         }

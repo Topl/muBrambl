@@ -1,8 +1,10 @@
 interface KeyManager {
+    [x: string]: any;
     keyStore: any;
     password: any;
     constants: string;
     instance: any;
+    mnemonic: any;
 }
 
 interface Requests {
